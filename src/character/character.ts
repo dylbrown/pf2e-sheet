@@ -136,7 +136,18 @@ export default class Character {
           break;
       }
       if (a.includes('Lore')) {
-        this.lore[a].proficiency = proficiency;
+        if (this.lore[a]) {
+          this.lore[a].proficiency = proficiency;
+        } else {
+          this.lore[a] = {
+            proficiency: proficiency,
+            total:
+              Number(proficiency) +
+              this.level +
+              Math.floor((this.scores[Score.Intelligence] - 10) / 2),
+            itemBonus: 0,
+          };
+        }
         continue;
       }
       const attr: Attribute = Object.values(Attribute).indexOf(
