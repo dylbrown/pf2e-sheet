@@ -109,6 +109,7 @@ export default class Character {
       const attr: Attribute = Object.values(Attribute).indexOf(
         a.replaceAll('_', '')
       ) as Attribute;
+      if ((attr as number) == -1) continue;
       switch (prof as string) {
         case 'T':
           this.attributes[attr].proficiency = Proficiency.Trained;
