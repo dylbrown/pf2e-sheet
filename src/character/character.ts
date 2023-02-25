@@ -96,9 +96,11 @@ export default class Character {
     this.hp = data.stats?.maxHP ?? 0;
     this.attributes[Attribute.Perception].total =
       data.stats?.totalPerception ?? 0;
-    const setAttribute = (k: string, v: number) =>
-      (this.attributes[Object.values(Attribute).indexOf(k) as Attribute].total =
-        v);
+    const setAttribute = (k: string, v: number) => {
+      if (k.includes('Lore')) return;
+      this.attributes[Object.values(Attribute).indexOf(k) as Attribute].total =
+        v;
+    };
     parseAndSet(data.stats?.totalSkills, 'Bonus', setAttribute);
     parseAndSet(data.stats?.totalSaves, 'Bonus', setAttribute);
 
