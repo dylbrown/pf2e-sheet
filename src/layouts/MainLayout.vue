@@ -3,6 +3,7 @@
     v-if="!ready"
     v-model="file"
     label="Pick one file"
+    accept=".guidechar"
     filled
     style="max-width: 300px"
     @update:model-value="(_$event) => load()"
