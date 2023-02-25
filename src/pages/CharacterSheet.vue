@@ -659,10 +659,10 @@ jQuery(() => {
   function checkRefresh() {
     setTimeout(function () {
       refresh();
-    }, 1000);
+    }, 100);
   }
-  window.matchMedia('print').addListener(refresh);
-  window.matchMedia('screen').addListener(refresh);
+  window.matchMedia('print').addEventListener('change', refresh);
+  window.matchMedia('screen').addEventListener('change', refresh);
   window.addEventListener('resize', checkRefresh);
 
   let inventoryGrid = jQuery('#inventory-grid');
