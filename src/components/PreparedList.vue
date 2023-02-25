@@ -21,7 +21,9 @@
       Slots
     </div>
     <template
-      v-for="[index, level] of Array.from(list.known.entries()).reverse()"
+      v-for="[index, level] of Array.from(list.known.entries())
+        .reverse()
+        .filter(([_, level]) => level.length > 0)"
       :key="index"
     >
       <div class="spells-level">

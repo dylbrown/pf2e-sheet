@@ -21,6 +21,7 @@ export enum Action {
   Three = '3',
   Free = 'F',
   Reaction = 'R',
+  None = '',
 }
 
 export enum Attribute {
@@ -110,6 +111,10 @@ export type Weapon = {
   name: string;
   attack: string;
   damage: string;
+  hands: number;
+  traits: string[];
+  range?: number;
+  reload?: number;
 };
 
 export type Ability = {
@@ -133,6 +138,19 @@ export type Item = {
 
 export type Spell = {
   name: string;
+  description: string;
+  cost: Action;
+  maxCost?: Action;
+  castTime: string;
+  components: Array<string>;
+  source: string;
+  traits: Array<string>;
+  requirements: string;
+  range: string;
+  area: string;
+  targets: string;
+  duration: string;
+  save: string;
 };
 
 export type SpellList = {
@@ -140,6 +158,8 @@ export type SpellList = {
   attack: number;
   dc: number;
   type: string;
+  tradition: string;
+  score: Score;
   known: Array<Array<Spell>>;
   slots: Array<number>;
   focus: Array<Spell>;

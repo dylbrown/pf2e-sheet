@@ -14,19 +14,20 @@
           <div class="label">Damage</div>
         </div>
         <div class="line" style="flex-grow: 0.5">
-          <div class="underlined weapon-info"><!--TODO: Hands--></div>
+          <div class="underlined weapon-info">{{ weapon.hands }}</div>
           <div class="label">Hands</div>
         </div>
-        <div class="line" v-if="false">
-          <div class="underlined weapon-info">
-            <!--TODO: Range-->
-            ft.
-          </div>
+        <div class="line" v-if="weapon.range">
+          <div class="underlined weapon-info">{{ weapon.range }} ft.</div>
           <div class="label">Range</div>
+        </div>
+        <div class="line" v-if="weapon.reload">
+          <div class="underlined weapon-info">{{ weapon.reload }}</div>
+          <div class="label">Reload</div>
         </div>
         <div class="line">
           <div class="underlined weapon-traits">
-            <!--TODO: Traits-->
+            {{ weapon.traits.join(', ') }}
           </div>
           <div class="label">Traits</div>
         </div>

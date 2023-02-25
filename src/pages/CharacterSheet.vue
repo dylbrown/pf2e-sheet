@@ -524,6 +524,26 @@
               </div>
             </div>
           </template>
+          <template
+            v-for="[name, lore] of Object.entries(character.lore)"
+            :key="name"
+          >
+            <div class="skill-label lore-label">{{ name }}</div>
+            <div class="line">
+              <div class="underlined-roll">
+                {{ signed(lore.total) }}
+              </div>
+            </div>
+            <div style="align-self: center; text-transform: uppercase">INT</div>
+            <ProficiencyDisplay :grid="false" :proficiency="lore.proficiency" />
+            <div class="line">
+              <div class="numBox">
+                <template v-if="lore.itemBonus != 0">{{
+                  lore.itemBonus
+                }}</template>
+              </div>
+            </div></template
+          >
         </div>
       </div>
     </div>

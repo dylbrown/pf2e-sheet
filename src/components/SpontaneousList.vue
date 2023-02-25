@@ -1,47 +1,62 @@
 <template>
   <div id="spells-spontaneous">
-    <div class="spells-title col-section-title">${listName} Spells</div>
+    <div class="spells-title col-section-title">{{ list.name }} Spells</div>
     <div class="spells-stats">
       <div class="rollLabel">Spell Attack</div>
       <div class="numBox rounded">
-        ${character.attributes.get(spellList.spellAttacksAttribute?lower_case,
-        listName).total?string.@s}
+        {{ list.attack }}
       </div>
       <div class="rollLabel">Spell DC</div>
       <div class="numBox rounded">
-        ${(10 + character.attributes.get(spellList.spellDCsAttribute?lower_case,
-        listName).total)?string}
+        {{ list.dc }}
       </div>
     </div>
     <div id="spells-spontaneous-grid">
-      [#list spellList.spellsKnown?reverse as levelSpells] [#if levelSpells?size
-      > 0] [#assign level=spellList.spellsKnown?size-levelSpells?index-1] [#if
-      level == 0]
-      <div class="spells-level" style="grid-column-end: span 2">
-        <div class="spells-line"></div>
-        <div class="spells-level-label">Cantrips</div>
-        <div class="spells-line"></div>
-      </div>
-      [#else]
-      <div class="spells-level">
-        <div class="spells-line"></div>
-        <div class="spells-level-label">Level ${level}</div>
-        <div class="spells-line"></div>
-      </div>
-      <div class="spells-level">
-        <div class="spells-line"></div>
-        [#list 1..spellList.spellSlots[level] as i]
-        <div class="spells-slot"></div>
-        [/#list]
-        <div class="spells-line"></div>
-      </div>
-      [/#if] [#list levelSpells as spell] [#if spell?index % 2 == 0]
-      <div class="spells-name left">${spell.name}</div>
-      [#else]
-      <div class="spells-name right">${spell.name}</div>
-      [/#if] [/#list] [#if levelSpells?size % 2 == 1]
-      <div class="spells-name right"></div>
-      [/#if] [/#if] [/#list]
+      <template
+        v-for="[index, level] of Array.from(list.known.entries())
+          .reverse()
+          .filter(([_, level]) => level.length > 0)"
+        :key="index"
+      >
+        <div
+          class="spells-level"
+          style="grid-column-end: span 2"
+          v-if="index == 0"
+        >
+          <div class="spells-line"></div>
+          <div class="spells-level-label">Cantrips</div>
+          <div class="spells-line"></div>
+        </div>
+        <template v-if="index > 0">
+          <div class="spells-level">
+            <div class="spells-line"></div>
+            <div class="spells-level-label">Level {{ index }}</div>
+            <div class="spells-line"></div>
+          </div>
+          <div class="spells-level">
+            <div class="spells-line"></div>
+            <div
+              class="spells-slot"
+              v-for="n in list.slots[index]"
+              :key="n"
+            ></div>
+            <div class="spells-line"></div>
+          </div>
+        </template>
+        <div
+          class="spells-name"
+          :class="i % 2 == 0 ? 'left' : 'right'"
+          v-for="[i, spell] of level.entries()"
+          :key="spell.name"
+        >
+          {{ spell.name }}
+        </div>
+
+        <div
+          class="spells-name right"
+          v-if="list.known[index].length % 2 == 1"
+        />
+      </template>
     </div>
   </div>
 </template>
