@@ -267,7 +267,7 @@ div {
 }
 
 .wrap {
-  text-wrap: normal;
+  overflow-wrap: break-word;
 }
 
 .box {
@@ -373,6 +373,9 @@ div {
   padding-right: 5px;
   text-align: right;
   text-transform: uppercase;
+}
+.skill-label.lore-label {
+  font-size: 0.6em;
 }
 .skill-break {
   grid-column-end: span 5;
@@ -550,7 +553,6 @@ div.action-label {
   align-items: start;
   justify-items: center;
   padding-bottom: 0.6em;
-  grid-template-rows: 0.25fr repeat(${character.skills?size}, 1fr);
 }
 #abilities-grid {
   position: absolute;
