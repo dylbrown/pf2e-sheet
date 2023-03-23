@@ -10,7 +10,8 @@ import {
   Action,
   Spell,
 } from './model';
-import { getActions, getScore, makeSource, ordinalToNumber } from './util';
+import { getActions, getScore, ordinalToNumber } from './util';
+import * as Wanderer from './wanderers-requests';
 
 export default class Character {
   name = 'Dave';
@@ -54,7 +55,7 @@ export default class Character {
 
   spells = {
     focusPoints: 0,
-    lists: Array<SpellList>(),
+    lists: new Array<SpellList>(),
     lookup: {} as { [key: string]: SpellList },
   };
 
@@ -73,9 +74,29 @@ export default class Character {
     });
   }
 
+  getOrCreateSpellsList(spellSRC: string) {
+    let list = this.spells.lookup[spellSRC];
+    if (list == null) {
+      list = this.spells.lookup[spellSRC] = {
+        name: spellSRC,
+        attack: 0,
+        dc: 0,
+        type: '',
+        known: [[], [], [], [], [], [], [], [], [], [], []],
+        slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        focus: [],
+        tradition: '',
+        score: -1 as Score,
+      };
+      this.spells.lists.push(list);
+    }
+    return list;
+  }
+
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  load(data: any, feats: any, items: any, spells: any) {
+  async load(data: any) {
+    const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
     this.ancestry = data.character?._heritage?.name ?? '';
@@ -158,22 +179,25 @@ export default class Character {
     }
     const attackMap = new Map<string, Weapon>();
 
-    const scores: any = JSON.parse(data.stats?.weapons);
-    if (scores instanceof Array) {
-      for (const entry of scores) {
+    const attacks: any = JSON.parse(data.stats?.weapons);
+    if (attacks instanceof Array) {
+      for (const entry of attacks) {
         if (entry.Name.includes('Improvised')) continue;
-        const attack = {
+        const attack: Weapon = {
           name: entry.Name,
+          id: -1,
+          count: -1,
+          weight: '',
           attack: entry.Bonus,
           damage: entry.Damage,
           hands: 0,
           traits: [],
+          weapon: true,
         };
         attackMap.set(attack.name, attack);
         this.combat.attacks.push(attack);
       }
     }
-    const featMap = new Map<string, Ability>();
 
     if (data.build.feats instanceof Array) {
       for (const entry of data.build.feats) {
@@ -191,8 +215,9 @@ export default class Character {
               break;
           }
         }
-        const feat = {
+        const feat: Ability = {
           name: entry.value?.name ?? '',
+          id: entry.value?.id ?? -1,
           type: type,
           source: '',
           description: entry.value?.description,
@@ -203,7 +228,7 @@ export default class Character {
           requirements: entry.value?.requirements,
           trigger: entry.value?.trigger,
         };
-        featMap.set(entry.value?.name, feat);
+        promises.push(Wanderer.loadFeat(feat));
         this.abilities.push(feat);
       }
     }
@@ -211,58 +236,39 @@ export default class Character {
       for (const entry of data.invItems) {
         if (entry.name.includes('Improvised') || entry.name.includes('Fist'))
           continue;
-        this.inventory.push({
-          name: entry.name,
-          count: Number(entry.quantity),
-          weight: entry.bulk > 0 ? entry.bulk : 0,
-        });
-      }
-    }
-    const spellMap = new Map<string, Spell>();
-    if (data.spellBookSpells instanceof Array) {
-      const lists: { [name: string]: SpellList } = {};
-      for (const entry of data.spellBookSpells) {
-        let list = lists[entry.spellSRC];
-        if (list == null) {
-          list = lists[entry.spellSRC] = {
-            name: entry.spellSRC,
-            attack: 0,
-            dc: 0,
-            type: '',
-            known: [[], [], [], [], [], [], [], [], [], [], []],
-            slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            focus: [],
-            tradition: '',
-            score: -1 as Score,
+        let item: Item | undefined = attackMap.get(entry.name);
+        if (item) {
+          item.id = entry.itemID;
+          item.count = Number(entry.quantity);
+          item.weight = entry.bulk > 0 ? entry.bulk : 0;
+        } else {
+          item = {
+            name: entry.name,
+            id: entry.itemID,
+            count: Number(entry.quantity),
+            weight: entry.bulk > 0 ? entry.bulk : 0,
+            traits: [],
+            weapon: false,
           };
         }
-        const spell = {
-          name: entry._spellName,
-          description: '',
-          cost: Action.Free,
-          castTime: '',
-          components: [],
-          source: '',
-          traits: [],
-          requirements: '',
-          range: '',
-          area: '',
-          targets: '',
-          duration: '',
-          save: '',
-        };
-        spellMap.set(spell.name, spell);
+        this.inventory.push(item);
+        promises.push(Wanderer.loadItem(item));
+      }
+    }
+    if (data.spellBookSpells instanceof Array) {
+      for (const entry of data.spellBookSpells) {
+        const list = this.getOrCreateSpellsList(entry.spellSRC);
+        const spell = new Spell(entry._spellName, entry.spellID);
+        promises.push(Wanderer.loadSpell(spell));
         list.known[entry.spellLevel].push(spell);
       }
-      this.spells.lists = Array.from(Object.values(lists));
-      this.spells.lookup = lists;
     }
     if (data.metaData instanceof Array) {
       for (const entry of data.metaData) {
         const i = entry.value.indexOf('=');
         const key: string = entry.value.substring(0, i);
         const value: string = entry.value.substring(i + 1);
-        const list = this.spells.lookup[key];
+        const list = this.getOrCreateSpellsList(key);
         switch (entry.source) {
           case 'spellCastingType': {
             list.type = value.startsWith('SPONTANEOUS')
@@ -293,67 +299,8 @@ export default class Character {
         }
       }
     }
-    for (const s of Object.values(spells)) {
-      if (typeof s !== 'object') continue;
-      const spellAndTags = s as any;
-      const spell = spellAndTags.Spell;
-      const e = spellMap.get(spell.name as string);
-      if (e != undefined) {
-        const entry = e as Spell;
-        entry.description = spell.description ?? '';
-        if (spell.cast.includes('_TO_')) {
-          const actions = spell.cast.split('_TO_');
-          entry.cost = actions[0] == 'ONE' ? Action.One : Action.Two;
-          entry.maxCost = getActions(actions[1]);
-        } else {
-          entry.cost = getActions(spell.cast);
-        }
-        entry.castTime = spell.cast.replaceAll('_', ' ');
-        entry.components = JSON.parse(spell.castingComponents) as Array<string>;
-        entry.source = makeSource(spell.contentSrc);
-        entry.traits = (spellAndTags.Tags as Array<any>).map((o) => o.name);
-        entry.requirements = spell.requirements;
-        entry.range = spell.range;
-        entry.area = spell.area;
-        entry.targets = spell.targets;
-        entry.duration = spell.duration;
-        entry.save =
-          spell.savingThrow != null
-            ? spell.savingThrow[0] +
-              spell.savingThrow.substring(1).toLowerCase()
-            : '';
-      }
-    }
 
-    for (const s of Object.values(feats)) {
-      if (typeof s !== 'object') continue;
-      const featAndTags = s as any;
-      const feat = featAndTags.Feat;
-      const f = featMap.get(feat.name as string);
-      if (f != undefined) {
-        const entry = f as Ability;
-        entry.source = makeSource(feat.contentSrc);
-        entry.traits = (featAndTags.Tags as Array<any>).map((o) => o.name);
-      }
-    }
-
-    for (const s of Object.values(items)) {
-      if (typeof s !== 'object') continue;
-      const itemAndTags = s as any;
-      const item = itemAndTags.Item;
-      const a = attackMap.get(item.name as string);
-      if (a != undefined) {
-        const entry = a as Weapon;
-        entry.hands = item.hands == 'TWO' ? 2 : 1;
-        entry.traits = (itemAndTags.TagArray as Array<any>).map((o) =>
-          o.name.replaceAll(' - Item', '')
-        );
-        if (item.weapons?.isRanged) {
-          entry.range = item.weapons?.rangedRange;
-          entry.reload = item.weapons?.rangedReload;
-        }
-      }
-    }
+    return Promise.all(promises);
   }
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }

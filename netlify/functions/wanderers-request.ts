@@ -9,7 +9,10 @@ const handler: Handler = async (event) => {
     console.log(event);
     const { WANDERERS_GUIDE_KEY } = process.env;
     const response = await fetch(
-      API_ENDPOINT + (event.queryStringParameters?.type ?? 'spell') + '/all',
+      API_ENDPOINT +
+        (event.queryStringParameters?.type ?? 'spell') +
+        '?id=' +
+        (event.queryStringParameters?.id ?? '-1'),
       {
         headers: { Authorization: 'Apikey ' + WANDERERS_GUIDE_KEY },
       }

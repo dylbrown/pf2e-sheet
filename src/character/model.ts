@@ -107,51 +107,73 @@ export const skills = [
   Attribute.Thievery,
 ];
 
-export type Weapon = {
+export interface Item {
   name: string;
+  id: number;
+  count: number;
+  weight: string;
+  traits: string[];
+  weapon: boolean;
+}
+
+export interface Weapon extends Item {
   attack: string;
   damage: string;
   hands: number;
-  traits: string[];
   range?: number;
   reload?: number;
-};
+}
 
-export type Ability = {
+export class Ability {
   name: string;
+  id: number;
   type: string;
-  source: string;
+  source = '';
   description: string;
   activity: boolean;
-  traits?: Array<string>;
+  traits: Array<string> = [];
   cost?: Action;
   frequency?: string;
   requirements?: string;
   trigger?: string;
-};
 
-export type Item = {
-  name: string;
-  count: number;
-  weight: string;
-};
+  constructor(
+    name: string,
+    id: number,
+    type: string,
+    activity: boolean,
+    description: string
+  ) {
+    this.name = name;
+    this.id = id;
+    this.type = type;
+    this.activity = activity;
+    this.description = description;
+  }
+}
 
-export type Spell = {
+export class Spell {
   name: string;
-  description: string;
-  cost: Action;
+  id: number;
+  description = '';
+  cost: Action = Action.Free;
   maxCost?: Action;
-  castTime: string;
-  components: Array<string>;
-  source: string;
-  traits: Array<string>;
-  requirements: string;
-  range: string;
-  area: string;
-  targets: string;
-  duration: string;
-  save: string;
-};
+  castTime = '';
+  components: Array<string> = [];
+  source = '';
+  traits: Array<string> = [];
+  requirements = '';
+  range = '';
+  area = '';
+  targets = '';
+  duration = '';
+  save = '';
+
+  constructor(name: string, id: number) {
+    this.name = name;
+    this.id = id;
+  }
+}
 
 export type SpellList = {
   name: string;
