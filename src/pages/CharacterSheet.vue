@@ -738,7 +738,7 @@ jQuery(() => {
       let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
       if (middle === -1) middle = end;
       text.html(contents.substring(0, middle));
-      if (text.parent().outerHeight(true) || 0 > maxHeight) {
+      if ((text.parent().outerHeight(true) || 0) > maxHeight) {
         end = Math.ceil((start + end) / 2) - 1;
       } else {
         start = middle;
@@ -812,36 +812,32 @@ jQuery(() => {
       currentTop += jQuery(this).outerHeight(true) || 0;
 
       // If overflows at all, clone remainder to next
-      if (currentTop >= totalHeight) {
+      let curr = jQuery(this);
+      while (currentTop >= totalHeight) {
         currentTop -= totalHeight;
         moveLeft();
-        let clone = jQuery(this).clone();
+        let clone = curr.clone();
         clone.css('left', currentLeft);
         clone.css('top', 0);
         if (
-          jQuery(this).attr('id') === 'inventory-grid' ||
-          jQuery(this).attr('id') === 'spells-prepared' ||
-          jQuery(this).attr('id') === 'spells-spontaneous'
+          curr.attr('id') === 'inventory-grid' ||
+          curr.attr('id') === 'spells-prepared' ||
+          curr.attr('id') === 'spells-spontaneous'
         ) {
-          binaryDivHeightSearch(
-            jQuery(this),
-            clone,
-            totalHeight - jQuery(this).position().top
-          );
+          binaryDivHeightSearch(curr, clone, totalHeight - curr.position().top);
         } else {
           clone
             .children()
             .last()
             .html(
-              binaryHeightSearch(
-                descTop,
-                totalHeight - jQuery(this).position().top
-              )
+              binaryHeightSearch(descTop, totalHeight - curr.position().top)
             );
           clone.children(':not(:last-child)').remove();
         }
         clone.appendTo(currPage);
         currentTop = clone.outerHeight(true) || 0;
+        curr = clone;
+        descTop = curr.find('.ability-description');
       }
     });
     for (let i = 1; i <= numPages; i++) {

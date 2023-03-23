@@ -12,7 +12,7 @@
       label="Trigger"
       :content="ability.trigger || ''"
     />
-    <div class="ability-description">{{ ability.description }}</div>
+    <div class="ability-description" v-html="ability.description" />
   </div>
 </template>
 

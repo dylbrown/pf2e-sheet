@@ -1,5 +1,5 @@
 import { Ability, Action, Item, Spell, Weapon } from './model';
-import { getActions, makeSource } from './util';
+import { getActions, makeSource, parseDescription } from './util';
 
 async function load(url: string) {
   const res = await fetch(url);
@@ -41,7 +41,7 @@ export async function loadSpell(spell: Spell) {
       encodeURIComponent(spell.id)
   );
   const entry = data.spell;
-  spell.description = entry.description ?? '';
+  spell.description = parseDescription(entry.description ?? '');
   if (entry.cast.includes('_TO_')) {
     const actions = entry.cast.split('_TO_');
     spell.cost = actions[0] == 'ONE' ? Action.One : Action.Two;

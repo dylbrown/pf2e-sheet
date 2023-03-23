@@ -10,7 +10,12 @@ import {
   Action,
   Spell,
 } from './model';
-import { getActions, getScore, ordinalToNumber } from './util';
+import {
+  getActions,
+  getScore,
+  ordinalToNumber,
+  parseDescription,
+} from './util';
 import * as Wanderer from './wanderers-requests';
 
 export default class Character {
@@ -95,7 +100,7 @@ export default class Character {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async load(data: any) {
+  load(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
@@ -220,7 +225,7 @@ export default class Character {
           id: entry.value?.id ?? -1,
           type: type,
           source: '',
-          description: entry.value?.description,
+          description: parseDescription(entry.value?.description),
           activity: cost != Action.None,
           traits: [],
           cost: cost,
@@ -300,7 +305,7 @@ export default class Character {
       }
     }
 
-    return Promise.all(promises);
+    return promises;
   }
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }

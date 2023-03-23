@@ -9,7 +9,7 @@ export function nonzero(num: number) {
 }
 
 export function signed(num: number) {
-  return num < 0 ? '-' + num : '+' + num;
+  return num < 0 ? num : '+' + num;
 }
 
 export function types(
@@ -80,6 +80,8 @@ export function getActions(s: string) {
       return Action.Three;
     case 'REACTION':
       return Action.Reaction;
+    case 'TWO_ROUNDS':
+      return Action.TwoRounds;
     case 'FREE':
       return Action.Free;
   }
@@ -90,4 +92,17 @@ export function makeSource(s: string) {
   const parts = s.split('-');
   if (parts.length == 1) return parts[0];
   return parts.reduce((acc, value) => acc + value[0], '');
+}
+
+export function parseDescription(s: string) {
+  const cleaned = s.replaceAll(
+    /\((feat|action|activity|trait): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
+    '$2'
+  );
+  const degrees = cleaned.replaceAll(
+    /(Critical )?(Success|Failure):/gi,
+    '<br><b>$&</b>'
+  );
+  const spacing = degrees.replaceAll('~', '<br>');
+  return spacing;
 }

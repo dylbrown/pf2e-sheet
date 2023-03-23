@@ -31,14 +31,18 @@
         </div>
         <div
           :class="
-            Number(spell.cost) < 2 ? 'spell-cost-yes' : 'spell-cost-optional'
+            Number(spell.cost) < 2
+              ? 'spell-cost-yes spell-cost-optional'
+              : 'spell-cost-yes'
           "
         >
           <span>♦</span>
         </div>
         <div
           :class="
-            Number(spell.cost) < 3 ? 'spell-cost-yes' : 'spell-cost-optional'
+            Number(spell.cost) < 3
+              ? 'spell-cost-yes spell-cost-optional'
+              : 'spell-cost-yes'
           "
         >
           <span>♦</span>
@@ -57,7 +61,7 @@
       <LinePart label="Duration" :content="spell.duration" />
       <LinePart label="Save" :content="spell.save" />
     </div>
-    <div class="ability-description">{{ spell.description }}</div>
+    <div class="ability-description" v-html="spell.description" />
   </div>
 </template>
 

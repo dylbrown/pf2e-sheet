@@ -1,3 +1,5 @@
+import { parseDescription } from './util';
+
 export enum Proficiency {
   Untrained = 0,
   Trained = 2,
@@ -21,6 +23,7 @@ export enum Action {
   Three = '3',
   Free = 'F',
   Reaction = 'R',
+  TwoRounds = '6',
   None = '',
 }
 
@@ -148,7 +151,7 @@ export class Ability {
     this.id = id;
     this.type = type;
     this.activity = activity;
-    this.description = description;
+    this.description = parseDescription(description);
   }
 }
 
