@@ -4,11 +4,11 @@
     <div class="spells-stats">
       <div class="rollLabel">Spell Attack</div>
       <div class="numBox rounded">
-        {{ signed(list.attack) }}
+        {{ list.attack != 0 ? signed(list.attack) : '' }}
       </div>
       <div class="rollLabel">Spell DC</div>
       <div class="numBox rounded">
-        {{ list.dc }}
+        {{ list.dc != 0 ? list.dc : '' }}
       </div>
     </div>
     <div class="col-section-label" style="border-left: 1px solid black">

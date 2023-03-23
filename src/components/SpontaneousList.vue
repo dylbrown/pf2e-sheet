@@ -4,11 +4,11 @@
     <div class="spells-stats">
       <div class="rollLabel">Spell Attack</div>
       <div class="numBox rounded">
-        {{ list.attack }}
+        {{ list.attack != 0 ? signed(list.attack) : '' }}
       </div>
       <div class="rollLabel">Spell DC</div>
       <div class="numBox rounded">
-        {{ list.dc }}
+        {{ list.dc != 0 ? list.dc : '' }}
       </div>
     </div>
     <div id="spells-spontaneous-grid">
@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { signed } from 'src/character/util';
 import { SpellList } from 'src/character/model';
 
 defineProps<{

@@ -81,7 +81,7 @@ export default class Character {
 
   getOrCreateSpellsList(spellSRC: string) {
     let list = this.spells.lookup[spellSRC];
-    if (list == null) {
+    if (list == null && spellSRC.length > 0) {
       list = this.spells.lookup[spellSRC] = {
         name: spellSRC,
         attack: 0,
@@ -104,6 +104,7 @@ export default class Character {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
+    // Wanderer.loadClass(data.character?.classID);
     this.ancestry = data.character?._heritage?.name ?? '';
     this.background = data.character?._background?.name ?? '';
     this.class = data.character?._class?.name ?? '';
@@ -276,9 +277,8 @@ export default class Character {
         const list = this.getOrCreateSpellsList(key);
         switch (entry.source) {
           case 'spellCastingType': {
-            list.type = value.startsWith('SPONTANEOUS')
-              ? 'Spontaneous'
-              : 'Prepared';
+            if (value.startsWith('SPONTANEOUS')) list.type = 'Spontaneous';
+            else if (value.startsWith('PREPARED')) list.type = 'Prepared';
             break;
           }
           case 'spellKeyAbilities': {
@@ -300,6 +300,35 @@ export default class Character {
                 list.slots[n as number] = (slots as Array<any>).length;
             }
             break;
+          }
+          case 'focusSpell': {
+            const spell = new Spell(value, Number(value));
+            promises.push(Wanderer.loadSpell(spell));
+            list.focus.push(spell);
+            break;
+          }
+          case 'focusPoint': {
+            this.spells.focusPoints += 1;
+            break;
+          }
+          case 'innateSpell': {
+            const innateList = this.getOrCreateSpellsList(entry.sourceType);
+            innateList.type = 'Innate';
+            const idIndex = entry.value.indexOf(':');
+            const id = entry.value.substring(0, idIndex);
+            const spell = new Spell(id, Number(id));
+            promises.push(
+              Wanderer.loadSpell(spell).then(() => {
+                innateList.known[spell.level].push(spell);
+              })
+            );
+          }
+        }
+        if (list && list.type == '') {
+          switch (key) {
+            case 'SORCERER':
+              list.type = 'Spontaneous';
+              break;
           }
         }
       }

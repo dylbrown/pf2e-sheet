@@ -597,6 +597,7 @@
       <template v-for="list of character.spells.lists" :key="list.name">
         <PreparedList v-if="list.type == 'Prepared'" :list="list" />
         <SpontaneousList v-if="list.type == 'Spontaneous'" :list="list" />
+        <InnateList v-if="list.type == 'Innate'" :list="list" />
         <template v-for="level of list.known.slice().reverse()">
           <SpellBlock v-for="spell of level" :key="spell.name" :spell="spell" />
         </template>
@@ -609,12 +610,14 @@
           <div class="spells-title col-section-title">Focus Spells</div>
         </div>
         <template
-          v-for="list of character.spells.lists.filter((l) => l.type == 'None')"
+          v-for="list of character.spells.lists.filter(
+            (l) => l.focus.length > 0
+          )"
           :key="list.name"
         >
           <div id="focus-rolls" class="do-not-break">
             <div class="spells-title col-section-title">{{ list.name }}</div>
-            <div class="spells-stats">
+            <div class="spells-stats" v-if="list.type == 'None'">
               <div class="rollLabel">Spell Attack</div>
               <div class="numBox rounded">
                 {{ signed(list.attack) }}
@@ -647,6 +650,7 @@ import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import SpellBlock from 'src/components/SpellBlock.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
+import InnateList from 'src/components/InnateList.vue';
 import PreparedList from 'src/components/PreparedList.vue';
 import SpontaneousList from 'src/components/SpontaneousList.vue';
 import jQuery from 'jquery';

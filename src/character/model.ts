@@ -158,6 +158,7 @@ export class Ability {
 export class Spell {
   name: string;
   id: number;
+  level = 0;
   description = '';
   cost: Action = Action.Free;
   maxCost?: Action;

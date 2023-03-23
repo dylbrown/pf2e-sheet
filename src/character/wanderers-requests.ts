@@ -4,9 +4,18 @@ import { getActions, makeSource, parseDescription } from './util';
 async function load(url: string) {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(res.statusText);
+    const json = await res.json();
+    throw new Error(json.error);
   }
   return res.json();
+}
+
+export async function loadClass(id: number) {
+  const data = await load(
+    '/.netlify/functions/wanderers-request?type=class&id=' +
+      encodeURIComponent(id)
+  );
+  console.log(data);
 }
 
 export async function loadFeat(feat: Ability) {
@@ -41,6 +50,8 @@ export async function loadSpell(spell: Spell) {
       encodeURIComponent(spell.id)
   );
   const entry = data.spell;
+  spell.name = entry.name;
+  spell.level = entry.level;
   spell.description = parseDescription(entry.description ?? '');
   if (entry.cast.includes('_TO_')) {
     const actions = entry.cast.split('_TO_');
