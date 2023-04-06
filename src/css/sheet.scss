@@ -638,6 +638,22 @@ div.ability-section {
   display: inline-block;
   flex-basis: 100%;
 }
+.ability-description > p {
+  margin: 0 0 0.25rem;
+}
+.ability-description > p:last-child {
+  margin: 0;
+}
+.description-header {
+  background-color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  color: white;
+  font-weight: bolder;
+  text-transform: uppercase;
+  font-size: 1em;
+  padding: 2.5px 5px;
+}
 .ability-box .label,
 .ability-box .underlined,
 .spell-box .label,

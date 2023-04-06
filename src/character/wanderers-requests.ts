@@ -25,7 +25,7 @@ export async function loadClass(id: number) {
     '/.netlify/functions/wanderers-request?type=class&id=' +
       encodeURIComponent(id)
   );
-  console.log(data);
+  return data;
 }
 
 export async function loadFeat(feat: Ability) {

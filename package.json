@@ -13,7 +13,9 @@
   "dependencies": {
     "@netlify/functions": "^1.4.0",
     "@quasar/extras": "^1.0.0",
+    "@types/marked": "^4.0.8",
     "jquery": "^3.6.3",
+    "marked": "^4.3.0",
     "netlify-cli": "^13.0.0",
     "quasar": "^2.6.0",
     "vue": "^3.0.0",

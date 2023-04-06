@@ -138,9 +138,18 @@ export function parseDescription(s: string) {
     '$2'
   );
   const degrees = cleaned.replaceAll(
-    /(Critical )?(Success|Failure):/gi,
-    '<br><b>$&</b>'
+    /((Critical )?(Success|Failure)):/gi,
+    '<b>$1</b>'
   );
-  const spacing = degrees.replaceAll('~', '<br>');
+  const HEADING = '</p><p><span class="description-header">$1</span> ';
+  const header =
+    '<p>' +
+    degrees
+      .replaceAll(/\n\*\*\*?([^\*]+)\*\*\*?\n/gi, HEADING)
+      .replaceAll(/\n~ ([^:]+):/gi, HEADING) +
+    '</p>';
+  const BULLET = '\n* : ';
+  const bulleted = header.replaceAll(BULLET, '<br>- ').replaceAll('\n', '<br>');
+  const spacing = bulleted.replaceAll('~', '<br>');
   return spacing;
 }
