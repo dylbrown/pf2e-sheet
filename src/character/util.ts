@@ -1,4 +1,4 @@
-import { Ability, Action, Score } from './model';
+import { Ability, AbilityType, Action, Score } from './model';
 
 export function abilityMod(score: number) {
   return signed(Math.floor((score - 10) / 2));
@@ -14,8 +14,8 @@ export function signed(num: number) {
 
 export function types(
   abilities: Array<Ability>,
-  include: Array<string>,
-  exclude: Array<string>
+  include: Array<AbilityType>,
+  exclude: Array<AbilityType>
 ) {
   return abilities.filter(
     (value: Ability) =>
@@ -40,6 +40,22 @@ export function getScore(s: string) {
       return Score.Charisma;
   }
   return -1 as Score;
+}
+
+export function getAbilityType(type: string) {
+  switch (type) {
+    case 'classFeature':
+      return AbilityType.ClassFeature;
+    case 'skill':
+      return AbilityType.SkillFeat;
+    case 'general':
+      return AbilityType.GeneralFeat;
+    case 'ancestry':
+      return AbilityType.AncestryFeat;
+    case 'class':
+      return AbilityType.ClassFeat;
+  }
+  return AbilityType.Unknown;
 }
 
 export function ordinalToNumber(s: string): number {

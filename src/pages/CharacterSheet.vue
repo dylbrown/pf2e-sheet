@@ -417,7 +417,7 @@
           </div>
           <div class="line">
             <div class="underlined">
-              {{ character.class }}
+              {{ character.class }} {{ character.level }}
             </div>
             <div class="label">Class</div>
           </div>
@@ -551,11 +551,13 @@
   <div class="page">
     <div class="printBorder"></div>
     <div class="abilities-flex first-page">
-      <div class="ability-box ability-section do-not-break">Class Feats</div>
+      <div class="ability-box ability-section do-not-break">
+        Class Feats & Features
+      </div>
       <AbilityBlock
         v-for="[index, ability] in types(
           character.abilities,
-          ['class', 'classFeature'],
+          [AbilityType.ClassFeat, AbilityType.ClassFeature],
           []
         ).entries()"
         :key="index"
@@ -568,7 +570,11 @@
         v-for="[index, ability] in types(
           character.abilities,
           [],
-          ['ancestry', 'class', 'classFeature']
+          [
+            AbilityType.ClassFeat,
+            AbilityType.ClassFeature,
+            AbilityType.AncestryFeat,
+          ]
         ).entries()"
         :key="index"
         :ability="ability"
@@ -577,7 +583,7 @@
       <AbilityBlock
         v-for="[index, ability] in types(
           character.abilities,
-          ['ancestry'],
+          [AbilityType.AncestryFeat],
           []
         ).entries()"
         :key="index"
@@ -644,7 +650,7 @@
 <script setup lang="ts">
 import { abilityMod, nonzero, signed, types } from 'src/character/util';
 import Character from 'src/character/character';
-import { Attribute, skills, Score } from 'src/character/model';
+import { Attribute, skills, Score, AbilityType } from 'src/character/model';
 import AbilityBlock from 'src/components/AbilityBlock.vue';
 import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';

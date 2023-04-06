@@ -1,21 +1,13 @@
+import Abilities from './abilities';
 import {
   Proficiency,
   Attribute,
   Score,
   Weapon,
-  Ability,
   Item,
-  SpellList,
   attrScore,
-  Action,
-  Spell,
 } from './model';
-import {
-  getActions,
-  getScore,
-  ordinalToNumber,
-  parseDescription,
-} from './util';
+import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
 
 export default class Character {
@@ -47,7 +39,7 @@ export default class Character {
     },
     attacks: Array<Weapon>(),
   };
-  abilities = Array<Ability>();
+  abilities = new Abilities();
   attributes: Attributes;
   lore = {} as {
     [lore: string]: {
@@ -58,11 +50,7 @@ export default class Character {
   };
   inventory = Array<Item>();
 
-  spells = {
-    focusPoints: 0,
-    lists: new Array<SpellList>(),
-    lookup: {} as { [key: string]: SpellList },
-  };
+  spells = new Spells();
 
   constructor() {
     this.scores = {} as Scores;
@@ -79,32 +67,12 @@ export default class Character {
     });
   }
 
-  getOrCreateSpellsList(spellSRC: string) {
-    let list = this.spells.lookup[spellSRC];
-    if (list == null && spellSRC.length > 0) {
-      list = this.spells.lookup[spellSRC] = {
-        name: spellSRC,
-        attack: 0,
-        dc: 0,
-        type: '',
-        known: [[], [], [], [], [], [], [], [], [], [], []],
-        slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        focus: [],
-        tradition: '',
-        score: -1 as Score,
-      };
-      this.spells.lists.push(list);
-    }
-    return list;
-  }
-
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
-    // Wanderer.loadClass(data.character?.classID);
     this.ancestry = data.character?._heritage?.name ?? '';
     this.background = data.character?._background?.name ?? '';
     this.class = data.character?._class?.name ?? '';
@@ -204,40 +172,6 @@ export default class Character {
         this.combat.attacks.push(attack);
       }
     }
-
-    if (data.build.feats instanceof Array) {
-      for (const entry of data.build.feats) {
-        const cost: Action = getActions(entry.value?.actions);
-        let type = entry.sourceType;
-        if (entry.value?.name.startsWith('Rage')) {
-          type = 'classFeature';
-        } else {
-          switch (entry.value?.genericType) {
-            case 'SKILL-FEAT':
-              type = 'skill';
-              break;
-            case 'GENERAL-FEAT':
-              type = 'general';
-              break;
-          }
-        }
-        const feat: Ability = {
-          name: entry.value?.name ?? '',
-          id: entry.value?.id ?? -1,
-          type: type,
-          source: '',
-          description: parseDescription(entry.value?.description),
-          activity: cost != Action.None,
-          traits: [],
-          cost: cost,
-          frequency: entry.value?.frequency,
-          requirements: entry.value?.requirements,
-          trigger: entry.value?.trigger,
-        };
-        promises.push(Wanderer.loadFeat(feat));
-        this.abilities.push(feat);
-      }
-    }
     if (data.invItems instanceof Array) {
       for (const entry of data.invItems) {
         if (entry.name.includes('Improvised') || entry.name.includes('Fist'))
@@ -261,78 +195,29 @@ export default class Character {
         promises.push(Wanderer.loadItem(item));
       }
     }
-    if (data.spellBookSpells instanceof Array) {
-      for (const entry of data.spellBookSpells) {
-        const list = this.getOrCreateSpellsList(entry.spellSRC);
-        const spell = new Spell(entry._spellName, entry.spellID);
-        promises.push(Wanderer.loadSpell(spell));
-        list.known[entry.spellLevel].push(spell);
+    const metaData = {
+      spells: new Array<any>(),
+      class_features: new Array<any>(),
+    };
+    for (const entry of data.metaData) {
+      switch (entry.source) {
+        case 'spellCastingType':
+        case 'spellKeyAbilities':
+        case 'spellLists':
+        case 'spellSlots':
+        case 'focusSpell':
+        case 'focusPoint':
+        case 'innateSpell':
+          metaData.spells.push(entry);
+          break;
+        case 'classChoice':
+          metaData.class_features.push(entry);
       }
     }
-    if (data.metaData instanceof Array) {
-      for (const entry of data.metaData) {
-        const i = entry.value.indexOf('=');
-        const key: string = entry.value.substring(0, i);
-        const value: string = entry.value.substring(i + 1);
-        const list = this.getOrCreateSpellsList(key);
-        switch (entry.source) {
-          case 'spellCastingType': {
-            if (value.startsWith('SPONTANEOUS')) list.type = 'Spontaneous';
-            else if (value.startsWith('PREPARED')) list.type = 'Prepared';
-            break;
-          }
-          case 'spellKeyAbilities': {
-            list.score = getScore(value);
-            break;
-          }
-          case 'spellLists': {
-            list.tradition = value[0] + value.toLowerCase().substring(1);
-            break;
-          }
-          case 'spellSlots': {
-            if (!entry.sourceCode.startsWith('classAbility-')) break;
-            const slotsData = JSON.parse(value);
-            for (const [index, slots] of Object.entries(slotsData)) {
-              const indexString: string = index.toString();
-              const end = indexString.indexOf('L');
-              const n = ordinalToNumber(indexString.substring(0, end));
-              if (n >= 0 && slots instanceof Array)
-                list.slots[n as number] = (slots as Array<any>).length;
-            }
-            break;
-          }
-          case 'focusSpell': {
-            const spell = new Spell(value, Number(value));
-            promises.push(Wanderer.loadSpell(spell));
-            list.focus.push(spell);
-            break;
-          }
-          case 'focusPoint': {
-            this.spells.focusPoints += 1;
-            break;
-          }
-          case 'innateSpell': {
-            const innateList = this.getOrCreateSpellsList(entry.sourceType);
-            innateList.type = 'Innate';
-            const idIndex = entry.value.indexOf(':');
-            const id = entry.value.substring(0, idIndex);
-            const spell = new Spell(id, Number(id));
-            promises.push(
-              Wanderer.loadSpell(spell).then(() => {
-                innateList.known[spell.level].push(spell);
-              })
-            );
-          }
-        }
-        if (list && list.type == '') {
-          switch (key) {
-            case 'SORCERER':
-              list.type = 'Spontaneous';
-              break;
-          }
-        }
-      }
-    }
+    promises.push(
+      ...this.abilities.load(data, metaData.class_features, this.level)
+    );
+    promises.push(...this.spells.load(data, metaData.spells));
 
     return promises;
   }

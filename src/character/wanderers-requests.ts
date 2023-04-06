@@ -1,8 +1,18 @@
 import { Ability, Action, Item, Spell, Weapon } from './model';
-import { getActions, makeSource, parseDescription } from './util';
+import * as Util from './util';
 
 async function load(url: string) {
-  const res = await fetch(url);
+  let res = await fetch(url);
+
+  // Wait a bit and then try one more time
+  if (!res.ok) {
+    await new Promise((resolve) =>
+      setTimeout(resolve, 2500 + Math.random() * 5500)
+    );
+    res = await fetch(url);
+  }
+
+  // If still not, then give up
   if (!res.ok) {
     const json = await res.json();
     throw new Error(json.error);
@@ -23,7 +33,7 @@ export async function loadFeat(feat: Ability) {
     '/.netlify/functions/wanderers-request?type=feat&id=' +
       encodeURIComponent(feat.id)
   );
-  feat.source = makeSource(data.feat.contentSrc);
+  feat.source = Util.makeSource(data.feat.contentSrc);
   feat.traits = data.traits.map((o: { name: string }) => o.name);
 }
 
@@ -52,19 +62,19 @@ export async function loadSpell(spell: Spell) {
   const entry = data.spell;
   spell.name = entry.name;
   spell.level = entry.level;
-  spell.description = parseDescription(entry.description ?? '');
+  spell.description = Util.parseDescription(entry.description ?? '');
   if (entry.cast.includes('_TO_')) {
     const actions = entry.cast.split('_TO_');
     spell.cost = actions[0] == 'ONE' ? Action.One : Action.Two;
-    spell.maxCost = getActions(actions[1]);
+    spell.maxCost = Util.getActions(actions[1]);
   } else {
-    spell.cost = getActions(entry.cast);
+    spell.cost = Util.getActions(entry.cast);
   }
   spell.castTime = entry.cast.replaceAll('_', ' ');
   spell.components = JSON.parse(entry?.castingComponents).map((o: string) =>
     o[0].toUpperCase()
   );
-  spell.source = makeSource(entry.contentSrc);
+  spell.source = Util.makeSource(entry.contentSrc);
   spell.traits = data.traits.map((o: { name: string }) => o.name);
   spell.requirements = entry?.requirements || '';
   spell.range = entry?.range || '';

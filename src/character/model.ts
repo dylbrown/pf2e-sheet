@@ -1,5 +1,14 @@
 import { parseDescription } from './util';
 
+export enum AbilityType {
+  ClassFeat,
+  ClassFeature,
+  GeneralFeat,
+  SkillFeat,
+  AncestryFeat,
+  Unknown,
+}
+
 export enum Proficiency {
   Untrained = 0,
   Trained = 2,
@@ -130,7 +139,8 @@ export interface Weapon extends Item {
 export class Ability {
   name: string;
   id: number;
-  type: string;
+  level: number;
+  type: AbilityType;
   source = '';
   description: string;
   activity: boolean;
@@ -143,12 +153,14 @@ export class Ability {
   constructor(
     name: string,
     id: number,
-    type: string,
+    level: number,
+    type: AbilityType,
     activity: boolean,
     description: string
   ) {
     this.name = name;
     this.id = id;
+    this.level = level;
     this.type = type;
     this.activity = activity;
     this.description = parseDescription(description);

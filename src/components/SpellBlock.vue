@@ -48,6 +48,7 @@
           <span>♦</span>
         </div>
       </div>
+      <LinePart label="Level" :content="spell.level.toString()" />
       <div v-if="isNaN(Number(spell.cost))">
         <LinePart label="Cast Time" :content="spell.castTime" />
       </div>
