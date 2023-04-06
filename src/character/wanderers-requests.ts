@@ -63,6 +63,22 @@ export async function loadSpell(spell: Spell) {
   spell.name = entry.name;
   spell.level = entry.level;
   spell.description = Util.parseDescription(entry.description ?? '');
+
+  for (const ordinal of ['One', 'Two', 'Three', 'Four']) {
+    const val = entry['heightened' + ordinal + 'Val'];
+    if (val == null) continue;
+    const type_and_num = val.split('_', 2);
+    let label = '';
+    if (type_and_num[0] == 'PLUS') {
+      label = '+' + Util.ordinalToNumber(type_and_num[1]);
+    } else if (type_and_num[0] == 'LEVEL') {
+      label = Util.numberAppendOrdinal(parseInt(type_and_num[1]));
+    }
+    spell.description += Util.parseDescription(
+      `<b>(${label})</b> ` + entry['heightened' + ordinal + 'Text']
+    );
+  }
+
   if (entry.cast.includes('_TO_')) {
     const actions = entry.cast.split('_TO_');
     spell.cost = actions[0] == 'ONE' ? Action.One : Action.Two;

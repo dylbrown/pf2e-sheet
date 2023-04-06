@@ -59,31 +59,53 @@ export function getAbilityType(type: string) {
 }
 
 export function ordinalToNumber(s: string): number {
-  switch (s) {
+  switch (s.toLowerCase()) {
     case 'cantrip':
+    case 'zero':
       return 0;
     case 'first':
+    case 'one':
       return 1;
     case 'second':
+    case 'two':
       return 2;
     case 'third':
+    case 'three':
       return 3;
     case 'fourth':
+    case 'four':
       return 4;
     case 'fifth':
+    case 'five':
       return 5;
     case 'sixth':
+    case 'six':
       return 6;
     case 'seventh':
+    case 'seven':
       return 7;
     case 'eighth':
+    case 'eight':
       return 8;
     case 'ninth':
+    case 'nine':
       return 9;
     case 'tenth':
+    case 'ten':
       return 10;
   }
   return -1;
+}
+
+export function numberAppendOrdinal(i: number) {
+  switch (i) {
+    case 2:
+      return i + 'nd';
+    case 3:
+      return i + 'rd';
+    default:
+      return i + 'th';
+  }
 }
 
 export function getActions(s: string) {
@@ -112,7 +134,7 @@ export function makeSource(s: string) {
 
 export function parseDescription(s: string) {
   const cleaned = s.replaceAll(
-    /\((feat|action|activity|trait): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
+    /\((feat|action|activity|trait|spell): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
     '$2'
   );
   const degrees = cleaned.replaceAll(
