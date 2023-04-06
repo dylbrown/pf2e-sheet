@@ -148,8 +148,11 @@ export function parseDescription(s: string) {
       .replaceAll(/\n\*\*\*?([^\*]+)\*\*\*?\n/gi, HEADING)
       .replaceAll(/\n~ ([^:]+):/gi, HEADING) +
     '</p>';
+  const h_rules = header.replaceAll(/\n----?\n/gi, '<hr>');
   const BULLET = '\n* : ';
-  const bulleted = header.replaceAll(BULLET, '<br>- ').replaceAll('\n', '<br>');
+  const bulleted = h_rules
+    .replaceAll(BULLET, '<br>- ')
+    .replaceAll('\n', '<br>');
   const spacing = bulleted.replaceAll('~', '<br>');
   return spacing;
 }

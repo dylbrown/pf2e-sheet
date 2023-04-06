@@ -45,7 +45,7 @@ export default class Abilities extends Array<Ability> {
             id: feature.id ?? -1,
             level: feature.level ?? -1,
             type: AbilityType.ClassFeature,
-            source: feature.contentSrc,
+            source: Util.makeSource(feature.contentSrc),
             description: Util.parseDescription(feature.description),
             activity: false,
             traits: [],
