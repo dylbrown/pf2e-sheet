@@ -168,7 +168,7 @@ const position = () => {
   )
     return;
 
-  const height = abilities.value.getBoundingClientRect().height + 1;
+  const height = abilities.value.getBoundingClientRect().height;
   page.value.style.top = height + 'px';
   const pos = new Positioning.Positioning(height);
 

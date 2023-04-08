@@ -19,9 +19,23 @@ export class Positioning {
   }
 
   public apply(block: HTMLElement) {
+    let shift =
+      Number(getComputedStyle(block).paddingTop.replaceAll('px', '')) || 0;
+    if (block.classList.contains('inventory-grid') && block.firstElementChild) {
+      shift =
+        Number(
+          getComputedStyle(block.firstElementChild).paddingTop.replaceAll(
+            'px',
+            ''
+          )
+        ) || 0;
+    }
+    const height = block.getBoundingClientRect().height ?? 0;
+    if (this.top + shift + height >= this.pageHeight) this.moveLeft();
+    this.top += shift;
     block.style.left = this.left;
     block.style.top = this.totalTop;
-    this.top += block.getBoundingClientRect().height ?? 0;
+    this.top += height;
   }
 
   public moveLeft() {
@@ -144,7 +158,7 @@ function binaryHeightSearch(
     let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
     if (middle === -1) middle = end;
     text.innerHTML = contents.substring(0, middle);
-    if ((text.getBoundingClientRect().height ?? 0) > maxHeight) {
+    if ((text.getBoundingClientRect().height ?? 0) + 5 >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;
