@@ -1,5 +1,5 @@
 <template>
-  <div id="spells-spontaneous">
+  <div class="spells-spontaneous" :data-list="list.name">
     <div class="spells-title col-section-title">{{ list.name }} Spells</div>
     <div class="spells-stats">
       <div class="rollLabel">Spell Attack</div>
@@ -11,7 +11,7 @@
         {{ list.dc != 0 ? list.dc : '' }}
       </div>
     </div>
-    <div id="spells-spontaneous-grid">
+    <div class="spells-spontaneous-grid">
       <template
         v-for="[index, level] of Array.from(list.known.entries())
           .reverse()

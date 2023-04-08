@@ -1,5 +1,5 @@
 <template>
-  <div class="ability-box">
+  <div class="ability-box" ref="box">
     <div class="action-icon" v-if="ability.activity">
       {{ ability.cost }}
     </div>
@@ -12,14 +12,32 @@
       label="Trigger"
       :content="ability.trigger || ''"
     />
-    <div class="ability-description" v-html="ability.description" />
+    <div class="ability-description" ref="description" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import LinePart from './LinePart.vue';
 import { Ability } from 'src/character/model';
-defineProps<{
+import * as Positioning from './positioning';
+const props = defineProps<{
   ability: Ability;
 }>();
+const box = ref<HTMLDivElement | null>(null);
+const description = ref<HTMLDivElement | null>(null);
+
+const position = (pos: Positioning.Positioning) => {
+  if (!box.value || !description.value) return;
+  Positioning.position(
+    pos,
+    box.value,
+    description.value,
+    props.ability.description
+  );
+};
+
+defineExpose({
+  position,
+});
 </script>

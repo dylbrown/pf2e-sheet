@@ -1,5 +1,5 @@
 <template>
-  <div id="spells-prepared">
+  <div class="spells-prepared" :data-list="list.name">
     <div class="spells-title col-section-title">{{ list.name }} Spells</div>
     <div class="spells-stats">
       <div class="rollLabel">Spell Attack</div>
