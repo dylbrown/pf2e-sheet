@@ -59,7 +59,7 @@ export default class Character {
     Object.values(Attribute).forEach((a) => {
       if (isNaN(a as number)) return;
       this.attributes[a as Attribute] = {
-        total: 9,
+        total: -1,
         score: attrScore[Attribute[a as Attribute]],
         itemBonus: 0,
         proficiency: Proficiency.Untrained,
@@ -218,6 +218,19 @@ export default class Character {
       ...this.abilities.load(data, metaData.class_features, this.level)
     );
     promises.push(...this.spells.load(data, metaData.spells));
+
+    for (const list of this.spells.lists) {
+      // Attack
+      const attack_prof = this.attributes[list.attack_attr].proficiency;
+      if (attack_prof != Proficiency.Untrained) list.attack += this.level;
+      list.attack += attack_prof;
+      list.attack += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+      // DC
+      const dc_prof = this.attributes[list.dc_attr].proficiency;
+      if (dc_prof != Proficiency.Untrained) list.dc += this.level;
+      list.dc += dc_prof;
+      list.dc += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+    }
 
     return promises;
   }

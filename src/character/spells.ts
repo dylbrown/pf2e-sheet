@@ -1,4 +1,4 @@
-import { Score, Spell, SpellList } from './model';
+import { Attribute, Score, Spell, SpellList } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 
@@ -12,8 +12,10 @@ export default class Spells {
     if (list == null && spellSRC.length > 0) {
       list = this.lookup[spellSRC] = {
         name: spellSRC,
+        attack_attr: -1 as Attribute,
+        dc_attr: -1 as Attribute,
         attack: 0,
-        dc: 0,
+        dc: 10,
         type: '',
         known: [[], [], [], [], [], [], [], [], [], [], []],
         slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -39,6 +41,15 @@ export default class Spells {
         list.known[entry.spellLevel].push(spell);
       }
     }
+    function setTradition(list: SpellList, value: string) {
+      list.tradition = value[0] + value.toLowerCase().substring(1);
+      list.attack_attr = Object.values(Attribute).indexOf(
+        list.tradition + 'SpellAttacks'
+      ) as Attribute;
+      list.dc_attr = Object.values(Attribute).indexOf(
+        list.tradition + 'SpellDCs'
+      ) as Attribute;
+    }
     for (const entry of metaData) {
       const i = entry.value.indexOf('=');
       const key: string = entry.value.substring(0, i);
@@ -55,7 +66,7 @@ export default class Spells {
           break;
         }
         case 'spellLists': {
-          list.tradition = value[0] + value.toLowerCase().substring(1);
+          setTradition(list, value);
           break;
         }
         case 'spellSlots': {
@@ -85,9 +96,10 @@ export default class Spells {
         case 'innateSpell': {
           const innateList = this.getOrCreateSpellsList(entry.sourceType);
           innateList.type = 'Innate';
-          const idIndex = entry.value.indexOf(':');
-          const id = entry.value.substring(0, idIndex);
-          const spell = new Spell(id, Number(id));
+          const bits = entry.value.split(':::');
+          const spell = new Spell(bits[0], Number(bits[0]));
+          setTradition(innateList, bits[2]);
+          innateList.score = Util.getScore(bits[4]);
           promises.push(
             Wanderer.loadSpell(spell).then(() => {
               innateList.known[spell.level].push(spell);

@@ -66,6 +66,14 @@ export enum Attribute {
   MediumArmor,
   HeavyArmor,
   ClassDC,
+  ArcaneSpellAttacks,
+  ArcaneSpellDCs,
+  DivineSpellAttacks,
+  DivineSpellDCs,
+  OccultSpellAttacks,
+  OccultSpellDCs,
+  PrimalSpellAttacks,
+  PrimalSpellDCs,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -193,6 +201,8 @@ export class Spell {
 
 export type SpellList = {
   name: string;
+  attack_attr: Attribute;
+  dc_attr: Attribute;
   attack: number;
   dc: number;
   type: string;
