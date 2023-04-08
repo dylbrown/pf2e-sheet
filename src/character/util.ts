@@ -137,7 +137,15 @@ export function parseDescription(s: string) {
     /\((feat|action|activity|trait|spell): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
     '$2'
   );
-  const degrees = cleaned.replaceAll(
+  const actions = cleaned
+    .replaceAll('ONE-ACTION', '⯁')
+    .replaceAll('TWO-ACTIONS', '⯁⯁')
+    .replaceAll('THREE-ACTIONS', '⯁⯁⯁');
+  const spellReminders = actions.replaceAll(
+    /make a (ranged )?spell attack( rolls?)?/gi,
+    '<u>$&</u>'
+  );
+  const degrees = spellReminders.replaceAll(
     /((Critical )?(Success|Failure)):/gi,
     '<b>$1</b>'
   );

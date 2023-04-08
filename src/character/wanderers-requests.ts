@@ -93,12 +93,18 @@ export async function loadSpell(spell: Spell) {
   spell.source = Util.makeSource(entry.contentSrc);
   spell.traits = data.traits.map((o: { name: string }) => o.name);
   spell.requirements = entry?.requirements || '';
-  spell.range = entry?.range || '';
-  spell.area = entry?.area || '';
-  spell.targets = entry?.targets || '';
+  spell.range = entry?.range?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';
+  spell.area = entry?.area?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';
+  spell.targets = entry?.targets?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';
   spell.duration = entry?.duration || '';
   spell.save =
     entry.savingThrow != null
-      ? entry.savingThrow[0] + entry.savingThrow.substring(1).toLowerCase()
+      ? (entry.savingThrow as string)
+          .split('_')
+          .map(
+            (bit: string) =>
+              bit[0].toUpperCase() + bit.substring(1).toLowerCase()
+          )
+          .join(' ')
       : '';
 }

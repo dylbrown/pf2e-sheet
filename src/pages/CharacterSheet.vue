@@ -477,8 +477,8 @@
               ).filter(([_, a]) => a.activity)"
               :key="index"
             >
-              <ActionBlock :action="ability" />
               <div class="action-divider" v-if="index > 0"></div>
+              <ActionBlock :action="ability" />
             </template>
           </div>
           <div id="focus" v-if="character.spells.focusPoints > 0">

@@ -91,7 +91,7 @@ export function position(
   description: HTMLElement,
   descriptionHTML: string
 ) {
-  box.style.removeProperty('borderBottom');
+  box.style.removeProperty('border-bottom');
   box.style.removeProperty('top');
   box.style.removeProperty('left');
   description.style.removeProperty('top');
@@ -117,12 +117,15 @@ export function position(
     pos
   );
   chunk.classList.add('first-chunk');
+  let descSpace = pos.pageHeight - pos.top - infoHeight;
   while (pos.top + height >= pos.pageHeight) {
-    const remainder = binaryHeightSearch(box, chunk, pos.pageHeight - pos.top);
+    const remainder = binaryHeightSearch(box, chunk, descSpace);
     pos.moveLeft();
     if (remainder.length > 0) {
+      chunk.style.borderBottom = 'none';
       chunk = makeChunk(description, remainder, boxPos, pos);
       height = chunk.getBoundingClientRect().height;
+      descSpace = pos.pageHeight;
     } else height = 0;
   }
   pos.top += height;
@@ -141,7 +144,7 @@ function binaryHeightSearch(
     let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
     if (middle === -1) middle = end;
     text.innerHTML = contents.substring(0, middle);
-    if ((box.getBoundingClientRect().height ?? 0) > maxHeight) {
+    if ((text.getBoundingClientRect().height ?? 0) > maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;

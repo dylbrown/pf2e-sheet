@@ -50,15 +50,27 @@
         <div class="col-section-label">Item Name</div>
         <div class="col-section-label">Wt.</div>
         <template v-for="item of character.inventory" :key="item">
-          <div>{{ item.count }}</div>
-          <div>{{ item.name }}</div>
-          <div>{{ item.weight }}</div></template
+          <div class="fixed-item">{{ item.count }}</div>
+          <div class="fixed-item">{{ item.name }}</div>
+          <div class="fixed-item">{{ item.weight }}</div></template
         >
       </div>
       <template v-for="list of character.spells.lists" :key="list.name">
-        <PreparedList v-if="list.type == 'Prepared'" :list="list" />
-        <SpontaneousList v-if="list.type == 'Spontaneous'" :list="list" />
-        <InnateList v-if="list.type == 'Innate'" :list="list" />
+        <PreparedList
+          v-if="list.type == 'Prepared'"
+          :list="list"
+          :character="character"
+        />
+        <SpontaneousList
+          v-if="list.type == 'Spontaneous'"
+          :list="list"
+          :character="character"
+        />
+        <InnateList
+          v-if="list.type == 'Innate'"
+          :list="list"
+          :character="character"
+        />
         <template v-for="level of list.known.slice().reverse()">
           <SpellBlock
             v-for="spell of level"
@@ -127,6 +139,7 @@ const props = defineProps<{
   character: Character;
 }>();
 
+// References
 const page = ref<HTMLDivElement | null>(null);
 const abilities = ref<HTMLDivElement | null>(null);
 const classLabel = ref<HTMLDivElement | null>(null);
@@ -139,6 +152,8 @@ const inventoryGrid = ref<HTMLDivElement | null>(null);
 const spells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusSpells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusLabel = ref<HTMLDivElement | null>(null);
+
+// Positioning Function
 const position = () => {
   if (
     !abilities.value ||
@@ -149,50 +164,73 @@ const position = () => {
     !generalLabel.value ||
     !ancestryAbilities.value ||
     !ancestryLabel.value ||
-    !inventoryGrid.value ||
-    !spells.value ||
-    !focusSpells.value ||
-    !focusLabel.value
+    !inventoryGrid.value
   )
     return;
 
   const height = abilities.value.getBoundingClientRect().height + 1;
   page.value.style.top = height + 'px';
   const pos = new Positioning.Positioning(height);
+
+  // Class Feats & Features
   pos.apply(classLabel.value);
   for (const block of classAbilities.value) {
     block.position(pos);
   }
+
+  // Skill & General Feats
   pos.apply(generalLabel.value);
   for (const block of generalAbilities.value) {
     block.position(pos);
   }
+
+  // Ancestry Feats
   pos.apply(ancestryLabel.value);
   for (const block of ancestryAbilities.value) {
     block.position(pos);
   }
+
+  // Inventory
   pos.moveLeft();
+  for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
+    const item = inventoryGrid.value.children.item(i);
+    if (!item || item.classList.contains('fixed-item')) break;
+    inventoryGrid.value.removeChild(item);
+  }
+  while (inventoryGrid.value.getBoundingClientRect().height < height) {
+    inventoryGrid.value.appendChild(document.createElement('div'));
+  }
+  if (inventoryGrid.value.lastElementChild)
+    inventoryGrid.value.removeChild(inventoryGrid.value.lastElementChild);
   pos.apply(inventoryGrid.value);
-  for (const list of props.character.spells.lists) {
-    const header = document.querySelector(
-      `[data-list='${list.name}']`
-    ) as HTMLElement;
-    if (header) {
-      pos.moveLeft();
-      Positioning.positionHeader(pos, header);
-      for (const block of spells.value) {
-        if (block.$attrs['data-list'] == list.name) block.position(pos);
+
+  // Spells
+  if (spells.value) {
+    pos.moveLeft();
+    for (const list of props.character.spells.lists) {
+      const header = document.querySelector(
+        `[data-list='${list.name}']`
+      ) as HTMLElement;
+      if (header) {
+        Positioning.positionHeader(pos, header);
+        for (const block of spells.value) {
+          if (block.$attrs['data-list'] == list.name) block.position(pos);
+        }
       }
     }
   }
-  pos.apply(focusLabel.value);
-  for (const list of props.character.spells.lists) {
-    const header = document.querySelector(
-      `[data-focus='${list.name}']`
-    ) as HTMLElement;
-    if (header) Positioning.positionHeader(pos, header);
-    for (const block of focusSpells.value) {
-      if (block.$attrs['data-focus'] == list.name) block.position(pos);
+
+  // Focus Spells
+  if (focusLabel.value && focusSpells.value) {
+    pos.apply(focusLabel.value);
+    for (const list of props.character.spells.lists) {
+      const header = document.querySelector(
+        `[data-focus='${list.name}']`
+      ) as HTMLElement;
+      if (header) Positioning.positionHeader(pos, header);
+      for (const block of focusSpells.value) {
+        if (block.$attrs['data-focus'] == list.name) block.position(pos);
+      }
     }
   }
   /*
