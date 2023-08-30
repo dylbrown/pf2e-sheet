@@ -156,7 +156,8 @@ export default class Character {
     const attacks: any = JSON.parse(data.stats?.weapons);
     if (attacks instanceof Array) {
       for (const entry of attacks) {
-        if (entry.Name.includes('Improvised')) continue;
+        if (entry.Name.includes('Improvised') || attackMap.has(entry.Name))
+          continue;
         const attack: Weapon = {
           name: entry.Name,
           id: -1,
