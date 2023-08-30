@@ -1,7 +1,19 @@
+import { LocalStorage } from 'quasar';
 import { Ability, Action, Item, Spell, Weapon } from './model';
 import * as Util from './util';
 
-async function load(url: string) {
+async function load(url_prefix: string, ls_key: string, id: number) {
+  // First, try to retrieve from LocalStorage
+  const full_key = '2e-sheet:' + ls_key;
+  const cache = LocalStorage.getItem(full_key) as {
+    [id: number]: object;
+  } | null;
+  if (cache != null) {
+    if (cache[id]) return cache[id];
+  }
+
+  // If not, poll the API
+  const url = url_prefix + encodeURIComponent(id);
   let res = await fetch(url);
 
   // Wait a bit and then try one more time
@@ -17,21 +29,30 @@ async function load(url: string) {
     const json = await res.json();
     throw new Error(json.error);
   }
-  return res.json();
+  return res.json().then((json) => {
+    const new_cache = (LocalStorage.getItem(full_key) ?? {}) as {
+      [id: number]: object;
+    };
+    new_cache[id] = json;
+    LocalStorage.set(full_key, new_cache);
+    return json;
+  });
 }
 
 export async function loadClass(id: number) {
   const data = await load(
-    '/.netlify/functions/wanderers-request?type=class&id=' +
-      encodeURIComponent(id)
+    '/.netlify/functions/wanderers-request?type=class&id=',
+    'class',
+    id
   );
   return data;
 }
 
 export async function loadFeat(feat: Ability) {
   const data = await load(
-    '/.netlify/functions/wanderers-request?type=feat&id=' +
-      encodeURIComponent(feat.id)
+    '/.netlify/functions/wanderers-request?type=feat&id=',
+    'feat',
+    feat.id
   );
   feat.source = Util.makeSource(data.feat.contentSrc);
   feat.traits = data.traits.map((o: { name: string }) => o.name);
@@ -39,8 +60,9 @@ export async function loadFeat(feat: Ability) {
 
 export async function loadItem(item: Item) {
   const data = await load(
-    '/.netlify/functions/wanderers-request?type=item&id=' +
-      encodeURIComponent(item.id)
+    '/.netlify/functions/wanderers-request?type=item&id=',
+    'item',
+    item.id
   );
   const entry = data.item;
   item.traits = data.traits.map((o: { name: string }) => o.name);
@@ -56,8 +78,9 @@ export async function loadItem(item: Item) {
 
 export async function loadSpell(spell: Spell) {
   const data = await load(
-    '/.netlify/functions/wanderers-request?type=spell&id=' +
-      encodeURIComponent(spell.id)
+    '/.netlify/functions/wanderers-request?type=spell&id=',
+    'spell',
+    spell.id
   );
   const entry = data.spell;
   spell.name = entry.name;
