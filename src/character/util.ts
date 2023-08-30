@@ -1,3 +1,4 @@
+import { marked } from 'marked';
 import { Ability, AbilityType, Action, Score } from './model';
 
 export function abilityMod(score: number) {
@@ -158,9 +159,8 @@ export function parseDescription(s: string) {
     '</p>';
   const h_rules = header.replaceAll(/\n----?\n/gi, '<hr>');
   const BULLET = '\n* : ';
-  const bulleted = h_rules
-    .replaceAll(BULLET, '<br>- ')
-    .replaceAll('\n', '<br>');
-  const spacing = bulleted.replaceAll('~', '<br>');
-  return spacing;
+  const bulleted = h_rules.replaceAll(BULLET, '\n- ').replaceAll('\n', '\n');
+  const spacing = bulleted.replaceAll('~', '\n');
+  const bolded = spacing.replaceAll(/__([^_]+)__/gi, '<b>$1</b>');
+  return marked.parse(bolded);
 }

@@ -86,6 +86,7 @@ export default class Abilities extends Array<Ability> {
           frequency: entry.value?.frequency,
           requirements: entry.value?.requirements,
           trigger: entry.value?.trigger,
+          code: entry.value?.code ?? '',
         };
         promises.push(Wanderer.loadFeat(feat));
         this.push(feat);

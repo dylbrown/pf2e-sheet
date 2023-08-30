@@ -644,6 +644,11 @@ div.ability-section {
 .description-chunk > p:last-child {
   margin: 0;
 }
+.ability-description > table,
+.description-chunk > table {
+  max-width: 100%;
+  line-break: anywhere;
+}
 .description-header {
   background-color: black;
   border: 1px solid black;

@@ -157,6 +157,7 @@ export class Ability {
   frequency?: string;
   requirements?: string;
   trigger?: string;
+  code?: string;
 
   constructor(
     name: string,
