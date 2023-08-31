@@ -12,7 +12,7 @@ export class Positioning {
   top: number;
 
   constructor(pageHeight: number) {
-    this._pageHeight = pageHeight;
+    this._pageHeight = pageHeight + 2;
     this._page = 0;
     this._left = 0;
     this.top = 0;
@@ -80,6 +80,16 @@ export class Positioning {
 }
 
 export function positionHeader(pos: Positioning, box: HTMLElement) {
+  if (box.children.item(0)?.classList.contains('header-chunk')) {
+    const old_chunks = Array.from(box.children);
+    box.replaceChildren();
+    for (const chunk of old_chunks) {
+      box.append(...Array.from(chunk.children));
+      chunk.replaceChildren();
+      chunk.remove();
+    }
+  }
+
   box.style.left = pos.left;
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
