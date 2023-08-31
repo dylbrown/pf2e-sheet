@@ -244,7 +244,7 @@ div {
   justify-content: flex-end;
   min-height: 1em;
   min-width: 2em;
-  flex-grow: 1;
+  flex-grow: 0;
   align-self: stretch;
   justify-self: stretch;
   vertical-align: bottom;
@@ -732,7 +732,18 @@ div.col-section-label {
 .inventory-grid > div:nth-last-child(3) {
   border-bottom: 1px solid black;
 }
-.spells-prepared {
+
+.spells-prepared,
+.spells-spontaneous,
+.header-chunk {
+  position: relative;
+  break-before: avoid;
+  display: block;
+  flex-basis: 100%;
+  width: calc(100% / 3 - 8px);
+}
+
+.spells-prepared .header-chunk {
   flex-basis: 100%;
   display: grid;
   grid-auto-rows: auto;
@@ -743,15 +754,23 @@ div.col-section-label {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% / 3 - 8px);
+  width: 100%;
 }
-.spells-spontaneous {
+
+.spells-spontaneous .header-chunk {
   flex-basis: 100%;
   justify-content: stretch;
   font-size: 1rem;
   margin-bottom: 4px;
-  width: calc(100% / 3 - 8px);
   position: absolute;
+  width: 100%;
+}
+.header-chunk:not(.first-chunk) {
+  position: absolute;
+  width: calc(100% + 2px);
+  padding: 0px 3px 6px;
+  border: 1px dashed grey;
+  border-top: none;
 }
 .focus-rolls {
   justify-content: stretch;

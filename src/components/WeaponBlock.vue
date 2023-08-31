@@ -26,7 +26,7 @@
           <div class="label">Reload</div>
         </div>
         <div class="line">
-          <div class="underlined weapon-traits">
+          <div class="underlined weapon-traits bounded-line" data-max="1.6">
             {{ weapon.traits.join(', ') }}
           </div>
           <div class="label">Traits</div>

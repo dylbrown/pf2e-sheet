@@ -83,20 +83,55 @@ export function positionHeader(pos: Positioning, box: HTMLElement) {
   box.style.left = pos.left;
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
-  const height = box.getBoundingClientRect().height;
-  /*while (pos.top + height >= pos.pageHeight) {
-    const remainder = binaryDivHeightSearch(
-      box,
-      chunk,
-      pos.pageHeight - pos.top
-    );
+  let height = box.getBoundingClientRect().height;
+  const all = Array.from(box.children);
+  box.replaceChildren();
+  let chunk = makeHeaderChunk(box, all, boxPos, pos);
+  chunk.classList.add('first-chunk');
+  while (pos.top + height >= pos.pageHeight) {
+    const remainder = binaryDivHeightSearch(chunk, pos.pageHeight - pos.top);
     pos.moveLeft();
-    if (remainder.length > 0) {
-      chunk = makeChunk(description, remainder, boxPos, pos);
+    if (remainder.length > 0 && box.parentElement) {
+      chunk = makeHeaderChunk(box, remainder, boxPos, pos);
       height = chunk.getBoundingClientRect().height;
     } else height = 0;
-  }*/
+  }
   pos.top += height;
+}
+
+function makeHeaderChunk(
+  box: HTMLElement,
+  contents: Element[],
+  boxPos: Position,
+  pos: Positioning
+) {
+  const chunk = document.createElement('div');
+  chunk.classList.add('header-chunk');
+  chunk.replaceChildren(...contents);
+  box.appendChild(chunk);
+  chunk.style.left = pos.leftRelative(boxPos);
+  chunk.style.top = pos.topRelative(boxPos);
+  return chunk;
+}
+
+function binaryDivHeightSearch(box: HTMLElement, maxHeight: number) {
+  const children = Array.from(box.children);
+  let start = 0;
+  let end = box.children.length;
+  while (start < end) {
+    const middle = Math.ceil((start + end) / 2);
+    box.replaceChildren(...children.slice(0, middle));
+    if ((box.getBoundingClientRect().height ?? 0) + 5 >= maxHeight) {
+      end = Math.ceil((start + end) / 2) - 1;
+    } else {
+      start = middle;
+    }
+  }
+  box.replaceChildren(...children.slice(0, start));
+  if (end < children.length) {
+    box.style.borderBottom = 'none';
+  }
+  return children.slice(start);
 }
 
 export function position(

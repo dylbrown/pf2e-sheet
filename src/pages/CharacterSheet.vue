@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>
       <div id="leftThird">
@@ -445,13 +445,13 @@
               <div class="label">Traits</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">
+              <div class="underlined bounded-line">
                 {{ character.languages.join(', ') }}
               </div>
               <div class="label">Languages</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">
+              <div class="underlined bounded-line">
                 {{ character.senses.join(', ') }}
               </div>
               <div class="label">Senses</div>
@@ -572,10 +572,30 @@ import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
 import AbilitiesBlock from 'src/components/AbilitiesBlock.vue';
+import { onMounted, ref } from 'vue';
 
 defineProps<{
   character: Character;
 }>();
+
+const root = ref<HTMLDivElement | null>(null);
+
+onMounted(() => {
+  if (!root.value) return;
+  root.value.querySelectorAll('.bounded-line').forEach((val) => {
+    const value = val as HTMLElement;
+    const bound = parseFloat(val.getAttribute('data-max') ?? '2.1');
+    let size = parseFloat(getComputedStyle(value).fontSize);
+    while (
+      value.offsetHeight / parseFloat(getComputedStyle(value).lineHeight) >=
+        bound &&
+      size > 4
+    ) {
+      size -= 0.25;
+      value.style.fontSize = size.toString() + 'px';
+    }
+  });
+});
 </script>
 
 <style>
