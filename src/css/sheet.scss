@@ -667,22 +667,24 @@ div.ability-section {
 }
 .inventory-grid {
   flex-basis: 100%;
-  display: grid;
-  grid-auto-rows: auto;
-  grid-template-columns: 2fr 6fr 1fr;
-  font-size: 1rem;
-  break-before: column;
-  break-inside: avoid;
   position: absolute;
   top: 0;
   left: 0;
   width: calc(100% / 3 - 8px);
   box-sizing: border-box;
 }
-.inventory-grid:first-child {
+.inventory-grid > .grid-chunk {
+  display: grid;
+  grid-auto-rows: auto;
+  grid-template-columns: 2fr 6fr 1fr;
+  font-size: 1rem;
+  break-before: column;
+  break-inside: avoid;
+}
+.inventory-grid > .grid-chunk:first-child {
   padding-left: 3px;
 }
-.inventory-grid > div:not(.col-section-title) {
+.inventory-grid > .grid-chunk > div:not(.col-section-title) {
   padding: 0 2px;
   border-bottom: 1px dotted lightgray;
   min-height: 2.2em;
@@ -707,7 +709,7 @@ div.col-section-title {
   height: 2em;
   min-height: 2em;
 }
-.inventory-grid > div.inventory-title {
+.inventory-grid > .grid-chunk > div.inventory-title {
   grid-column-end: span 3;
   margin: 0;
 }
@@ -716,25 +718,28 @@ div.col-section-label {
   border-bottom: 1px solid black;
   border-top: 1px solid black;
 }
-.inventory-grid > div:nth-child(3n + 2) {
+.inventory-grid > .grid-chunk.first-chunk > div:nth-child(3n + 2),
+.inventory-grid > .grid-chunk:not(.first-chunk) > div:nth-child(3n + 1) {
   text-align: right;
   justify-content: flex-end;
   border-left: 1px solid black;
   border-right: 1px solid black;
 }
-.inventory-grid > div:nth-child(3n + 4) {
+.inventory-grid > .grid-chunk.first-chunk > div:nth-child(3n + 4),
+.inventory-grid > .grid-chunk:not(.first-chunk) > div:nth-child(3n) {
   text-align: center;
   justify-content: center;
   border-right: 1px solid black;
 }
-.inventory-grid > div:nth-last-child(1),
-.inventory-grid > div:nth-last-child(2),
-.inventory-grid > div:nth-last-child(3) {
+.inventory-grid > .grid-chunk > div:nth-last-child(1),
+.inventory-grid > .grid-chunk > div:nth-last-child(2),
+.inventory-grid > .grid-chunk > div:nth-last-child(3) {
   border-bottom: 1px solid black;
 }
 
 .spells-prepared,
 .spells-spontaneous,
+.spells-spontaneous-grid,
 .header-chunk {
   position: relative;
   break-before: avoid;
@@ -778,14 +783,22 @@ div.col-section-label {
   width: calc(100% / 3 - 8px);
   position: absolute;
 }
-.spells-spontaneous-grid {
-  width: 100%;
+.spells-spontaneous-grid > .grid-chunk {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 1fr 1fr;
   border: 1px solid black;
   box-sizing: border-box;
   padding-bottom: 2px;
+}
+.grid-chunk {
+  font-size: 1rem;
+  flex-basis: 100%;
+}
+.grid-chunk:not(:first-child) {
+  position: absolute;
+  break-before: avoid;
+  width: 100%;
 }
 .spells-title {
   grid-column-end: span 2;
@@ -887,7 +900,7 @@ div.col-center {
   padding-left: 2px;
   border-left: 1px solid black;
 }
-.spells-spontaneous div.spells-name {
+.spells-spontaneous-grid div.spells-name {
   flex-grow: 0;
   padding: 2px;
   box-sizing: border-box;

@@ -204,7 +204,7 @@ function binaryHeightSearch(
     let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
     if (middle === -1) middle = end;
     text.innerHTML = contents.substring(0, middle);
-    if ((text.getBoundingClientRect().height ?? 0) + 5 >= maxHeight) {
+    if ((text.getBoundingClientRect().height ?? 0) + 15 >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;
@@ -227,6 +227,52 @@ function makeChunk(
   chunk.classList.add('description-chunk');
   chunk.innerHTML = contents;
   description.appendChild(chunk);
+  chunk.style.left = pos.leftRelative(boxPos);
+  chunk.style.top = pos.topRelative(boxPos);
+  return chunk;
+}
+
+export function positionGrid(pos: Positioning, box: HTMLElement) {
+  if (box.children.item(0)?.classList.contains('grid-chunk')) {
+    const old_chunks = Array.from(box.children);
+    box.replaceChildren();
+    for (const chunk of old_chunks) {
+      box.append(...Array.from(chunk.children));
+      chunk.replaceChildren();
+      chunk.remove();
+    }
+  }
+
+  box.style.left = pos.left;
+  box.style.top = pos.totalTop;
+  const boxPos = pos.pos;
+  let height = box.getBoundingClientRect().height;
+  const all = Array.from(box.children);
+  box.replaceChildren();
+  let chunk = makeGridChunk(box, all, boxPos, pos);
+  chunk.classList.add('first-chunk');
+  while (pos.top + height >= pos.pageHeight) {
+    const remainder = binaryDivHeightSearch(chunk, pos.pageHeight - pos.top);
+    pos.moveLeft();
+    if (remainder.length > 0 && box.parentElement) {
+      chunk = makeGridChunk(box, remainder, boxPos, pos);
+      height = chunk.getBoundingClientRect().height;
+    } else height = 0;
+  }
+  height = chunk.getBoundingClientRect().height;
+  pos.top += height;
+}
+
+function makeGridChunk(
+  box: HTMLElement,
+  contents: Element[],
+  boxPos: Position,
+  pos: Positioning
+) {
+  const chunk = document.createElement('div');
+  chunk.classList.add('grid-chunk');
+  chunk.replaceChildren(...contents);
+  box.appendChild(chunk);
   chunk.style.left = pos.leftRelative(boxPos);
   chunk.style.top = pos.topRelative(boxPos);
   return chunk;

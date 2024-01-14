@@ -11,7 +11,9 @@
         {{ list.dc }}
       </div>
     </div>
-    <div class="spells-spontaneous-grid">
+  </div>
+  <div class="spells-spontaneous-grid" :data-grid="list.name">
+    <div class="grid-chunk">
       <template
         v-for="[index, level] of Array.from(list.known.entries())
           .reverse()

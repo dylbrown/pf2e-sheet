@@ -45,15 +45,17 @@
         :ability="ability"
       />
       <div class="inventory-grid" ref="inventoryGrid">
-        <div class="inventory-title col-section-title">Inventory</div>
-        <div class="col-section-label">#</div>
-        <div class="col-section-label">Item Name</div>
-        <div class="col-section-label">Wt.</div>
-        <template v-for="item of character.inventory" :key="item">
-          <div class="fixed-item">{{ item.count }}</div>
-          <div class="fixed-item">{{ item.name }}</div>
-          <div class="fixed-item">{{ item.weight }}</div></template
-        >
+        <div class="grid-chunk">
+          <div class="inventory-title col-section-title">Inventory</div>
+          <div class="col-section-label">#</div>
+          <div class="col-section-label">Item Name</div>
+          <div class="col-section-label">Wt.</div>
+          <template v-for="item of character.inventory" :key="item">
+            <div class="fixed-item">{{ item.count }}</div>
+            <div class="fixed-item">{{ item.name }}</div>
+            <div class="fixed-item">{{ item.weight }}</div></template
+          >
+        </div>
       </div>
       <template v-for="list of character.spells.lists" :key="list.name">
         <PreparedList
@@ -96,7 +98,9 @@
           :key="list.name"
         >
           <div class="focus-rolls do-not-break" :data-focus="list.name">
-            <div class="spells-title col-section-title">{{ list.name }}</div>
+            <div class="spells-title col-section-title" style="width: 100%">
+              {{ list.name }}
+            </div>
             <div class="spells-stats" v-if="list.type == 'None'">
               <div class="rollLabel">Spell Attack</div>
               <div class="numBox rounded">
@@ -191,7 +195,8 @@ const position = () => {
   }
 
   // Inventory
-  pos.moveLeft();
+  //pos.moveLeft();
+  /*
   for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
     const item = inventoryGrid.value.children.item(i);
     if (!item || item.classList.contains('fixed-item')) break;
@@ -201,18 +206,24 @@ const position = () => {
     inventoryGrid.value.appendChild(document.createElement('div'));
   }
   if (inventoryGrid.value.lastElementChild)
-    inventoryGrid.value.removeChild(inventoryGrid.value.lastElementChild);
-  pos.apply(inventoryGrid.value);
+    inventoryGrid.value.removeChild(inventoryGrid.value.lastElementChild);*/
+  Positioning.positionGrid(pos, inventoryGrid.value);
 
   // Spells
   if (spells.value) {
-    pos.moveLeft();
+    //pos.moveLeft();
     for (const list of props.character.spells.lists) {
       const header = document.querySelector(
         `[data-list='${list.name}']`
       ) as HTMLElement;
       if (header) {
         Positioning.positionHeader(pos, header);
+        const grid = document.querySelector(
+          `[data-grid='${list.name}']`
+        ) as HTMLElement;
+        if (grid) {
+          Positioning.positionGrid(pos, grid);
+        }
         for (const block of spells.value) {
           if (block.$attrs['data-list'] == list.name) block.position(pos);
         }
