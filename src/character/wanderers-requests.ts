@@ -90,6 +90,14 @@ export async function loadSpell(spell: Spell) {
   for (const ordinal of ['One', 'Two', 'Three', 'Four']) {
     const val = entry['heightened' + ordinal + 'Val'];
     if (val == null) continue;
+    if (val == 'CUSTOM') {
+      const text = entry['heightened' + ordinal + 'Text'].replaceAll(
+        /~ (\(\d{1,2}\w\w\))/gi,
+        '<br><b>$1</b>'
+      );
+      spell.description += Util.parseDescription(text);
+      break;
+    }
     const type_and_num = val.split('_', 2);
     let label = '';
     if (type_and_num[0] == 'PLUS') {

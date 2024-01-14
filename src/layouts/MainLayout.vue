@@ -45,7 +45,9 @@ const load = () => {
       let promises = character.load(JSON.parse(reader.result as string));
       Promise.all(promises)
         .then(() => (ready.value = true))
-        .catch((a) => console.log(a));
+        .catch((a) => {
+          console.log(a);
+        });
       for (const promise of promises) {
         promise.then(() => {
           progress.value += 1.0 / promises.length;

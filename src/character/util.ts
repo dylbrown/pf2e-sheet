@@ -162,5 +162,7 @@ export function parseDescription(s: string) {
   const bulleted = h_rules.replaceAll(BULLET, '\n- ').replaceAll('\n', '\n');
   const spacing = bulleted.replaceAll('~', '\n');
   const bolded = spacing.replaceAll(/__([^_]+)__/gi, '<b>$1</b>');
-  return marked.parse(bolded);
+  const links = bolded.replaceAll(/\[http[^\]]*\]/gi, '');
+  const excessSpace = links.replaceAll(/<br>(\s*<br>)+/gi, '<br>');
+  return marked.parse(excessSpace).replaceAll(/\n/gi, '<br>');
 }

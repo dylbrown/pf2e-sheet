@@ -106,6 +106,7 @@ export function positionHeader(pos: Positioning, box: HTMLElement) {
       height = chunk.getBoundingClientRect().height;
     } else height = 0;
   }
+  height = chunk.getBoundingClientRect().height;
   pos.top += height;
 }
 

@@ -79,7 +79,7 @@ export default class Character {
     const info: any = JSON.parse(data.stats?.generalInfo);
     this.size = info?.size ?? '';
     const traits = info?.traits;
-    if (traits instanceof Array<string>) this.traits = traits;
+    if (traits instanceof Array) this.traits = traits;
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',
