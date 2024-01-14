@@ -783,6 +783,9 @@ div.col-section-label {
   width: calc(100% / 3 - 8px);
   position: absolute;
 }
+.focus-rolls > .header-chunk {
+  width: 100%;
+}
 .spells-spontaneous-grid > .grid-chunk {
   display: grid;
   grid-auto-rows: auto;

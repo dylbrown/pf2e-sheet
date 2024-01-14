@@ -98,7 +98,7 @@
           :key="list.name"
         >
           <div class="focus-rolls do-not-break" :data-focus="list.name">
-            <div class="spells-title col-section-title" style="width: 100%">
+            <div class="spells-title col-section-title">
               {{ list.name }}
             </div>
             <div class="spells-stats" v-if="list.type == 'None'">
