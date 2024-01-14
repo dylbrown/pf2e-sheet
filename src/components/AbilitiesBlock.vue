@@ -195,7 +195,7 @@ const position = () => {
   }
 
   // Inventory
-  //pos.moveLeft();
+  pos.moveLeftIfPast(0.75);
   /*
   for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
     const item = inventoryGrid.value.children.item(i);
@@ -211,7 +211,7 @@ const position = () => {
 
   // Spells
   if (spells.value) {
-    //pos.moveLeft();
+    pos.moveLeftIfPast(0.75);
     for (const list of props.character.spells.lists) {
       const header = document.querySelector(
         `[data-list='${list.name}']`

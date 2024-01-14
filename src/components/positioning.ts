@@ -44,6 +44,10 @@ export class Positioning {
     this._page += this._left == 0 ? 1 : 0;
   }
 
+  public moveLeftIfPast(threshold: number) {
+    if ((this.top * 1.0) / this.pageHeight >= threshold) this.moveLeft();
+  }
+
   public leftRelative(boxPos: Position) {
     const shift = this._left - boxPos.left;
     return `calc(${shift}00% + ${
@@ -132,7 +136,7 @@ function binaryDivHeightSearch(box: HTMLElement, maxHeight: number) {
   while (start < end) {
     const middle = Math.ceil((start + end) / 2);
     box.replaceChildren(...children.slice(0, middle));
-    if ((box.getBoundingClientRect().height ?? 0) + 5 >= maxHeight) {
+    if ((box.getBoundingClientRect().height ?? 0) + 15 >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;
