@@ -1,5 +1,5 @@
 <template>
-  <div class="printButton" ref="printButton">Print (Experimental)</div>
+  <div class="printButton" ref="printButton">Export to PDF</div>
   <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>

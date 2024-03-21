@@ -5,13 +5,13 @@ import Character from 'src/character/character';
 export default class PDFSheet {
   makeSheet(character: Character, pages: HTMLCollectionOf<HTMLElement>) {
     const pagePromises = [];
-    const scale = 8;
+    const scale = 10;
     for (const page of Array.from(pages)) {
       pagePromises.push(
         html2canvas(page, {
           scale: scale, // Adjusts your resolution
-          windowWidth: 1100,
-          windowHeight: 850,
+          windowWidth: (window.innerHeight * 11.0) / 8.5,
+          windowHeight: window.innerHeight,
           onclone: (document) => {
             Array.from(document.querySelectorAll('*')).forEach((e) => {
               const existingStyle = e.getAttribute('style') || '';

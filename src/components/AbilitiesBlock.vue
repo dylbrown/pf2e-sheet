@@ -262,13 +262,5 @@ const position = () => {
 };
 onMounted(() => {
   position();
-  window.matchMedia('print').addEventListener('change', position);
-  window.matchMedia('screen').addEventListener('change', position);
-  window.addEventListener('resize', position);
-});
-onUnmounted(() => {
-  window.matchMedia('print').removeEventListener('change', position);
-  window.matchMedia('screen').removeEventListener('change', position);
-  window.removeEventListener('resize', position);
 });
 </script>

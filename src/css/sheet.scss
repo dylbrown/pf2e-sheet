@@ -2,6 +2,7 @@ html,
 body,
 * {
   font-family: 'Roboto Mono', monospace;
+  line-height: 1.5;
 }
 .height_measure {
   position: fixed;
@@ -40,7 +41,7 @@ body,
     top: 7.7in;
   }
   html {
-    font-size: 2.1vh;
+    font-size: 14px;
   }
 }
 @media screen {
@@ -51,8 +52,8 @@ body,
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: calc(100vh * 11 / 8.5 * 10.2 / 11);
+    height: calc(100vh * 7.7 / 8.5);
     box-sizing: border-box;
     border: 1px dashed grey;
   }
@@ -73,10 +74,10 @@ body,
     position: absolute;
     left: 50vw;
     transform: translate(-50%, 0);
-    width: calc(calc(100vh) * 11 / 8.5);
-    height: 100vh;
+    width: calc(100vh * 11 / 8.5 * 10.2 / 11);
+    height: calc(100vh * 7.7 / 8.5);
     overflow: visible;
-    font-size: min(2.2vh, 18px);
+    font-size: 14px;
   }
   .page:nth-child(1) {
     top: 0;
@@ -85,7 +86,7 @@ body,
     top: 100vh;
   }
   html {
-    font-size: min(2.2vh, 18px);
+    font-size: 14px;
   }
 }
 @media (max-height: 600px) {
@@ -340,7 +341,7 @@ div {
   color: white;
 }
 .box-label {
-  font-size: 0.5rem;
+  font-size: 0.5em;
   color: #333;
   flex-grow: 0;
   text-align: center;
@@ -359,7 +360,7 @@ div {
 }
 
 .sectionLabel {
-  font-size: 0.7rem;
+  font-size: 0.7em;
   color: #333;
   flex-grow: 0;
   font-weight: bold;
@@ -444,10 +445,10 @@ div.action-label {
   font-size: 0.8em;
 }
 .action {
-  font-size: 0.8rem;
+  font-size: 0.8em;
 }
 .underText {
-  font-size: 0.6rem;
+  font-size: 0.6em;
   color: #444;
 }
 .wide8 {
@@ -641,7 +642,7 @@ div.ability-section {
 }
 .ability-description > p,
 .description-chunk > p {
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.25em;
 }
 .ability-description > p:last-child,
 .description-chunk > p:last-child {
@@ -680,7 +681,7 @@ div.ability-section {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 2fr 6fr 1fr;
-  font-size: 1rem;
+  font-size: 1.2em;
   break-before: column;
   break-inside: avoid;
 }
@@ -756,7 +757,7 @@ div.col-section-label {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 10fr 3fr;
-  font-size: 1rem;
+  font-size: 1em;
   margin-bottom: 4px;
   break-before: column;
   position: absolute;
@@ -968,7 +969,7 @@ div.spell-cost-optional > span {
 }
 
 .printButton {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   background-color: grey;
@@ -977,5 +978,6 @@ div.spell-cost-optional > span {
   border: 1px solid lightgray;
   padding: 2px;
   z-index: 100;
+  font-size: 1.6em;
   user-select: none;
 }
