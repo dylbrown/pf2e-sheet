@@ -85,7 +85,7 @@
       </template>
       <template v-if="character.spells.focusPoints > 0">
         <div
-          style="position: absolute; width: calc(100% / 3 - 8px)"
+          style="position: absolute; width: calc(100% / 3)"
           class="do-not-break"
           ref="focusLabel"
         >

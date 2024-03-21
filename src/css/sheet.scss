@@ -571,7 +571,7 @@ div.action-label {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   flex-grow: 0;
   padding: 6px 3px;
   border: 1px dashed grey;
@@ -673,7 +673,7 @@ div.ability-section {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   box-sizing: border-box;
 }
 .inventory-grid > .grid-chunk {
@@ -748,7 +748,7 @@ div.col-section-label {
   break-before: avoid;
   display: block;
   flex-basis: 100%;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
 }
 
 .spells-prepared .header-chunk {
@@ -783,7 +783,7 @@ div.col-section-label {
 .focus-rolls {
   justify-content: stretch;
   font-size: 1rem;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   position: absolute;
 }
 .focus-rolls > .header-chunk {

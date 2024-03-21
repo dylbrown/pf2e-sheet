@@ -4,12 +4,6 @@ import Character from 'src/character/character';
 
 export default class PDFSheet {
   makeSheet(character: Character, pages: HTMLCollectionOf<HTMLElement>) {
-    const firstPage = pages[0];
-    const left = (firstPage.offsetWidth / 10.2) * 0.4;
-    const top = (firstPage.offsetWidth / 10.2) * 0.4;
-    const width = firstPage.offsetWidth;
-    const height = firstPage.offsetHeight;
-
     const pagePromises = [];
     const scale = 8;
     for (const page of Array.from(pages)) {
@@ -18,7 +12,6 @@ export default class PDFSheet {
           scale: scale, // Adjusts your resolution
           windowWidth: 1100,
           windowHeight: 850,
-          allowTaint: true,
           onclone: (document) => {
             Array.from(document.querySelectorAll('*')).forEach((e) => {
               const existingStyle = e.getAttribute('style') || '';
@@ -35,17 +28,22 @@ export default class PDFSheet {
     Promise.all(pagePromises).then((canvases) => {
       const doc = new jsPDF({
         orientation: 'landscape',
-        unit: 'px',
+        unit: 'in',
         format: 'letter',
-        hotfixes: ['px_scaling'],
       });
 
-      const img1 = canvases[0].toDataURL('image/jpeg', 1);
       const ctx = canvases[0].getContext('2d');
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
       }
-      doc.addImage(img1, 'JPEG', left, top, width, height);
+      doc.addImage(
+        canvases[0].toDataURL('image/jpeg', 1),
+        'JPEG',
+        0.4,
+        0.4,
+        10.2,
+        7.7
+      );
 
       const multicanvas = canvases[1];
       const numPages = parseInt(pages[1].dataset.pages ?? '1');
@@ -55,17 +53,17 @@ export default class PDFSheet {
           .getContext('2d')
           ?.getImageData(
             0,
-            page * height * scale,
-            width * scale,
-            height * scale
+            (page * multicanvas.height) / 1.0 / numPages,
+            multicanvas.width,
+            multicanvas.height / 1.0 / numPages
           );
         if (!imageContentRaw) continue;
         doc.addPage('letter', 'landscape');
         // create new canvas
         const canvas = document.createElement('canvas');
         // with the correct size
-        canvas.width = width * scale;
-        canvas.height = height * scale;
+        canvas.width = multicanvas.width;
+        canvas.height = multicanvas.height / 1.0 / numPages;
         // put there raw image data
         // expected to be faster as there are no scaling, etc
         canvas.getContext('2d')?.putImageData(imageContentRaw, 0, 0);
@@ -77,10 +75,10 @@ export default class PDFSheet {
         doc.addImage(
           canvas.toDataURL('image/jpeg', 1.0),
           'JPEG',
-          left,
-          top,
-          width,
-          height
+          0.4,
+          0.4,
+          10.2,
+          7.7
         );
       }
       doc.save(`${character.name}_${character.level}.pdf`);
