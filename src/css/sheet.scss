@@ -41,7 +41,7 @@ body,
     top: 7.7in;
   }
   html {
-    font-size: 14px;
+    font-size: calc(2.5vh - 4px);
   }
 }
 @media screen {
@@ -77,7 +77,7 @@ body,
     width: calc(100vh * 11 / 8.5 * 10.2 / 11);
     height: calc(100vh * 7.7 / 8.5);
     overflow: visible;
-    font-size: 14px;
+    font-size: calc(2.5vh - 3.5px);
   }
   .page:nth-child(1) {
     top: 0;
@@ -86,12 +86,12 @@ body,
     top: 100vh;
   }
   html {
-    font-size: 14px;
+    font-size: calc(2.5vh - 4px);
   }
 }
 @media (max-height: 600px) {
   #page1 {
-    font-size: 2vh;
+    font-size: calc(2.5vh - 4px);
   }
 }
 
