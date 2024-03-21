@@ -1,4 +1,5 @@
 <template>
+  <div class="printButton" ref="printButton">Print (Experimental)</div>
   <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>
@@ -16,109 +17,109 @@
               <div class="inverted numBox rounded" style="font-weight: bold">
                 STR
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Strength]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Strength] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
             <div class="line">
               <div class="inverted numBox rounded" style="font-weight: bold">
                 INT
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Intelligence]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Intelligence] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
             <div class="line">
               <div class="inverted numBox rounded" style="font-weight: bold">
                 DEX
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Dexterity]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Dexterity] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
             <div class="line">
               <div class="inverted numBox rounded" style="font-weight: bold">
                 WIS
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Wisdom]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Wisdom] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
             <div class="line">
               <div class="inverted numBox rounded" style="font-weight: bold">
                 CON
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Constitution]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Constitution] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
             <div class="line">
               <div class="inverted numBox rounded" style="font-weight: bold">
                 CHA
               </div>
-              <div class="label invisible">A</div>
+              <div class="labello invisible">A</div>
             </div>
             <div class="line">
               <div class="underlined-roll">
                 {{ abilityMod(character.scores[Score.Charisma]) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.scores[Score.Charisma] }}
               </div>
-              <div class="label">Score</div>
+              <div class="labello">Score</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -128,13 +129,13 @@
           <div class="row-between">
             <div class="line">
               <div class="numBox rounded">{{ character.speed }} ft.</div>
-              <div class="label">Speed</div>
+              <div class="labello">Speed</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.classDC }}
               </div>
-              <div class="label">Class DC</div>
+              <div class="labello">Class DC</div>
             </div>
             <div class="line" style="flex-grow: 0">
               <div class="hero-grid">
@@ -142,7 +143,7 @@
                 <div class="hero-box"></div>
                 <div class="hero-box"></div>
               </div>
-              <div class="label">Hero Points</div>
+              <div class="labello">Hero Points</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -152,15 +153,15 @@
           <div class="row-between" style="flex-grow: 2">
             <div class="line" style="flex-grow: 0">
               <div class="numBox rounded">{{ character.hp }}</div>
-              <div class="label">Max</div>
+              <div class="labello">Max</div>
             </div>
             <div class="line">
               <div class="numBox"></div>
-              <div class="label">Current</div>
+              <div class="labello">Current</div>
             </div>
             <div class="line">
               <div class="numBox"></div>
-              <div class="label">Conditions</div>
+              <div class="labello">Conditions</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -171,7 +172,7 @@
             <div class="top-right rollLabel">AC</div>
             <div class="line">
               <div class="underlined-roll">{{ character.ac }}</div>
-              <div class="label">Total</div>
+              <div class="labello">Total</div>
             </div>
             <div class="line">
               <div class="numBox rounded" style="border: none">10</div>
@@ -214,13 +215,13 @@
               <div class="underlined-roll">
                 {{ signed(character.attributes[Attribute.Perception].total) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ abilityMod(character.scores[Score.Wisdom]) }}
               </div>
-              <div class="label">WIS</div>
+              <div class="labello">WIS</div>
             </div>
             <ProficiencyDisplay
               :proficiency="
@@ -234,24 +235,24 @@
                   nonzero(character.attributes[Attribute.Perception].itemBonus)
                 }}
               </div>
-              <div class="label">Item</div>
+              <div class="labello">Item</div>
             </div>
             <div class="line">
               <div class="numBox dashed"></div>
-              <div class="label">Temp</div>
+              <div class="labello">Temp</div>
             </div>
             <div class="center-right rollLabel">FORTITUDE</div>
             <div class="line">
               <div class="underlined-roll">
                 {{ signed(character.attributes[Attribute.Fortitude].total) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ abilityMod(character.scores[Score.Constitution]) }}
               </div>
-              <div class="label">CON</div>
+              <div class="labello">CON</div>
             </div>
             <ProficiencyDisplay
               :proficiency="
@@ -265,24 +266,24 @@
                   nonzero(character.attributes[Attribute.Fortitude].itemBonus)
                 }}
               </div>
-              <div class="label">Item</div>
+              <div class="labello">Item</div>
             </div>
             <div class="line">
               <div class="numBox dashed"></div>
-              <div class="label">Temp</div>
+              <div class="labello">Temp</div>
             </div>
             <div class="center-right rollLabel">REFLEX</div>
             <div class="line">
               <div class="underlined-roll">
                 {{ signed(character.attributes[Attribute.Reflex].total) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ abilityMod(character.scores[Score.Dexterity]) }}
               </div>
-              <div class="label">DEX</div>
+              <div class="labello">DEX</div>
             </div>
             <ProficiencyDisplay
               :proficiency="character.attributes[Attribute.Reflex].proficiency"
@@ -292,24 +293,24 @@
               <div class="numBox">
                 {{ nonzero(character.attributes[Attribute.Reflex].itemBonus) }}
               </div>
-              <div class="label">Item</div>
+              <div class="labello">Item</div>
             </div>
             <div class="line">
               <div class="numBox dashed"></div>
-              <div class="label">Temp</div>
+              <div class="labello">Temp</div>
             </div>
             <div class="center-right rollLabel">WILL</div>
             <div class="line">
               <div class="underlined-roll">
                 {{ signed(character.attributes[Attribute.Will].total) }}
               </div>
-              <div class="label">Mod</div>
+              <div class="labello">Mod</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ abilityMod(character.scores[Score.Wisdom]) }}
               </div>
-              <div class="label">WIS</div>
+              <div class="labello">WIS</div>
             </div>
             <ProficiencyDisplay
               :proficiency="character.attributes[Attribute.Will].proficiency"
@@ -319,11 +320,11 @@
               <div class="numBox">
                 {{ nonzero(character.attributes[Attribute.Will].itemBonus) }}
               </div>
-              <div class="label">Item</div>
+              <div class="labello">Item</div>
             </div>
             <div class="line">
               <div class="numBox dashed"></div>
-              <div class="label">Temp</div>
+              <div class="labello">Temp</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -355,10 +356,10 @@
               "
               :grid="false"
             />
-            <div class="label">Unarmed</div>
-            <div class="label">Simple</div>
-            <div class="label">Martial</div>
-            <div class="label">Advanced</div>
+            <div class="labello">Unarmed</div>
+            <div class="labello">Simple</div>
+            <div class="labello">Martial</div>
+            <div class="labello">Advanced</div>
             <ProficiencyDisplay
               :proficiency="
                 character.attributes[Attribute.UnarmoredDefense].proficiency
@@ -383,10 +384,10 @@
               "
               :grid="false"
             />
-            <div class="label">Unarmored</div>
-            <div class="label">Light</div>
-            <div class="label">Medium</div>
-            <div class="label">Heavy</div>
+            <div class="labello">Unarmored</div>
+            <div class="labello">Light</div>
+            <div class="labello">Medium</div>
+            <div class="labello">Heavy</div>
           </div>
         </div>
       </div>
@@ -404,57 +405,57 @@
               <div class="underlined wrap">
                 {{ character.name }}
               </div>
-              <div class="label">Character Name</div>
+              <div class="labello">Character Name</div>
             </div>
             <div class="line" style="grid-column-end: span 2; min-height: 2em">
               <div class="underlined">
                 {{ character.ancestry }}
               </div>
-              <div class="label">Ancestry & Heritage</div>
+              <div class="labello">Ancestry & Heritage</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
               <div class="underlined">{{ character.background }}</div>
-              <div class="label">Background</div>
+              <div class="labello">Background</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
               <div class="underlined">{{ character.player }}</div>
-              <div class="label">Player</div>
+              <div class="labello">Player</div>
             </div>
             <div class="line">
               <div class="underlined">
                 {{ character.class }} {{ character.level }}
               </div>
-              <div class="label">Class</div>
+              <div class="labello">Class</div>
             </div>
             <div class="line">
               <div class="underlined">{{ character.deity }}</div>
-              <div class="label">Deity</div>
+              <div class="labello">Deity</div>
             </div>
             <div class="line">
               <div class="underlined">{{ character.alignment }}</div>
-              <div class="label">Alignment</div>
+              <div class="labello">Alignment</div>
             </div>
             <div class="line">
               <div class="underlined">{{ character.size }}</div>
-              <div class="label">Size</div>
+              <div class="labello">Size</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
               <div class="underlined">
                 {{ character.traits.join(', ') }}
               </div>
-              <div class="label">Traits</div>
+              <div class="labello">Traits</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
               <div class="underlined bounded-line">
                 {{ character.languages.join(', ') }}
               </div>
-              <div class="label">Languages</div>
+              <div class="labello">Languages</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
               <div class="underlined bounded-line">
                 {{ character.senses.join(', ') }}
               </div>
-              <div class="label">Senses</div>
+              <div class="labello">Senses</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -484,13 +485,13 @@
           <div id="focus" v-if="character.spells.focusPoints > 0">
             <div class="line">
               <div class="numBox rounded"></div>
-              <div class="label">Focus</div>
+              <div class="labello">Focus</div>
             </div>
             <div class="line">
               <div class="numBox rounded">
                 {{ character.spells.focusPoints }}
               </div>
-              <div class="label">Max Focus</div>
+              <div class="labello">Max Focus</div>
             </div>
           </div>
         </div>
@@ -502,11 +503,11 @@
           </div>
           <div class="sectionLabel">Skills</div>
           <div id="skills-grid">
-            <div class="label">Skill</div>
-            <div class="label">Total</div>
-            <div class="label">Stat</div>
-            <div class="label">Prof</div>
-            <div class="label">Item</div>
+            <div class="labello">Skill</div>
+            <div class="labello">Total</div>
+            <div class="labello">Stat</div>
+            <div class="labello">Prof</div>
+            <div class="labello">Item</div>
             <template v-for="skill of skills" :key="skill">
               <div class="skill-label">{{ Attribute[skill] }}</div>
               <div class="line">
@@ -558,8 +559,7 @@
         </div>
       </div>
     </div>
-    <AbilitiesBlock :character="character" />
-    <div class="separator first-page" style="top: -3px"></div>
+    <AbilitiesBlock :character="character" :heightMeasure="heightMeasure" />
     <div class="height_measure" ref="heightMeasure"></div>
   </div>
 </template>
@@ -573,12 +573,15 @@ import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
 import AbilitiesBlock from 'src/components/AbilitiesBlock.vue';
 import { onMounted, ref } from 'vue';
+import PDFSheet from './pdf-sheet';
 
-defineProps<{
+const props = defineProps<{
   character: Character;
 }>();
 
 const root = ref<HTMLDivElement | null>(null);
+const printButton = ref<HTMLDivElement | null>(null);
+const heightMeasure = ref<HTMLDivElement | null>(null);
 
 onMounted(() => {
   if (!root.value) return;
@@ -594,6 +597,15 @@ onMounted(() => {
       size -= 0.25;
       value.style.fontSize = size.toString() + 'px';
     }
+  });
+  if (!printButton.value) return;
+  printButton.value.addEventListener('click', () => {
+    if (!root.value) return;
+    const sheet = new PDFSheet();
+    sheet.makeSheet(
+      props.character,
+      root.value.children as HTMLCollectionOf<HTMLElement>
+    );
   });
 });
 </script>

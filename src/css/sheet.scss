@@ -1,6 +1,7 @@
 html,
-body {
-  font-family: monospace;
+body,
+* {
+  font-family: 'Roboto Mono', monospace;
 }
 .height_measure {
   position: fixed;
@@ -326,15 +327,17 @@ div {
 .dashed {
   border-style: dashed;
 }
-.label {
+.labello {
   font-size: 0.5em;
   min-height: 0.5em;
   color: #333;
   flex-grow: 0;
   padding-left: 3px;
+  border: none;
+  text-align: left;
 }
-.label.invisible {
-  color: transparent;
+.labello.invisible {
+  color: white;
 }
 .box-label {
   font-size: 0.5rem;
@@ -506,8 +509,8 @@ div.action-label {
   justify-items: center;
   flex-grow: 0.25;
 }
-#ac-grid .label,
-#rolls-grid .label {
+#ac-grid .labello,
+#rolls-grid .labello {
   text-align: center;
 }
 #prof-grid {
@@ -521,10 +524,10 @@ div.action-label {
   text-align: center;
   padding-bottom: 5px;
 }
-#prof-grid > :not(:nth-child(4n), .label) {
+#prof-grid > :not(:nth-child(4n), .labello) {
   border-right: 1px solid black;
 }
-#prof-grid > :not(:nth-child(4n + 1), .label) {
+#prof-grid > :not(:nth-child(4n + 1), .labello) {
   border-left: 1px solid black;
 }
 #info-grid {
@@ -659,9 +662,9 @@ div.ability-section {
   font-size: 1em;
   padding: 2.5px 5px;
 }
-.ability-box .label,
+.ability-box .labello,
 .ability-box .underlined,
-.spell-box .label,
+.spell-box .labello,
 .spell-box .underlined {
   text-align: right;
 }
@@ -962,4 +965,17 @@ div.spell-cost-optional > span {
 }
 .spell-cost-no > span {
   visibility: hidden;
+}
+
+.printButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: grey;
+  color: white;
+  border-radius: 10px;
+  border: 1px solid lightgray;
+  padding: 2px;
+  z-index: 100;
+  user-select: none;
 }

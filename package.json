@@ -14,12 +14,19 @@
     "@netlify/functions": "^1.4.0",
     "@quasar/extras": "^1.0.0",
     "@types/marked": "^4.0.8",
+    "@types/pdfkit": "^0.13.4",
+    "buffer": "^6.0.3",
+    "fs2": "^0.3.9",
+    "html2canvas": "^1.4.1",
     "jquery": "^3.6.3",
+    "jspdf": "^2.5.1",
     "marked": "^4.3.0",
-    "netlify-cli": "^13.0.0",
+    "netlify-cli": "^17.19.4",
     "quasar": "^2.6.0",
+    "vite-plugin-node-polyfills": "^0.21.0",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.0.0",
+    "webpack": "^5.90.3"
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.0.0",
@@ -39,5 +46,9 @@
     "node": "^20 || ^18 || ^16 || ^14.19",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
+  },
+  "resolutions": {
+    "vite": "^5.0.7",
+    "@vitejs/plugin-vue": "^4.5.2"
   }
 }

@@ -123,7 +123,6 @@
       </template>
     </div>
   </div>
-  <div class="separator first-page" style="top: -3px"></div>
 </template>
 
 <script setup lang="ts">
@@ -141,6 +140,7 @@ import * as Positioning from './positioning';
 
 const props = defineProps<{
   character: Character;
+  heightMeasure: HTMLDivElement | null;
 }>();
 
 // References
@@ -253,6 +253,8 @@ const position = () => {
     }
   }
   */
+  page.value.style.height = `${pos.pageHeight * (pos.page + 1)}px`;
+  page.value.dataset.pages = `${pos.page + 1}`;
 };
 onMounted(() => {
   position();
