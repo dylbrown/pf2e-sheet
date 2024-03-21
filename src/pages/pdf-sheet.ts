@@ -5,7 +5,8 @@ import Character from 'src/character/character';
 export default class PDFSheet {
   makeSheet(character: Character, pages: HTMLCollectionOf<HTMLElement>) {
     const pagePromises = [];
-    const scale = 10;
+    const scale = (300 /*px/in */ * 8) /* in */ / window.innerHeight; /* px */
+    console.log('Scale: ' + scale);
     for (const page of Array.from(pages)) {
       pagePromises.push(
         html2canvas(page, {
