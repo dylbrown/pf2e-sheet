@@ -135,7 +135,7 @@ import { signed, types } from 'src/character/util';
 import Character from 'src/character/character';
 import { AbilityType } from 'src/character/model';
 
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import * as Positioning from './positioning';
 
 const props = defineProps<{
