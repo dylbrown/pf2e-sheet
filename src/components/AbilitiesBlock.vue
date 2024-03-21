@@ -156,6 +156,7 @@ const inventoryGrid = ref<HTMLDivElement | null>(null);
 const spells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusSpells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusLabel = ref<HTMLDivElement | null>(null);
+let storedHeight = 0;
 
 // Positioning Function
 const position = () => {
@@ -172,7 +173,10 @@ const position = () => {
   )
     return;
 
-  const height = abilities.value.getBoundingClientRect().height;
+  const height =
+    storedHeight == 0
+      ? abilities.value.getBoundingClientRect().height
+      : storedHeight;
   page.value.style.top = height + 'px';
   const pos = new Positioning.Positioning(height);
 
