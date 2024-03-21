@@ -1,4 +1,4 @@
-const LEFTS = ['4px', 'calc(4px + 100% / 3)', 'calc(4px + 200% / 3)'];
+const LEFTS = ['0px', 'calc(100% / 3)', 'calc(200% / 3)'];
 
 export interface Position {
   left: number; // Column
@@ -51,7 +51,7 @@ export class Positioning {
   public leftRelative(boxPos: Position) {
     const shift = this._left - boxPos.left;
     return `calc(${shift}00% + ${
-      Math.sign(shift) * (Math.abs(shift) == 2 ? 21 : 9)
+      Math.sign(shift) * (Math.abs(shift) == 2 ? 3 : 0)
     }px`;
   }
 
@@ -136,7 +136,7 @@ function binaryDivHeightSearch(box: HTMLElement, maxHeight: number) {
   while (start < end) {
     const middle = Math.ceil((start + end) / 2);
     box.replaceChildren(...children.slice(0, middle));
-    if ((box.getBoundingClientRect().height ?? 0) + 15 >= maxHeight) {
+    if ((box.getBoundingClientRect().height ?? 0) >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;
@@ -208,7 +208,7 @@ function binaryHeightSearch(
     let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
     if (middle === -1) middle = end;
     text.innerHTML = contents.substring(0, middle);
-    if ((text.getBoundingClientRect().height ?? 0) + 15 >= maxHeight) {
+    if ((text.getBoundingClientRect().height ?? 0) >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
     } else {
       start = middle;

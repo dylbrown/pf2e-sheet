@@ -18,7 +18,7 @@
         :class="proficiency >= 8 ? 'filled' : ''"
       ></div>
     </div>
-    <div class="label" v-if="grid">Prof</div>
+    <div class="labello" v-if="grid">Prof</div>
   </div>
 </template>
 

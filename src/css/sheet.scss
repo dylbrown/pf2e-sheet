@@ -1,6 +1,8 @@
 html,
-body {
-  font-family: monospace;
+body,
+* {
+  font-family: 'Roboto Mono', monospace;
+  line-height: 1.5;
 }
 .height_measure {
   position: fixed;
@@ -39,7 +41,7 @@ body {
     top: 7.7in;
   }
   html {
-    font-size: 2.1vh;
+    font-size: calc(2.5vh - 4px);
   }
 }
 @media screen {
@@ -50,8 +52,8 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: calc(100vh * 11 / 8.5 * 10.2 / 11);
+    height: calc(100vh * 7.7 / 8.5);
     box-sizing: border-box;
     border: 1px dashed grey;
   }
@@ -72,10 +74,10 @@ body {
     position: absolute;
     left: 50vw;
     transform: translate(-50%, 0);
-    width: calc(calc(100vh) * 11 / 8.5);
-    height: 100vh;
+    width: calc(100vh * 11 / 8.5 * 10.2 / 11);
+    height: calc(100vh * 7.7 / 8.5);
     overflow: visible;
-    font-size: min(2.2vh, 18px);
+    font-size: calc(2.5vh - 3.5px);
   }
   .page:nth-child(1) {
     top: 0;
@@ -84,12 +86,12 @@ body {
     top: 100vh;
   }
   html {
-    font-size: min(2.2vh, 18px);
+    font-size: calc(2.5vh - 4px);
   }
 }
 @media (max-height: 600px) {
   #page1 {
-    font-size: 2vh;
+    font-size: calc(2.5vh - 4px);
   }
 }
 
@@ -326,18 +328,20 @@ div {
 .dashed {
   border-style: dashed;
 }
-.label {
+.labello {
   font-size: 0.5em;
   min-height: 0.5em;
   color: #333;
   flex-grow: 0;
   padding-left: 3px;
+  border: none;
+  text-align: left;
 }
-.label.invisible {
-  color: transparent;
+.labello.invisible {
+  color: white;
 }
 .box-label {
-  font-size: 0.5rem;
+  font-size: 0.5em;
   color: #333;
   flex-grow: 0;
   text-align: center;
@@ -356,7 +360,7 @@ div {
 }
 
 .sectionLabel {
-  font-size: 0.7rem;
+  font-size: 0.7em;
   color: #333;
   flex-grow: 0;
   font-weight: bold;
@@ -441,10 +445,10 @@ div.action-label {
   font-size: 0.8em;
 }
 .action {
-  font-size: 0.8rem;
+  font-size: 0.8em;
 }
 .underText {
-  font-size: 0.6rem;
+  font-size: 0.6em;
   color: #444;
 }
 .wide8 {
@@ -506,8 +510,8 @@ div.action-label {
   justify-items: center;
   flex-grow: 0.25;
 }
-#ac-grid .label,
-#rolls-grid .label {
+#ac-grid .labello,
+#rolls-grid .labello {
   text-align: center;
 }
 #prof-grid {
@@ -521,10 +525,10 @@ div.action-label {
   text-align: center;
   padding-bottom: 5px;
 }
-#prof-grid > :not(:nth-child(4n), .label) {
+#prof-grid > :not(:nth-child(4n), .labello) {
   border-right: 1px solid black;
 }
-#prof-grid > :not(:nth-child(4n + 1), .label) {
+#prof-grid > :not(:nth-child(4n + 1), .labello) {
   border-left: 1px solid black;
 }
 #info-grid {
@@ -568,7 +572,7 @@ div.action-label {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   flex-grow: 0;
   padding: 6px 3px;
   border: 1px dashed grey;
@@ -638,7 +642,7 @@ div.ability-section {
 }
 .ability-description > p,
 .description-chunk > p {
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.25em;
 }
 .ability-description > p:last-child,
 .description-chunk > p:last-child {
@@ -659,9 +663,9 @@ div.ability-section {
   font-size: 1em;
   padding: 2.5px 5px;
 }
-.ability-box .label,
+.ability-box .labello,
 .ability-box .underlined,
-.spell-box .label,
+.spell-box .labello,
 .spell-box .underlined {
   text-align: right;
 }
@@ -670,14 +674,14 @@ div.ability-section {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   box-sizing: border-box;
 }
 .inventory-grid > .grid-chunk {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 2fr 6fr 1fr;
-  font-size: 1rem;
+  font-size: 1.2em;
   break-before: column;
   break-inside: avoid;
 }
@@ -745,7 +749,7 @@ div.col-section-label {
   break-before: avoid;
   display: block;
   flex-basis: 100%;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
 }
 
 .spells-prepared .header-chunk {
@@ -753,7 +757,7 @@ div.col-section-label {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 10fr 3fr;
-  font-size: 1rem;
+  font-size: 1em;
   margin-bottom: 4px;
   break-before: column;
   position: absolute;
@@ -780,7 +784,7 @@ div.col-section-label {
 .focus-rolls {
   justify-content: stretch;
   font-size: 1rem;
-  width: calc(100% / 3 - 8px);
+  width: calc(100% / 3);
   position: absolute;
 }
 .focus-rolls > .header-chunk {
@@ -962,4 +966,18 @@ div.spell-cost-optional > span {
 }
 .spell-cost-no > span {
   visibility: hidden;
+}
+
+.printButton {
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: grey;
+  color: white;
+  border-radius: 10px;
+  border: 1px solid lightgray;
+  padding: 2px;
+  z-index: 100;
+  font-size: 1.6em;
+  user-select: none;
 }

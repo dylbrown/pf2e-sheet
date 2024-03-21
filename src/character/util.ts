@@ -164,5 +164,5 @@ export function parseDescription(s: string) {
   const bolded = spacing.replaceAll(/__([^_]+)__/gi, '<b>$1</b>');
   const links = bolded.replaceAll(/\[http[^\]]*\]/gi, '');
   const excessSpace = links.replaceAll(/<br>(\s*<br>)+/gi, '<br>');
-  return marked.parse(excessSpace).replaceAll(/\n/gi, '<br>');
+  return marked.parse(excessSpace).replaceAll(/[\n\r]+/gi, '<br>');
 }

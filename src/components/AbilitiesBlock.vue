@@ -85,7 +85,7 @@
       </template>
       <template v-if="character.spells.focusPoints > 0">
         <div
-          style="position: absolute; width: calc(100% / 3 - 8px)"
+          style="position: absolute; width: calc(100% / 3)"
           class="do-not-break"
           ref="focusLabel"
         >
@@ -123,7 +123,6 @@
       </template>
     </div>
   </div>
-  <div class="separator first-page" style="top: -3px"></div>
 </template>
 
 <script setup lang="ts">
@@ -136,11 +135,12 @@ import { signed, types } from 'src/character/util';
 import Character from 'src/character/character';
 import { AbilityType } from 'src/character/model';
 
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import * as Positioning from './positioning';
 
 const props = defineProps<{
   character: Character;
+  heightMeasure: HTMLDivElement | null;
 }>();
 
 // References
@@ -156,6 +156,7 @@ const inventoryGrid = ref<HTMLDivElement | null>(null);
 const spells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusSpells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusLabel = ref<HTMLDivElement | null>(null);
+let storedHeight = 0;
 
 // Positioning Function
 const position = () => {
@@ -172,7 +173,10 @@ const position = () => {
   )
     return;
 
-  const height = abilities.value.getBoundingClientRect().height;
+  const height =
+    storedHeight == 0
+      ? abilities.value.getBoundingClientRect().height
+      : storedHeight;
   page.value.style.top = height + 'px';
   const pos = new Positioning.Positioning(height);
 
@@ -253,16 +257,10 @@ const position = () => {
     }
   }
   */
+  page.value.style.height = `${pos.pageHeight * (pos.page + 1)}px`;
+  page.value.dataset.pages = `${pos.page + 1}`;
 };
 onMounted(() => {
   position();
-  window.matchMedia('print').addEventListener('change', position);
-  window.matchMedia('screen').addEventListener('change', position);
-  window.addEventListener('resize', position);
-});
-onUnmounted(() => {
-  window.matchMedia('print').removeEventListener('change', position);
-  window.matchMedia('screen').removeEventListener('change', position);
-  window.removeEventListener('resize', position);
 });
 </script>
