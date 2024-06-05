@@ -134,35 +134,44 @@ export function makeSource(s: string) {
 }
 
 export function parseDescription(s: string) {
-  const cleaned = s.replaceAll(
-    /\((feat|action|activity|trait|spell): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
-    '$2'
-  );
+  const cleaned = marked
+    .parse(s)
+    .replaceAll(
+      /\((feat|action|activity|trait|spell): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
+      '$2'
+    );
   const actions = cleaned
     .replaceAll('ONE-ACTION', '⯁')
     .replaceAll('TWO-ACTIONS', '⯁⯁')
     .replaceAll('THREE-ACTIONS', '⯁⯁⯁');
-  const spellReminders = actions.replaceAll(
+  const attackReminders = actions.replaceAll(
     /make a (ranged )?spell attack( rolls?)?/gi,
     '<u>$&</u>'
   );
-  const degrees = spellReminders.replaceAll(
-    /((Critical )?(Success|Failure)):/gi,
-    '<b>$1</b>'
+  const damageReminders = attackReminders.replaceAll(
+    /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points))/gi,
+    '$1 <b>$3</b>'
   );
-  const HEADING = '</p><p><span class="description-header">$1</span> ';
-  const header =
-    '<p>' +
-    degrees
-      .replaceAll(/\n\*\*\*?([^\*]+)\*\*\*?\n/gi, HEADING)
-      .replaceAll(/\n~ ([^:]+):/gi, HEADING) +
-    '</p>';
-  const h_rules = header.replaceAll(/\n----?\n/gi, '<hr>');
-  const BULLET = '\n* : ';
-  const bulleted = h_rules.replaceAll(BULLET, '\n- ').replaceAll('\n', '\n');
-  const spacing = bulleted.replaceAll('~', '\n');
-  const bolded = spacing.replaceAll(/__([^_]+)__/gi, '<b>$1</b>');
-  const links = bolded.replaceAll(/\[http[^\]]*\]/gi, '');
-  const excessSpace = links.replaceAll(/<br>(\s*<br>)+/gi, '<br>');
-  return marked.parse(excessSpace).replaceAll(/[\n\r]+/gi, '<br>');
+  const conditionReminders = damageReminders
+    .replaceAll(
+      /(Invisible|Friendly|Helpful|Hostile|Indifferent|Unfriendly|Doomed|Dying|Frightened|Unconscious|Wounded|Hidden|Observed|Undetected|Unnoticed|Clumsy|Drained|Enfeebled|Stupefied|Blinded|Concealed|Dazzled|Deafened|Invisible) (\d|for \d+ (rounds?|minutes?|hours?|days?))/gi,
+      '<b>$&</b>'
+    )
+    .replaceAll(/(gains? the )(\w+)( condition)/gi, '$1<b>$2</b>$3');
+  const degrees = conditionReminders.replaceAll(
+    /((Critical )?(Success|Failure)):/gi,
+    '&nbsp;&nbsp;<b>$1</b>'
+  );
+  const HEADING = '\n<span class="description-header">$2</span> ';
+  const header = degrees.replaceAll(/(\n~ )([^:]+):/gi, HEADING);
+  const kineticist = header.replaceAll(
+    /(~ )(Level \([^\)]*\)):/gi,
+    '<b>$2</b>'
+  );
+  const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
+  const colons = links.replaceAll(/(<li>)\s*:\s*/gi, '$1');
+  const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
+  return hs
+    .replaceAll(/[\n\r]+/gi, '<br>')
+    .replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
 }

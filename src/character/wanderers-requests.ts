@@ -87,6 +87,7 @@ export async function loadSpell(spell: Spell) {
   spell.level = entry.level;
   spell.description = Util.parseDescription(entry.description ?? '');
 
+  const heightenedArray = [];
   for (const ordinal of ['One', 'Two', 'Three', 'Four']) {
     const val = entry['heightened' + ordinal + 'Val'];
     if (val == null) continue;
@@ -105,10 +106,16 @@ export async function loadSpell(spell: Spell) {
     } else if (type_and_num[0] == 'LEVEL') {
       label = Util.numberAppendOrdinal(parseInt(type_and_num[1]));
     }
-    spell.description += Util.parseDescription(
+    const heightened = Util.parseDescription(
       `<b>(${label})</b> ` + entry['heightened' + ordinal + 'Text']
     );
+    heightenedArray.push(heightened.replace(/(^<p>)(.*)<\/p>$/gi, '$2'));
   }
+  spell.description += heightenedArray.join('<br>');
+  spell.description = spell.description.replaceAll(
+    /<br>([\s\n\r]*<br>)+/gi,
+    '<br>'
+  );
 
   if (entry.cast.includes('_TO_')) {
     const actions = entry.cast.split('_TO_');
