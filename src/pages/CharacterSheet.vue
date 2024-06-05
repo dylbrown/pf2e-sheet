@@ -134,7 +134,9 @@
           <div class="sectionLabel">Misc.</div>
           <div class="row-between">
             <div class="line">
-              <div class="numBox rounded">{{ character.speed }} ft.</div>
+              <div class="numBox rounded bounded-line" data-max="2.1">
+                {{ character.speed }} ft.
+              </div>
               <div class="labello">Speed</div>
             </div>
             <div class="line">
@@ -402,7 +404,9 @@
           <div class="sectionDivider">
             <hr />
           </div>
-          <div class="sectionLabel">Character Info</div>
+          <div class="sectionLabel" style="margin-bottom: 0">
+            Character Info
+          </div>
           <div id="info-grid">
             <div
               class="line"
@@ -414,7 +418,7 @@
               <div class="labello">Character Name</div>
             </div>
             <div class="line" style="grid-column-end: span 2; min-height: 2em">
-              <div class="underlined">
+              <div class="underlined bounded-line" data-max="1.6">
                 {{ character.ancestry }}
               </div>
               <div class="labello">Ancestry & Heritage</div>
@@ -424,14 +428,14 @@
               <div class="labello">Background</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">{{ character.player }}</div>
-              <div class="labello">Player</div>
-            </div>
-            <div class="line">
               <div class="underlined">
                 {{ character.class }} {{ character.level }}
               </div>
               <div class="labello">Class</div>
+            </div>
+            <div class="line">
+              <div class="underlined">{{ character.player }}</div>
+              <div class="labello">Player</div>
             </div>
             <div class="line">
               <div class="underlined">{{ character.deity }}</div>
@@ -446,13 +450,13 @@
               <div class="labello">Size</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">
+              <div class="underlined bounded-line" data-max="1.7">
                 {{ character.traits.join(', ') }}
               </div>
               <div class="labello">Traits</div>
             </div>
             <div class="line" style="grid-column-end: span 2">
-              <div class="underlined bounded-line">
+              <div class="underlined bounded-line" data-max="1.7">
                 {{ character.languages.join(', ') }}
               </div>
               <div class="labello">Languages</div>
@@ -477,7 +481,7 @@
             <hr />
           </div>
           <div class="sectionLabel">Actions and Activities</div>
-          <div class="column" style="flex-grow: 0">
+          <div class="column" ref="abilities" style="flex-grow: 0">
             <template
               v-for="[index, ability] in Array.from(
                 character.abilities.entries()
@@ -507,9 +511,11 @@
           <div class="sectionDivider">
             <hr />
           </div>
-          <div class="sectionLabel">Skills</div>
           <div id="skills-grid">
-            <div class="labello">Skill</div>
+            <div class="labello combined-label">
+              <div class="sectionLabel">Skills</div>
+              <span>Skill</span>
+            </div>
             <div class="labello">Total</div>
             <div class="labello">Stat</div>
             <div class="labello">Prof</div>
@@ -586,19 +592,27 @@ const props = defineProps<{
 }>();
 
 const root = ref<HTMLDivElement | null>(null);
+const middleThird = ref<HTMLDivElement | null>(null);
+const abilities = ref<HTMLDivElement | null>(null);
 const heightMeasure = ref<HTMLDivElement | null>(null);
 
 onMounted(() => {
+  if (middleThird.value && abilities.value) {
+    if (
+      abilities.value.offsetTop + abilities.value.offsetHeight >
+      middleThird.value.offsetHeight
+    ) {
+      abilities.value.classList.add('compact');
+    }
+  }
   if (!root.value) return;
   root.value.querySelectorAll('.bounded-line').forEach((val) => {
     const value = val as HTMLElement;
-    const bound = parseFloat(val.getAttribute('data-max') ?? '2.1');
     let size = parseFloat(getComputedStyle(value).fontSize);
-    while (
-      value.offsetHeight / parseFloat(getComputedStyle(value).lineHeight) >=
-        bound &&
-      size > 4
-    ) {
+    const bound =
+      parseFloat(val.getAttribute('data-max') ?? '2.1') *
+      parseFloat(getComputedStyle(value).lineHeight);
+    while (value.offsetHeight >= bound && size > 4) {
       size -= 0.25;
       value.style.fontSize = size.toString() + 'px';
     }

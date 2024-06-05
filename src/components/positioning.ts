@@ -44,8 +44,13 @@ export class Positioning {
     this._page += this._left == 0 ? 1 : 0;
   }
 
-  public moveLeftIfPast(threshold: number) {
-    if ((this.top * 1.0) / this.pageHeight >= threshold) this.moveLeft();
+  public moveLeftIfPast(t1: number, t2: number, t3: number) {
+    if (this._left == 0 && (this.top * 1.0) / this.pageHeight >= t1)
+      this.moveLeft();
+    if (this._left == 1 && (this.top * 1.0) / this.pageHeight >= t2)
+      this.moveLeft();
+    if (this._left == 2 && (this.top * 1.0) / this.pageHeight >= t3)
+      this.moveLeft();
   }
 
   public leftRelative(boxPos: Position) {

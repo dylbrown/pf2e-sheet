@@ -220,7 +220,7 @@ div {
   align-self: stretch;
   justify-self: stretch;
 }
-.column {
+.column:not(.compact) {
   flex-flow: column nowrap;
   flex-grow: 1;
   display: flex;
@@ -336,6 +336,7 @@ div {
   padding-left: 3px;
   border: none;
   text-align: left;
+  align-self: flex-end;
 }
 .labello.invisible {
   color: white;
@@ -369,6 +370,18 @@ div {
   margin-left: 3px;
   margin-bottom: 3px;
 }
+.combined-label .sectionLabel {
+  font-size: 1.4em;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.combined-label {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
 
 .skill-label {
   font-size: 0.8em;
@@ -392,6 +405,7 @@ div.weapon-label {
   text-align: left;
   text-transform: uppercase;
   max-width: 25%;
+  align-self: center;
 }
 .weapon .underlined {
   text-align: center;
@@ -447,6 +461,36 @@ div.action-label {
 .action {
   font-size: 0.8em;
 }
+
+.column.compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: stretch;
+  align-items: stretch;
+  column-gap: 3px;
+}
+
+.compact .action-divider {
+  display: none;
+}
+
+.compact .action-icon {
+  margin: 2;
+}
+
+.compact .row-stretch.action {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.compact .action-details {
+  grid-column: 1 / -1;
+}
+
+.compact .labello {
+  font-size: 0.4em;
+}
+
 .underText {
   font-size: 0.6em;
   color: #444;
@@ -554,10 +598,10 @@ div.action-label {
   display: grid;
   grid-template-columns: 2fr 1.3fr 0.7fr 1fr 1fr;
   column-gap: 3px;
-  row-gap: 5px;
+  row-gap: 3px;
   align-items: start;
   justify-items: center;
-  padding-bottom: 0.6em;
+  max-height: 100%;
 }
 .abilities-flex {
   position: absolute;

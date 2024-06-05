@@ -1,6 +1,8 @@
 <template>
   <div class="row-stretch weapon" style="flex-grow: 0">
-    <div class="weapon-label">{{ weapon.name }}</div>
+    <div class="weapon-label bounded-line" data-max="2.4">
+      {{ weapon.name }}
+    </div>
     <div class="column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
@@ -8,7 +10,7 @@
           <div class="labello">Attack</div>
         </div>
         <div class="line">
-          <div class="underlined weapon-info">
+          <div class="underlined weapon-info bounded-line" data-max="1.6">
             {{ weapon.damage }}
           </div>
           <div class="labello">Damage</div>
