@@ -1,8 +1,10 @@
 import { Ability, AbilityType, Action } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
+import { capitalize } from 'vue';
 
 export default class Abilities extends Array<Ability> {
+  conditionals: string[] = [];
   /* eslint-disable @typescript-eslint/no-explicit-any */
   load(data: any, metaData: any, level: number): Promise<void>[] {
     const promises: Array<Promise<void>> = [];
@@ -49,7 +51,9 @@ export default class Abilities extends Array<Ability> {
             description: Util.parseDescription(feature.description),
             activity: false,
             traits: [],
+            code: feature.code ?? '',
           };
+          if (feat.code) this.checkConditionals(feat.code);
           this.push(feat);
         }
       })
@@ -89,6 +93,7 @@ export default class Abilities extends Array<Ability> {
           code: entry.value?.code ?? '',
         };
         promises.push(Wanderer.loadFeat(feat));
+        if (feat.code) this.checkConditionals(feat.code);
         this.push(feat);
       }
     }
@@ -98,5 +103,31 @@ export default class Abilities extends Array<Ability> {
       })
     );
     return promises;
+  }
+
+  private checkConditionals(code: string) {
+    // GIVE-PROF-IN=Intimidation:T\nGIVE-FEAT-NAME=Intimidating Glare\nCONDITIONAL-INCREASE-SKILL_Deception=2~circumstance bonus to Impersonate when pretending to be a tiefling
+    for (const line of code.split('\n')) {
+      const equals = line.indexOf('=');
+      if (equals == -1) continue;
+      const key = line.substring(0, equals);
+      const subkey = line.substring(0, key.indexOf('_'));
+      const subvalue = key.substring(key.indexOf('_') + 1);
+      const value = line.substring(equals + 1);
+
+      switch (subkey) {
+        case 'CONDITIONAL-INCREASE-SKILL': {
+          this.conditionals.push(
+            value
+              .replaceAll(
+                /(\d+)~(\w+) bonus/gi,
+                `+$1 $2 to ${capitalize(subvalue.toLowerCase())}`
+              )
+              .replaceAll('circumstance', 'circ.')
+          );
+          break;
+        }
+      }
+    }
   }
 }

@@ -8,7 +8,7 @@
     <line-part label="Traits" :content="ability.traits?.join(', ') || ''" />
     <line-part label="Requirements" :content="ability.requirements || ''" />
     <line-part
-      v-if="ability.activity"
+      v-if="ability.activity && ability.trigger"
       label="Trigger"
       :content="ability.trigger || ''"
     />

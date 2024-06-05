@@ -90,7 +90,7 @@ export default class Spells {
           break;
         }
         case 'focusPoint': {
-          this.focusPoints += 1;
+          this.focusPoints = Math.min(this.focusPoints + 1, 3);
           break;
         }
         case 'innateSpell': {

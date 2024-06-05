@@ -399,7 +399,7 @@
           </div>
         </div>
       </div>
-      <div id="middleThird">
+      <div id="middleThird" ref="middleThird">
         <div class="column" style="justify-content: flex-start">
           <div class="sectionDivider">
             <hr />
@@ -537,7 +537,7 @@
               <div class="line">
                 <div class="numBox">
                   <template v-if="character.attributes[skill].itemBonus != 0">{{
-                    character.attributes[skill].itemBonus
+                    nonzero(character.attributes[skill].itemBonus)
                   }}</template>
                 </div>
               </div>
@@ -567,6 +567,9 @@
                 </div>
               </div></template
             >
+            <div class="line conditionals">
+              {{ character.abilities.conditionals.join(', ') }}
+            </div>
           </div>
         </div>
       </div>

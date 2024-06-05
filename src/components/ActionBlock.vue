@@ -20,7 +20,7 @@
         </div>
         <div class="labello">Frequency</div>
       </div>
-      <div class="line" v-if="action.cost == Action.Reaction">
+      <div class="line" v-if="action.cost == Action.Reaction && action.trigger">
         <div class="underlined bounded-line" data-max="1.6">
           {{ action.trigger }}
         </div>

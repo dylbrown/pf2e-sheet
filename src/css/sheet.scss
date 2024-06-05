@@ -397,6 +397,10 @@ div {
 .skill-break {
   grid-column-end: span 5;
 }
+.conditionals {
+  grid-column: 1 / -1;
+  font-size: 0.4em;
+}
 div.weapon-label {
   font-size: 0.8em;
   display: flex;

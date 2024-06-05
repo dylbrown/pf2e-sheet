@@ -73,7 +73,10 @@ export default class Character {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
-    this.ancestry = data.character?._heritage?.name ?? '';
+    this.ancestry = data.character?._heritage?.name;
+    if (!this.ancestry.includes(data.character?._ancestry.name)) {
+      this.ancestry += ' ' + data.character?._ancestry.name;
+    }
     this.background = data.character?._background?.name ?? '';
     this.class = data.character?._class?.name ?? '';
     const info: any = JSON.parse(data.stats?.generalInfo);
@@ -150,6 +153,11 @@ export default class Character {
       ) as Attribute;
       if ((attr as number) == -1) continue;
       this.attributes[attr].proficiency = proficiency;
+      this.attributes[attr].itemBonus =
+        this.attributes[attr].total -
+        this.level -
+        proficiency -
+        Math.floor((this.scores[this.attributes[attr].score] - 10) / 2);
     }
     const attackMap = new Map<string, Weapon>();
 
