@@ -77,11 +77,11 @@ export default function makeSheet(
       if (ctx) {
         ctx.putImageData(imageContentRaw, 0, 0);
         ctx.font = '30px monospace';
-        ctx.textAlign = 'center';
+        ctx.textAlign = 'right';
         ctx.textBaseline = 'bottom';
         ctx.fillText(
           (page + 1).toString(),
-          canvas.width / 2,
+          canvas.width - 5,
           canvas.height - 5
         );
         ctx.imageSmoothingEnabled = true;
