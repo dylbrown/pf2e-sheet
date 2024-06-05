@@ -1,5 +1,11 @@
 <template>
-  <div class="printButton" ref="printButton">Export to PDF</div>
+  <q-btn
+    color="primary"
+    class="printButton"
+    icon="fa-solid fa-floppy-disk"
+    label="Export to PDF"
+    @click="makePDF"
+  />
   <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>
@@ -573,14 +579,13 @@ import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
 import AbilitiesBlock from 'src/components/AbilitiesBlock.vue';
 import { onMounted, ref } from 'vue';
-import PDFSheet from './pdf-sheet';
+import makeSheet from './pdf-sheet';
 
 const props = defineProps<{
   character: Character;
 }>();
 
 const root = ref<HTMLDivElement | null>(null);
-const printButton = ref<HTMLDivElement | null>(null);
 const heightMeasure = ref<HTMLDivElement | null>(null);
 
 onMounted(() => {
@@ -598,16 +603,15 @@ onMounted(() => {
       value.style.fontSize = size.toString() + 'px';
     }
   });
-  if (!printButton.value) return;
-  printButton.value.addEventListener('click', () => {
-    if (!root.value) return;
-    const sheet = new PDFSheet();
-    sheet.makeSheet(
-      props.character,
-      root.value.children as HTMLCollectionOf<HTMLElement>
-    );
-  });
 });
+
+const makePDF = () => {
+  if (!root.value) return;
+  makeSheet(
+    props.character,
+    root.value.children as HTMLCollectionOf<HTMLElement>
+  );
+};
 </script>
 
 <style>

@@ -13,7 +13,9 @@
 
 
 
+import {Loading} from 'quasar'
 
 
-export default { config: {} }
+
+export default { config: {},plugins: {Loading} }
 
