@@ -255,11 +255,11 @@ export function positionGrid(pos: Positioning, box: HTMLElement) {
   box.style.left = pos.left;
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
-  let height = box.getBoundingClientRect().height;
   const all = Array.from(box.children);
   box.replaceChildren();
   let chunk = makeGridChunk(box, all, boxPos, pos);
   chunk.classList.add('first-chunk');
+  let height = chunk.getBoundingClientRect().height;
   while (pos.top + height >= pos.pageHeight) {
     const remainder = binaryDivHeightSearch(chunk, pos.pageHeight - pos.top);
     pos.moveLeft();

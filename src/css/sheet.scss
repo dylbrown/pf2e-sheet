@@ -487,8 +487,18 @@ div.action-label {
   grid-template-columns: auto 1fr;
 }
 
-.compact .action-details {
+.compact .action-details,
+.compact-action-details {
+  display: none;
+}
+
+.compact .compact-action-details {
+  display: block;
   grid-column: 1 / -1;
+  font-size: 0.7em;
+}
+.compact-action-details p {
+  margin: 0;
 }
 
 .compact .labello {

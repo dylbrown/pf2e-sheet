@@ -481,7 +481,7 @@
             <hr />
           </div>
           <div class="sectionLabel">Actions and Activities</div>
-          <div class="column" ref="abilities" style="flex-grow: 0">
+          <div class="column abilities" ref="abilities" style="flex-grow: 0">
             <template
               v-for="[index, ability] in Array.from(
                 character.abilities.entries()
@@ -495,7 +495,12 @@
           <div id="focus" v-if="character.spells.focusPoints > 0">
             <div class="line">
               <div class="numBox rounded"></div>
-              <div class="labello">Focus</div>
+              <div
+                class="labello"
+                style="align-self: center; text-align: center"
+              >
+                Focus
+              </div>
             </div>
             <div class="line">
               <div class="numBox rounded">
@@ -600,6 +605,21 @@ const abilities = ref<HTMLDivElement | null>(null);
 const heightMeasure = ref<HTMLDivElement | null>(null);
 
 onMounted(() => {
+  const boundedCheck = () => {
+    if (!root.value) return;
+    root.value.querySelectorAll('.bounded-line').forEach((val) => {
+      const value = val as HTMLElement;
+      let size = parseFloat(getComputedStyle(value).fontSize);
+      const bound =
+        parseFloat(val.getAttribute('data-max') ?? '2.1') *
+        parseFloat(getComputedStyle(value).lineHeight);
+      while (value.offsetHeight >= bound && size > 4) {
+        size -= 0.25;
+        value.style.fontSize = size.toString() + 'px';
+      }
+    });
+  };
+  boundedCheck();
   if (middleThird.value && abilities.value) {
     if (
       abilities.value.offsetTop + abilities.value.offsetHeight >
@@ -608,18 +628,7 @@ onMounted(() => {
       abilities.value.classList.add('compact');
     }
   }
-  if (!root.value) return;
-  root.value.querySelectorAll('.bounded-line').forEach((val) => {
-    const value = val as HTMLElement;
-    let size = parseFloat(getComputedStyle(value).fontSize);
-    const bound =
-      parseFloat(val.getAttribute('data-max') ?? '2.1') *
-      parseFloat(getComputedStyle(value).lineHeight);
-    while (value.offsetHeight >= bound && size > 4) {
-      size -= 0.25;
-      value.style.fontSize = size.toString() + 'px';
-    }
-  });
+  boundedCheck();
 });
 
 const makePDF = () => {

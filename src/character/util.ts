@@ -171,7 +171,8 @@ export function parseDescription(s: string) {
   const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
   const colons = links.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
-  return hs
+  const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
+  return featReferences
     .replaceAll(/[\n\r]+/gi, '<br>')
     .replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
 }

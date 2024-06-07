@@ -45,7 +45,7 @@
         :ability="ability"
       />
       <div class="inventory-grid" ref="inventoryGrid">
-        <div class="grid-chunk">
+        <div class="grid-chunk first-chunk">
           <div class="inventory-title col-section-title">Inventory</div>
           <div class="col-section-label">#</div>
           <div class="col-section-label">Item Name</div>
@@ -199,7 +199,7 @@ const position = () => {
   }
 
   // Inventory
-  pos.moveLeftIfPast(0.75, 0.75, 0.5);
+  pos.moveLeftIfPast(0.7, 0.7, 0.5);
   /*
   for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
     const item = inventoryGrid.value.children.item(i);
@@ -215,8 +215,8 @@ const position = () => {
 
   // Spells
   if (spells.value) {
-    pos.moveLeftIfPast(0.75, 0.75, 0.5);
     for (const list of props.character.spells.lists) {
+      pos.moveLeftIfPast(0.7, 0.7, 0.5);
       const header = document.querySelector(
         `[data-list='${list.name}']`
       ) as HTMLElement;
