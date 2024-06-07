@@ -199,7 +199,7 @@ const position = () => {
   }
 
   // Inventory
-  pos.moveLeftIfPast(0.75, 0.75, 5);
+  pos.moveLeftIfPast(0.75, 0.75, 0.5);
   /*
   for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
     const item = inventoryGrid.value.children.item(i);
