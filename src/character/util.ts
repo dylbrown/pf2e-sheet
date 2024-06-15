@@ -172,7 +172,16 @@ export function parseDescription(s: string) {
   const colons = links.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
   const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
-  return featReferences
-    .replaceAll(/[\n\r]+/gi, '<br>')
-    .replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
+  const spaced = featReferences.replaceAll(/[\n\r]+/gi, '<br>');
+  const tablecut = spaced
+    .replaceAll(
+      /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
+      '$1$3'
+    )
+    .replaceAll(
+      /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
+      '$1$3'
+    )
+    .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
+  return tablecut.replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
 }

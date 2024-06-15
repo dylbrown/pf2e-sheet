@@ -212,6 +212,16 @@ function binaryHeightSearch(
   while (start < end) {
     let middle = contents.indexOf(' ', Math.ceil((start + end) / 2));
     if (middle === -1) middle = end;
+    if (middle > end) {
+      const close = contents
+        .substring(Math.ceil((start + end) / 2))
+        .match(/(<\/\w+>|<br>)/i);
+      if (close)
+        middle =
+          contents.indexOf(close[0], Math.ceil((start + end) / 2)) +
+          close[0].length;
+      else middle = Math.ceil((start + end) / 2);
+    }
     text.innerHTML = contents.substring(0, middle);
     if ((text.getBoundingClientRect().height ?? 0) >= maxHeight) {
       end = Math.ceil((start + end) / 2) - 1;
