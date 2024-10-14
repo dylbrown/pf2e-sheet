@@ -7,15 +7,18 @@ import { Handler } from '@netlify/functions';
 const handler: Handler = async (event) => {
   try {
     const { WANDERERS_GUIDE_KEY } = process.env;
-    const response = await fetch(
+    let url =
       API_ENDPOINT +
-        (event.queryStringParameters?.type ?? 'spell') +
-        '?id=' +
-        (event.queryStringParameters?.id ?? '-1'),
-      {
-        headers: { Authorization: 'Apikey ' + WANDERERS_GUIDE_KEY },
-      }
-    );
+      (event.queryStringParameters?.type ?? 'spell') +
+      '?id=' +
+      (event.queryStringParameters?.id ?? '-1');
+    if (event.queryStringParameters?.id == '-2') {
+      url =
+        API_ENDPOINT + (event.queryStringParameters?.type ?? 'spell') + '/all';
+    }
+    const response = await fetch(url, {
+      headers: { Authorization: 'Apikey ' + WANDERERS_GUIDE_KEY },
+    });
     if (!response.ok) {
       const text = await response.text();
       console.log(text);

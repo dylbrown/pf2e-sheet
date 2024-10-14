@@ -1,15 +1,24 @@
 import { LocalStorage } from 'quasar';
 import { Ability, Action, Item, Spell, Weapon } from './model';
 import * as Util from './util';
+import runeLookupJSON from './examples/rune_lookup.json';
+const runeLookup = runeLookupJSON as { [key: string]: number };
 
-async function load(url_prefix: string, ls_key: string, id: number) {
+async function load(
+  url_prefix: string,
+  ls_key: string,
+  id: number,
+  store?: boolean
+) {
   // First, try to retrieve from LocalStorage
   const full_key = '2e-sheet:' + ls_key;
-  const cache = LocalStorage.getItem(full_key) as {
-    [id: number]: object;
-  } | null;
-  if (cache != null) {
-    if (cache[id]) return cache[id];
+  if (store) {
+    const cache = LocalStorage.getItem(full_key) as {
+      [id: number]: object;
+    } | null;
+    if (cache != null) {
+      if (cache[id]) return cache[id];
+    }
   }
 
   // If not, poll the API
@@ -30,6 +39,7 @@ async function load(url_prefix: string, ls_key: string, id: number) {
     throw new Error(json.error);
   }
   return res.json().then((json) => {
+    if (!store) return json;
     const new_cache = (LocalStorage.getItem(full_key) ?? {}) as {
       [id: number]: object;
     };
@@ -65,7 +75,9 @@ export async function loadItem(item: Item) {
     item.id
   );
   const entry = data.item;
-  item.traits = data.traits.map((o: { name: string }) => o.name);
+  item.traits = data.traits.map((o: { name: string }) =>
+    o.name.replaceAll(' - Item', '')
+  );
   if (item.weapon) {
     const weapon = item as Weapon;
     weapon.hands = entry.hands == 'TWO' ? 2 : 1;
@@ -145,4 +157,25 @@ export async function loadSpell(spell: Spell) {
           )
           .join(' ')
       : '';
+}
+export async function loadRune(weapon: Weapon, key: string) {
+  const data = await load(
+    '/.netlify/functions/wanderers-request?type=item&id=',
+    'item',
+    runeLookup[key] ?? -1,
+    false
+  );
+  const entry = data.item;
+  for (const line of entry.code.split('\n')) {
+    const equals = line.indexOf('=');
+    if (equals == -1) continue;
+    const key = line.substring(0, equals);
+    const value = line.substring(equals + 1);
+
+    switch (key) {
+      case 'DEFAULT-ON-HIT-DAMAGE': {
+        weapon.damage += value;
+      }
+    }
+  }
 }

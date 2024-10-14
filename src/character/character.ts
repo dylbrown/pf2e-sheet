@@ -200,6 +200,16 @@ export default class Character {
             weapon: false,
           };
         }
+        if (item.weapon) {
+          const weapon = item as Weapon;
+          // Rune Check
+          for (let i = 1; i <= 4; i++) {
+            const key = 'propRune' + i + 'ID';
+            if (entry[key]) {
+              promises.push(Wanderer.loadRune(weapon, entry[key]));
+            }
+          }
+        }
         this.inventory.push(item);
         promises.push(Wanderer.loadItem(item));
       }
