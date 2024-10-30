@@ -33,6 +33,8 @@ import 'quasar/dist/quasar.sass'
 
 import 'src/css/app.scss'
 
+import 'rpg-awesome/scss/rpg-awesome.scss'
+
 
 import createQuasarApp from './app.js'
 import quasarUserOptions from './quasar-user-options.js'

@@ -21,6 +21,7 @@
     "marked": "^4.3.0",
     "netlify-cli": "^17.19.4",
     "quasar": "^2.6.0",
+    "rpg-awesome": "^0.2.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },
