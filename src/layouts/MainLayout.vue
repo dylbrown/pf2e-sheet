@@ -4,7 +4,7 @@
     <q-file
       v-model="file"
       label="Pick one file"
-      accept=".guidechar"
+      accept=".guidechar,.json"
       filled
       style="max-width: 300px; align-self: flex-start"
       :item-aligned="true"

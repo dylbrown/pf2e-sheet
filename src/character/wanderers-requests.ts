@@ -80,7 +80,7 @@ export async function loadItem(item: Item) {
   );
   if (item.weapon) {
     const weapon = item as Weapon;
-    weapon.hands = entry.hands == 'TWO' ? 2 : 1;
+    weapon.hands = entry.hands == 'TWO' ? '2' : '1';
     if (entry.weapons?.isRanged) {
       weapon.range = entry.weapons?.rangedRange;
       weapon.reload = entry.weapons?.rangedReload;

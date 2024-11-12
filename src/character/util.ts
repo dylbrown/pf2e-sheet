@@ -1,8 +1,9 @@
 import { marked } from 'marked';
-import { Ability, AbilityType, Action, Score } from './model';
+import { Ability, AbilityType, Action, Proficiency, Score } from './model';
 
-export function abilityMod(score: number) {
-  return signed(Math.floor((score - 10) / 2));
+export function abilityMod(score: number): number {
+  const signy = signed(Math.floor((score - 10) / 2));
+  return isNaN(signy as number) ? 0 : (signy as number);
 }
 
 export function nonzero(num: number) {
@@ -41,6 +42,22 @@ export function getScore(s: string) {
       return Score.Charisma;
   }
   return -1 as Score;
+}
+
+export function getProficiency(prof: string) {
+  switch (prof.substring(0, 1).toUpperCase()) {
+    case 'U':
+      return Proficiency.Untrained;
+    case 'T':
+      return Proficiency.Trained;
+    case 'E':
+      return Proficiency.Expert;
+    case 'M':
+      return Proficiency.Master;
+    case 'L':
+      return Proficiency.Legendary;
+  }
+  return Proficiency.Untrained;
 }
 
 export function getAbilityType(type: string) {

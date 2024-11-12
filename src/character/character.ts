@@ -1,3 +1,4 @@
+import { capitalize } from 'vue';
 import Abilities from './abilities';
 import {
   Proficiency,
@@ -6,9 +7,11 @@ import {
   Weapon,
   Item,
   attrScore,
+  skills,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
+import { getProficiency } from './util';
 
 export default class Character {
   name = 'Dave';
@@ -69,7 +72,167 @@ export default class Character {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  load(data: any) {
+  load(data: any): Array<Promise<void>> {
+    switch (data.version) {
+      case 3:
+        return this.loadLegacy(data);
+      case 4:
+        return this.loadRemaster(data);
+      default:
+        alert('Version not supported!');
+    }
+    return [];
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private loadRemaster(data: any) {
+    this.name = data.character?.name ?? '';
+    this.level = data.character?.level ?? 0;
+
+    // Ancestry & Heritage name
+    this.ancestry = data.character?.details?.ancestry?.name;
+    const heritages = data.character?.details?.feats_features?.heritages;
+    if (heritages && heritages[0] && heritages[0].name) {
+      this.ancestry = heritages[0].name.includes(this.ancestry)
+        ? heritages[0].name
+        : heritages[0].name + ' ' + this.ancestry;
+    }
+
+    this.background = data.character?.details?._background?.name ?? '';
+    this.class = data.character?.details?._class?.name ?? '';
+    this.size = data.character?.details?.size ?? '';
+    this.traits = (data.character?.details?.character_traits ?? []).map(
+      (e: { name: string }) => e.name ?? ''
+    );
+
+    // Ability Scores
+    for (const score of Object.values(Score)) {
+      const key = score.toString().substring(0, 3).toUpperCase();
+      const entry = data.content?.attributes['ATTRIBUTE_' + key];
+      if (!entry) continue;
+      this.scores[score as Score] =
+        10 + 2 * entry.value + (entry.partial ? 1 : 0);
+    }
+
+    // Senses
+    for (const senseType of Object.values(data.content?.senses ?? [])) {
+      for (const sense of senseType as Array<any>) {
+        const senseName = sense.sense?.name ?? '';
+        if (senseName.length == 0 || senseName == 'Hearing') continue;
+        this.senses.push(senseName);
+      }
+    }
+
+    this.languages = (data.content?.languages ?? []).map((lang: string) =>
+      capitalize(lang)
+    );
+
+    // Speed
+    (data.content?.speeds ?? [])
+      .map((speed: any) => {
+        const name = speed.name.replaceAll(/SPEED_?/gi, '');
+        if (speed.value.value == 0) return '';
+        return name.length == 0
+          ? speed.value.value
+          : name + ' ' + speed.value.value;
+      })
+      .filter((s: string) => s.length > 0)
+      .join(', ');
+
+    this.classDC =
+      10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
+    this.ac = data.content?.ac ?? 0;
+    this.hp = data.content?.max_hp ?? 0;
+    this.setProficiency(data, Attribute.Perception);
+    this.setProficiency(data, Attribute.Fortitude, 'SAVE_');
+    this.setProficiency(data, Attribute.Reflex, 'SAVE_');
+    this.setProficiency(data, Attribute.Will, 'SAVE_');
+    skills.forEach((s) => this.setProficiency(data, s, 'SKILL_'));
+
+    // Lores
+    for (const [a, e] of Object.entries(data.content?.proficiencies)) {
+      if (a.startsWith('SKILL_LORE_') && a.charAt(11) != '_') {
+        const entry: any = e;
+        this.lore[capitalize(a.substring(11))] = {
+          proficiency: entry?.parts?.profValue as Proficiency,
+          total: parseInt(entry?.total ?? '0'),
+          itemBonus: 0, // TODO: Support
+        };
+      }
+    }
+
+    const attackMap = new Map<string, Weapon>();
+    for (const entry of data?.content?.weapons ?? []) {
+      const damage =
+        entry.stats.damage.dice.toString() +
+        entry.stats.damage.die +
+        '+' +
+        entry.stats.damage.bonus.total +
+        ' ' +
+        entry.stats.damage.damageType; // TODO: Support extra types
+      const attack: Weapon = {
+        name: entry.item.name,
+        id: -1,
+        count: -1,
+        weight: '',
+        attack: entry.stats.attack_bonus.total[0],
+        damage: damage,
+        hands: entry.item.hands,
+        traits: [],
+        weapon: true,
+      };
+      // TODO: Range and reload
+      attackMap.set(attack.name, attack);
+      this.combat.attacks.push(attack);
+    }
+    for (const entry of data?.content?.inventory_flat ?? []) {
+      if (
+        entry.item.name.includes('Improvised') ||
+        entry.item.name.includes('Fist')
+      )
+        continue;
+      let item: Item | undefined = attackMap.get(entry.name);
+      if (item) {
+        item.id = entry.item.id;
+        item.count = Number(entry.item.meta_data.quantity);
+        item.weight = entry.item.bulk ?? '';
+      } else {
+        item = {
+          name: entry.item.name,
+          id: entry.item.id,
+          count: Number(entry.item.meta_data.quantity),
+          weight: entry.item.bulk ?? '',
+          traits: [], // TODO: Support
+          weapon: false,
+        };
+      }
+      if (item.weapon) {
+        // const weapon = item as Weapon;
+        // TODO: Rune check
+      }
+      this.inventory.push(item);
+    }
+    this.abilities.loadRemaster(data.content.feats_features);
+    this.spells.loadRemaster(data.content);
+
+    return [];
+  }
+
+  private setProficiency(data: any, attribute: Attribute, prefix = '') {
+    const proficiencies = data.content?.proficiencies;
+    if (!proficiencies) return;
+    const attr: string =
+      attribute != Attribute.Fortitude ? Attribute[attribute] : 'FORT';
+    this.attributes[attribute].total = parseInt(
+      proficiencies[prefix + attr.toUpperCase()].total ?? 0
+    );
+    // TODO: Set other components
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private loadLegacy(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
@@ -118,21 +281,9 @@ export default class Character {
     parseAndSet(data.stats?.totalSaves, 'Bonus', setAttribute);
 
     for (const [a, prof] of Object.entries(data.profs)) {
-      let proficiency: Proficiency = 0;
-      switch (prof as string) {
-        case 'T':
-          proficiency = Proficiency.Trained;
-          break;
-        case 'E':
-          proficiency = Proficiency.Expert;
-          break;
-        case 'M':
-          proficiency = Proficiency.Master;
-          break;
-        case 'L':
-          proficiency = Proficiency.Legendary;
-          break;
-      }
+      const proficiency: Proficiency = getProficiency(
+        prof ? prof.toString() : ''
+      );
       if (a.includes('Lore')) {
         if (this.lore[a]) {
           this.lore[a].proficiency = proficiency;
@@ -173,7 +324,7 @@ export default class Character {
           weight: '',
           attack: entry.Bonus,
           damage: entry.Damage,
-          hands: 0,
+          hands: '0',
           traits: [],
           weapon: true,
         };
@@ -234,9 +385,9 @@ export default class Character {
       }
     }
     promises.push(
-      ...this.abilities.load(data, metaData.class_features, this.level)
+      ...this.abilities.loadLegacy(data, metaData.class_features, this.level)
     );
-    promises.push(...this.spells.load(data, metaData.spells));
+    promises.push(...this.spells.loadLegacy(data, metaData.spells));
 
     for (const list of this.spells.lists) {
       if (list.attack_attr.valueOf() == -1) continue;
@@ -255,7 +406,6 @@ export default class Character {
 
     return promises;
   }
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
 function parseAndSet(

@@ -29,7 +29,13 @@ export default class Spells {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  load(data: any, metaData: any): Promise<void>[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  loadRemaster(content: any) {
+    // TODO: Implement
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  loadLegacy(data: any, metaData: any): Promise<void>[] {
     /* eslint-enable @typescript-eslint/no-explicit-any */
     const promises: Array<Promise<void>> = [];
 
