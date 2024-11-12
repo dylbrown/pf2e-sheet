@@ -127,6 +127,17 @@ export const skills = [
   Attribute.Thievery,
 ];
 
+export const weaponsAndArmor: { [s: string]: Attribute } = {
+  UNARMED_ATTACKS: Attribute.UnarmedAttacks,
+  SIMPLE_WEAPONS: Attribute.SimpleWeapons,
+  MARTIAL_WEAPONS: Attribute.MartialWeapons,
+  ADVANCED_WEAPONS: Attribute.AdvancedWeapons,
+  UNARMORED_DEFENSE: Attribute.UnarmoredDefense,
+  LIGHT_ARMOR: Attribute.LightArmor,
+  MEDIUM_ARMOR: Attribute.MediumArmor,
+  HEAVY_ARMOR: Attribute.HeavyArmor,
+};
+
 export interface Item {
   name: string;
   id: number;
@@ -139,7 +150,7 @@ export interface Item {
 export interface Weapon extends Item {
   attack: string;
   damage: string;
-  hands: number;
+  hands: string;
   range?: number;
   reload?: number;
 }

@@ -442,14 +442,10 @@
               <div class="labello">Deity</div>
             </div>
             <div class="line">
-              <div class="underlined">{{ character.alignment }}</div>
-              <div class="labello">Alignment</div>
-            </div>
-            <div class="line">
               <div class="underlined">{{ character.size }}</div>
               <div class="labello">Size</div>
             </div>
-            <div class="line" style="grid-column-end: span 2">
+            <div class="line" style="grid-column-end: span 3">
               <div class="underlined bounded-line" data-max="1.7">
                 {{ character.traits.join(', ') }}
               </div>

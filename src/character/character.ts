@@ -8,12 +8,14 @@ import {
   Item,
   attrScore,
   skills,
+  weaponsAndArmor,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
 import { getProficiency } from './util';
 
 export default class Character {
+  remaster = false;
   name = 'Dave';
   player = '';
   level = 0;
@@ -87,32 +89,33 @@ export default class Character {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private loadRemaster(data: any) {
+    this.remaster = true;
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
 
     // Ancestry & Heritage name
     this.ancestry = data.character?.details?.ancestry?.name;
-    const heritages = data.character?.details?.feats_features?.heritages;
+    const heritages = data.content?.feats_features?.heritages;
     if (heritages && heritages[0] && heritages[0].name) {
       this.ancestry = heritages[0].name.includes(this.ancestry)
         ? heritages[0].name
         : heritages[0].name + ' ' + this.ancestry;
     }
 
-    this.background = data.character?.details?._background?.name ?? '';
-    this.class = data.character?.details?._class?.name ?? '';
-    this.size = data.character?.details?.size ?? '';
-    this.traits = (data.character?.details?.character_traits ?? []).map(
+    this.background = data.character?.details?.background?.name ?? '';
+    this.class = data.character?.details?.class?.name ?? '';
+    this.size = data.content?.size ?? '';
+    this.traits = (data.content?.character_traits ?? []).map(
       (e: { name: string }) => e.name ?? ''
     );
 
     // Ability Scores
-    for (const score of Object.values(Score)) {
-      const key = score.toString().substring(0, 3).toUpperCase();
+    for (let i = 0; i < 6; i++) {
+      const score = i as Score;
+      const key = Score[score].substring(0, 3).toUpperCase();
       const entry = data.content?.attributes['ATTRIBUTE_' + key];
       if (!entry) continue;
-      this.scores[score as Score] =
-        10 + 2 * entry.value + (entry.partial ? 1 : 0);
+      this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
     }
 
     // Senses
@@ -125,7 +128,7 @@ export default class Character {
     }
 
     this.languages = (data.content?.languages ?? []).map((lang: string) =>
-      capitalize(lang)
+      capitalize(lang.toLowerCase())
     );
 
     // Speed
@@ -143,18 +146,32 @@ export default class Character {
     this.classDC =
       10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
     this.ac = data.content?.ac ?? 0;
+    this.combat.armor.ac =
+      data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
+    this.combat.shield.ac =
+      data.content?.shield_item?.item?.meta_data?.ac_bonus ?? 0;
     this.hp = data.content?.max_hp ?? 0;
     this.setProficiency(data, Attribute.Perception);
-    this.setProficiency(data, Attribute.Fortitude, 'SAVE_');
+    this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
     this.setProficiency(data, Attribute.Will, 'SAVE_');
     skills.forEach((s) => this.setProficiency(data, s, 'SKILL_'));
+    Object.entries(weaponsAndArmor).forEach(([k, v]) =>
+      this.setProficiency(data, v, k, true)
+    );
+    const armorCategory = data.content?.armor_item?.item?.meta_data?.category;
+    if (armorCategory) {
+      this.combat.armor.proficiency =
+        this.attributes[
+          weaponsAndArmor[armorCategory.toUpperCase() + '_ARMOR']
+        ].proficiency;
+    }
 
     // Lores
     for (const [a, e] of Object.entries(data.content?.proficiencies)) {
       if (a.startsWith('SKILL_LORE_') && a.charAt(11) != '_') {
         const entry: any = e;
-        this.lore[capitalize(a.substring(11))] = {
+        this.lore[capitalize(a.substring(11)) + ' Lore'] = {
           proficiency: entry?.parts?.profValue as Proficiency,
           total: parseInt(entry?.total ?? '0'),
           itemBonus: 0, // TODO: Support
@@ -219,15 +236,22 @@ export default class Character {
     return [];
   }
 
-  private setProficiency(data: any, attribute: Attribute, prefix = '') {
+  private setProficiency(
+    data: any,
+    attribute: Attribute,
+    prefix = '',
+    prefixOnly = false
+  ) {
     const proficiencies = data.content?.proficiencies;
     if (!proficiencies) return;
-    const attr: string =
-      attribute != Attribute.Fortitude ? Attribute[attribute] : 'FORT';
-    this.attributes[attribute].total = parseInt(
-      proficiencies[prefix + attr.toUpperCase()].total ?? 0
-    );
-    // TODO: Set other components
+    const key = prefixOnly
+      ? prefix
+      : prefix + Attribute[attribute].toUpperCase();
+    this.attributes[attribute].total = parseInt(proficiencies[key].total ?? 0);
+    this.attributes[attribute].itemBonus =
+      proficiencies[key].parts?.breakdown?.bonusValue ?? 0;
+    this.attributes[attribute].proficiency = (proficiencies[key].parts
+      ?.profValue ?? 0) as Proficiency;
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
