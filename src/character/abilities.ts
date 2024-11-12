@@ -11,6 +11,12 @@ export default class Abilities extends Array<Ability> {
     feats_features.otherFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.ClassFeature)
     );
+    feats_features.ancestryFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.AncestryFeat)
+    );
+    feats_features.generalAndSkillFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.GeneralFeat)
+    );
     feats_features.classFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.ClassFeat)
     );
@@ -27,6 +33,12 @@ export default class Abilities extends Array<Ability> {
       activity: feature.actions != null,
       traits: [], // TODO
     };
+    if (
+      type == AbilityType.GeneralFeat &&
+      feature.traits &&
+      feature.traits.includes(1438)
+    )
+      feat.type = AbilityType.SkillFeat;
     if (feat.activity) {
       feat.cost = Util.getActions(feature.actions);
       feat.frequency = feature.frequency;

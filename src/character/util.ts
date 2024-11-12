@@ -127,16 +127,17 @@ export function numberAppendOrdinal(i: number) {
 }
 
 export function getActions(s: string) {
-  switch (s) {
+  switch (s.replaceAll(/[_-]/g, '')) {
+    case 'ONEACTION':
     case 'ACTION':
       return Action.One;
-    case 'TWO_ACTIONS':
+    case 'TWOACTIONS':
       return Action.Two;
-    case 'THREE_ACTIONS':
+    case 'THREEACTIONS':
       return Action.Three;
     case 'REACTION':
       return Action.Reaction;
-    case 'TWO_ROUNDS':
+    case 'TWOROUNDS':
       return Action.TwoRounds;
     case 'FREE':
       return Action.Free;
@@ -186,7 +187,8 @@ export function parseDescription(s: string) {
     '<b>$2</b>'
   );
   const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
-  const colons = links.replaceAll(/(<li>)\s*:\s*/gi, '$1');
+  const remasterLinks = links.replaceAll(/<a[^>]*>([^<]*)<\/a>/gi, '$1');
+  const colons = remasterLinks.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
   const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
   const spaced = featReferences.replaceAll(/[\n\r]+/gi, '<br>');
