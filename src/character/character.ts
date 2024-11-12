@@ -12,7 +12,7 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { getProficiency } from './util';
+import { getProficiency, signed } from './util';
 
 export default class Character {
   remaster = false;
@@ -193,7 +193,7 @@ export default class Character {
         id: -1,
         count: -1,
         weight: '',
-        attack: entry.stats.attack_bonus.total[0],
+        attack: signed(entry.stats.attack_bonus.total[0]),
         damage: damage,
         hands: entry.item.hands,
         traits: [],

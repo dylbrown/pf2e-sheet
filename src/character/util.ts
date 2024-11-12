@@ -11,7 +11,7 @@ export function nonzero(num: number) {
 }
 
 export function signed(num: number) {
-  return num < 0 ? num : '+' + num;
+  return num < 0 ? num.toString() : '+' + num;
 }
 
 export function types(
