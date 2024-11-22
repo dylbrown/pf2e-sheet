@@ -40,7 +40,7 @@
             <template v-if="action.traits.length > 0"
               >(<i
                 ><template v-for="(trait, index) in action.traits">
-                  {{ trait
+                  {{ trait.name
                   }}<template v-if="action.traits.length - 1 > index"
                     >,
                   </template>
