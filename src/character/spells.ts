@@ -69,6 +69,7 @@ export default class Spells {
       const spell = this.makeSpell(entry, level);
       list.focus.push(spell);
     }
+    this.focusPoints = Math.min(content.focus_spells.length, 3);
     // TODO: Innate Spells
     //for (const entry of content.innate_spells) {
     //}
