@@ -66,6 +66,8 @@ export enum Attribute {
   MediumArmor,
   HeavyArmor,
   ClassDC,
+  SpellAttacks,
+  SpellDCs,
   ArcaneSpellAttacks,
   ArcaneSpellDCs,
   DivineSpellAttacks,
@@ -195,7 +197,7 @@ export class Spell {
   cost: Action = Action.Free;
   maxCost?: Action;
   castTime = '';
-  components: Array<string> = [];
+  components?: Array<string> = [];
   source = '';
   traits: Array<string> = [];
   requirements = '';

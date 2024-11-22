@@ -2,8 +2,7 @@ import { marked } from 'marked';
 import { Ability, AbilityType, Action, Proficiency, Score } from './model';
 
 export function abilityMod(score: number): number {
-  const signy = signed(Math.floor((score - 10) / 2));
-  return isNaN(signy as number) ? 0 : (signy as number);
+  return Math.floor((score - 10) / 2);
 }
 
 export function nonzero(num: number) {
@@ -151,7 +150,7 @@ export function makeSource(s: string) {
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
-export function parseDescription(s: string) {
+export function parseDescription(s: string, level = 0) {
   const cleaned = marked
     .parse(s)
     .replaceAll(
@@ -162,7 +161,11 @@ export function parseDescription(s: string) {
     .replaceAll('ONE-ACTION', '⯁')
     .replaceAll('TWO-ACTIONS', '⯁⯁')
     .replaceAll('THREE-ACTIONS', '⯁⯁⯁');
-  const attackReminders = actions.replaceAll(
+
+  const conditions = actions
+    .replaceAll(/\[\[\w+\]\]\{([A-Za-z1-9 ]+)\}/gi, '$1')
+    .replaceAll(/\[\[(\w+)\]\]/gi, '$1');
+  const attackReminders = conditions.replaceAll(
     /make a (ranged )?spell attack( rolls?)?/gi,
     '<u>$&</u>'
   );
@@ -187,12 +190,15 @@ export function parseDescription(s: string) {
     '<b>$2</b>'
   );
   const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
-  const remasterLinks = links.replaceAll(/<a[^>]*>([^<]*)<\/a>/gi, '$1');
-  const colons = remasterLinks.replaceAll(/(<li>)\s*:\s*/gi, '$1');
+  const remasterLinks = links
+    .replaceAll(/<a[^>]*>([^<]*)<\/a>/gi, '$1')
+    .replaceAll(/<a[^>]*><em>([^<]*)<\/em><\/a>/gi, '<em>$1</em>');
+  const traits = remasterLinks.replaceAll(/\((\w+)\)\{\w+\}/gi, '($1)');
+  const colons = traits.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
   const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
   const spaced = featReferences.replaceAll(/[\n\r]+/gi, '<br>');
-  const tablecut = spaced
+  let tablecut = spaced
     .replaceAll(
       /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
       '$1$3'
@@ -202,5 +208,22 @@ export function parseDescription(s: string) {
       '$1$3'
     )
     .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
-  return tablecut.replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
+
+  if (level > 0) {
+    for (
+      let heighten = tablecut.indexOf('⬆️');
+      heighten != -1;
+      heighten = tablecut.indexOf('⬆️')
+    ) {
+      const open = tablecut.indexOf('{{', heighten) + 2;
+      const close = tablecut.indexOf('}}', heighten);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const ceil = Math.ceil;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const floor = Math.floor;
+      const result = eval(tablecut.substring(open, close));
+      tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/gi, '<b>⇮</b> ' + result);
+    }
+  }
+  return tablecut;
 }

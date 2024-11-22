@@ -706,7 +706,7 @@ div.ability-section {
 }
 .ability-description > p,
 .description-chunk > p {
-  margin: 0 0 0.25em;
+  margin: 0 0 0.4em;
 }
 .ability-description > p:last-child,
 .description-chunk > p:last-child {
@@ -718,7 +718,18 @@ div.ability-section {
   line-break: anywhere;
 }
 .ability-description ul {
-  padding-left: 16px;
+  padding-left: 12px;
+}
+ul p {
+  margin: 0;
+  padding: 0;
+}
+ul br,
+ol br,
+p + br,
+ul + br,
+ol + br {
+  display: none;
 }
 .description-header {
   background-color: black;
@@ -812,7 +823,7 @@ div.col-section-label {
 .spells-spontaneous,
 .spells-spontaneous-grid,
 .header-chunk {
-  position: relative;
+  position: absolute;
   break-before: avoid;
   display: block;
   flex-basis: 100%;

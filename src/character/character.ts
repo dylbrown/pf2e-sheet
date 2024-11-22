@@ -231,7 +231,7 @@ export default class Character {
       this.inventory.push(item);
     }
     this.abilities.loadRemaster(data.content.feats_features);
-    this.spells.loadRemaster(data.content);
+    this.spells.loadRemaster(data.content, this.class, this.level);
 
     return [];
   }

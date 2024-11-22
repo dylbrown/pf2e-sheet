@@ -188,7 +188,7 @@ export function position(
   chunk.classList.add('first-chunk');
   let descSpace = pos.pageHeight - pos.top - infoHeight;
   while (pos.top + height >= pos.pageHeight) {
-    const remainder = binaryHeightSearch(box, chunk, descSpace);
+    const remainder = searchAndTraverseFix(box, chunk, descSpace);
     pos.moveLeft();
     if (remainder.length > 0) {
       chunk.style.borderBottom = 'none';
@@ -200,13 +200,40 @@ export function position(
   pos.top += height;
 }
 
-function binaryHeightSearch(
+function searchAndTraverseFix(
   box: HTMLElement,
   text: HTMLElement,
   maxHeight: number
 ) {
   const contents = text.innerHTML;
-  if (contents === null || contents === undefined) return '';
+  const split = binaryHeightSearch(box, text, maxHeight);
+  let tagStart = -1;
+  const tags: string[] = [];
+  for (let i = 0; i < split; i++) {
+    const c = contents[i];
+    if (tagStart == -1) {
+      if (c == '<') {
+        tagStart = i;
+      }
+    } else if (c == '>') {
+      if (contents[tagStart + 1] == '/') tags.pop();
+      else {
+        const tag = contents.substring(tagStart, i) + ' class="tag-fix">';
+        if (!tag.startsWith('<br')) tags.push(tag);
+      }
+      tagStart = -1;
+    }
+  }
+  return split == -1 ? '' : tags.join('') + contents.substring(split);
+}
+
+function binaryHeightSearch(
+  box: HTMLElement,
+  text: HTMLElement,
+  maxHeight: number
+): number {
+  const contents = text.innerHTML;
+  if (contents === null || contents === undefined) return -1;
   let start = 0;
   let end = contents.length;
   while (start < end) {
@@ -233,7 +260,7 @@ function binaryHeightSearch(
   if (end < contents.length) {
     box.style.borderBottom = 'none';
   }
-  return contents.substring(start);
+  return start;
 }
 
 function makeChunk(

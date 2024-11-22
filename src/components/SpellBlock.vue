@@ -52,7 +52,11 @@
       <div v-if="isNaN(Number(spell.cost))">
         <LinePart label="Cast Time" :content="spell.castTime" />
       </div>
-      <LinePart label="Components" :content="spell.components.join(', ')" />
+      <LinePart
+        label="Components"
+        v-if="spell.components"
+        :content="spell.components.join(', ')"
+      />
       <LinePart label="Source" :content="spell.source" />
       <LinePart label="Traits" :content="spell.traits.join(', ')" />
       <LinePart label="Requirements" :content="spell.requirements" />
