@@ -1,5 +1,5 @@
 import { LocalStorage } from 'quasar';
-import { Ability, Action, Item, Spell, Weapon } from './model';
+import { Ability, Action, Item, Spell, Trait, Weapon } from './model';
 import * as Util from './util';
 import runeLookupJSON from './examples/rune_lookup.json';
 const runeLookup = runeLookupJSON as { [key: string]: number };
@@ -65,7 +65,10 @@ export async function loadFeat(feat: Ability) {
     feat.id
   );
   feat.source = Util.makeSource(data.feat.contentSrc);
-  feat.traits = data.traits.map((o: { name: string }) => o.name);
+  feat.traits = data.traits.map(
+    (o: { name: string; description: string; id: number }) =>
+      Trait.createIfAbsent(o.name, o.id, o.description)
+  );
 }
 
 export async function loadItem(item: Item) {
@@ -75,8 +78,9 @@ export async function loadItem(item: Item) {
     item.id
   );
   const entry = data.item;
-  item.traits = data.traits.map((o: { name: string }) =>
-    o.name.replaceAll(' - Item', '')
+  item.traits = data.traits.map(
+    (o: { name: string; description: string; id: number }) =>
+      Trait.createIfAbsent(o.name, o.id, o.description)
   );
   if (item.weapon) {
     const weapon = item as Weapon;
@@ -141,7 +145,10 @@ export async function loadSpell(spell: Spell) {
     o[0].toUpperCase()
   );
   spell.source = Util.makeSource(entry.contentSrc);
-  spell.traits = data.traits.map((o: { name: string }) => o.name);
+  spell.traits = data.traits.map(
+    (o: { name: string; description: string; id: number }) =>
+      Trait.createIfAbsent(o.name, o.id, o.description)
+  );
   spell.requirements = entry?.requirements || '';
   spell.range = entry?.range?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';
   spell.area = entry?.area?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';

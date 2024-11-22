@@ -5,7 +5,10 @@
     </div>
     <div class="ability-title">{{ ability.name }}</div>
     <line-part label="Source" :content="ability.source" />
-    <line-part label="Traits" :content="ability.traits?.join(', ') || ''" />
+    <line-part
+      label="Traits"
+      :content="ability.traits?.map((t) => t.name).join(', ') || ''"
+    />
     <line-part label="Requirements" :content="ability.requirements || ''" />
     <line-part
       v-if="ability.activity && ability.trigger"

@@ -58,7 +58,10 @@
         :content="spell.components.join(', ')"
       />
       <LinePart label="Source" :content="spell.source" />
-      <LinePart label="Traits" :content="spell.traits.join(', ')" />
+      <LinePart
+        label="Traits"
+        :content="spell.traits.map((t) => t.name).join(', ')"
+      />
       <LinePart label="Requirements" :content="spell.requirements" />
       <LinePart label="Range" :content="spell.range" />
       <LinePart label="Area" :content="spell.area" />

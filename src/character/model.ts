@@ -30,8 +30,8 @@ export enum Action {
   One = '1',
   Two = '2',
   Three = '3',
-  Free = 'F',
-  Reaction = 'R',
+  Free = '◇',
+  Reaction = '↩',
   TwoRounds = '6',
   None = '',
 }
@@ -145,7 +145,7 @@ export interface Item {
   id: number;
   count: number;
   weight: string;
-  traits: string[];
+  traits: Trait[];
   weapon: boolean;
 }
 
@@ -165,7 +165,7 @@ export class Ability {
   source = '';
   description: string;
   activity: boolean;
-  traits: Array<string> = [];
+  traits: Array<Trait> = [];
   cost?: Action;
   frequency?: string;
   requirements?: string;
@@ -199,7 +199,7 @@ export class Spell {
   castTime = '';
   components?: Array<string> = [];
   source = '';
-  traits: Array<string> = [];
+  traits: Array<Trait> = [];
   requirements = '';
   range = '';
   area = '';
@@ -226,3 +226,97 @@ export type SpellList = {
   slots: Array<number>;
   focus: Array<Spell>;
 };
+
+interface DataEntry {
+  id: number;
+  name: string;
+  description: string;
+}
+export class Trait {
+  name: string;
+  description: string;
+  id: number;
+
+  private static trait_map: { [id: number]: Trait } = {};
+
+  private constructor(name: string, id: number, description: string) {
+    this.name = name.replace('(legacy)', '(L)').replace(' - Item', '');
+    this.id = id;
+    this.description = description ?? '';
+  }
+
+  // DB
+  private static db: { [id: number]: DataEntry } = {};
+  public static setDB(db: Array<DataEntry>) {
+    for (const entry of db) {
+      this.db[entry.id] = entry;
+    }
+  }
+
+  // DB Access
+  static map(traits: Array<number>): Trait[] {
+    return traits.map((id: number) => Trait.getFromDB(id));
+  }
+  public static getFromDB(id: number) {
+    if (this.trait_map[id]) return this.trait_map[id];
+    if (!this.trait_map[id] && this.db[id]) {
+      this.trait_map[id] = new Trait(
+        this.db[id].name,
+        id,
+        this.db[id].description
+      );
+    }
+    return this.trait_map[id];
+  }
+
+  // === Legacy stuff ===
+  public static createIfAbsent(
+    name: string,
+    id: number,
+    description = ''
+  ): Trait {
+    if (this.trait_map[id]) return this.trait_map[id];
+    const trait = new Trait(name, id, description);
+    this.trait_map[id] = trait;
+    return trait;
+  }
+
+  // === Legacy stuff ===
+  public static dummy(name: string) {
+    return new Trait(name, -1, '');
+  }
+}
+
+const sources: { [id: number]: string } = {
+  1: 'PC1',
+  7: 'GMC',
+  8: 'MC',
+  11: 'CRB',
+  12: 'DA',
+  13: 'SoM',
+  14: 'APG',
+  15: 'RoE',
+  16: 'TV',
+  17: 'G&G',
+  18: 'AG',
+  19: 'CG',
+  20: 'Abs',
+  21: 'Fbs',
+  23: 'GB',
+  24: 'IL',
+  28: 'ME',
+  31: 'WG',
+  35: 'P#183',
+  41: 'P#176',
+  42: 'P#172',
+  51: 'BotD',
+  146: 'Hh',
+  185: 'HotW',
+  256: 'PC2',
+  318: 'TXCG',
+  400: 'WoI',
+};
+
+export function getSource(id: number) {
+  return sources[id] ?? id.toString();
+}

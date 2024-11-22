@@ -9,6 +9,7 @@ import {
   attrScore,
   skills,
   weaponsAndArmor,
+  Trait,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
@@ -25,7 +26,7 @@ export default class Character {
   deity = '';
   alignment = 'LN';
   size = 'Medium';
-  traits = Array<string>();
+  traits = Array<Trait>();
   senses = Array<string>();
   languages = Array<string>();
   scores: Scores;
@@ -90,6 +91,7 @@ export default class Character {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private loadRemaster(data: any) {
     this.remaster = true;
+    Trait.setDB(data.content.all_traits);
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
 
@@ -106,7 +108,7 @@ export default class Character {
     this.class = data.character?.details?.class?.name ?? '';
     this.size = data.content?.size ?? '';
     this.traits = (data.content?.character_traits ?? []).map(
-      (e: { name: string }) => e.name ?? ''
+      (e: { id: number }) => Trait.getFromDB(e.id)
     );
 
     // Ability Scores
@@ -196,7 +198,7 @@ export default class Character {
         attack: signed(entry.stats.attack_bonus.total[0]),
         damage: damage,
         hands: entry.item.hands,
-        traits: [],
+        traits: Trait.map(entry.item.traits),
         weapon: true,
       };
       // TODO: Range and reload
@@ -220,7 +222,7 @@ export default class Character {
           id: entry.item.id,
           count: Number(entry.item.meta_data.quantity),
           weight: entry.item.bulk ?? '',
-          traits: [], // TODO: Support
+          traits: Trait.map(entry.item.traits),
           weapon: false,
         };
       }
@@ -255,7 +257,6 @@ export default class Character {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private loadLegacy(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
@@ -269,7 +270,8 @@ export default class Character {
     const info: any = JSON.parse(data.stats?.generalInfo);
     this.size = info?.size ?? '';
     const traits = info?.traits;
-    if (traits instanceof Array) this.traits = traits;
+    if (traits instanceof Array)
+      this.traits = traits.map((trait) => Trait.dummy(trait));
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',

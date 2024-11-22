@@ -1,4 +1,12 @@
-import { Action, Attribute, Score, Spell, SpellList } from './model';
+import {
+  Action,
+  Attribute,
+  getSource,
+  Score,
+  Spell,
+  SpellList,
+  Trait,
+} from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -33,7 +41,6 @@ export default class Spells {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadRemaster(content: any, className: string, level: number) {
-    // TODO: Implement
     for (const entry of content.spells.all) {
       const list = this.getOrCreateSpellsList(
         entry.casting_source || className
@@ -88,8 +95,8 @@ export default class Spells {
       id: entry.id,
       level: entry.rank,
       description: Util.parseDescription(entry.description, level) ?? '',
-      source: entry.content_source_id.toString(), // TODO: Sources
-      traits: [], //
+      source: getSource(entry.content_source_id), // TODO: Sources
+      traits: Trait.map(entry.traits),
       cost: cost,
       maxCost: maxCost,
       castTime: entry.cast.replaceAll('_', ' '),

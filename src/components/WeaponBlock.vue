@@ -29,7 +29,7 @@
         </div>
         <div class="line">
           <div class="underlined weapon-traits bounded-line second-pass">
-            {{ weapon.traits.join(', ') }}
+            {{ weapon.traits.map((t) => t.name).join(', ') }}
           </div>
           <div class="labello compact">Traits</div>
         </div>

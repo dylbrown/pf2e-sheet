@@ -1,4 +1,4 @@
-import { Ability, AbilityType, Action } from './model';
+import { Ability, AbilityType, Action, getSource, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -28,10 +28,10 @@ export default class Abilities extends Array<Ability> {
       id: feature.id ?? -1,
       level: feature.level ?? -1,
       type: type,
-      source: feature.content_source_id.toString(), // TODO: Map to string
+      source: getSource(feature.content_source_id), // TODO: Map to string
       description: Util.parseDescription(feature.description),
       activity: feature.actions != null,
-      traits: [], // TODO
+      traits: Trait.map(feature.traits),
     };
     if (
       type == AbilityType.GeneralFeat &&

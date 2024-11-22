@@ -447,7 +447,7 @@
             </div>
             <div class="line" style="grid-column-end: span 3">
               <div class="underlined bounded-line" data-max="1.7">
-                {{ character.traits.join(', ') }}
+                {{ character.traits.map((t) => t.name).join(', ') }}
               </div>
               <div class="labello">Traits</div>
             </div>

@@ -139,6 +139,7 @@ export function getActions(s: string) {
     case 'TWOROUNDS':
       return Action.TwoRounds;
     case 'FREE':
+    case 'FREEACTION':
       return Action.Free;
   }
   return Action.None;
@@ -222,7 +223,7 @@ export function parseDescription(s: string, level = 0) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const floor = Math.floor;
       const result = eval(tablecut.substring(open, close));
-      tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/gi, '<b>⇮</b> ' + result);
+      tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
     }
   }
   return tablecut;
