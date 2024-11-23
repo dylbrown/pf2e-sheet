@@ -40,12 +40,12 @@ export default class Spells {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  loadRemaster(content: any, className: string, level: number) {
+  loadRemaster(content: any, className: string, level: number, chaMod: number) {
     for (const entry of content.spells.all) {
       const list = this.getOrCreateSpellsList(
         entry.casting_source || className
       );
-      const spell = this.makeSpell(entry, level);
+      const spell = this.makeSpell(entry, level, list.name);
       list.known[spell.level].push(spell);
     }
     for (const entry of content.spell_sources) {
@@ -66,13 +66,21 @@ export default class Spells {
       const list = this.getOrCreateSpellsList(
         entry.casting_source || className
       );
-      const spell = this.makeSpell(entry, level);
+      const spell = this.makeSpell(entry, level, list.name);
       list.focus.push(spell);
     }
     this.focusPoints = Math.min(content.focus_spells.length, 3);
-    // TODO: Innate Spells
-    //for (const entry of content.innate_spells) {
-    //}
+
+    for (const entry of content.innate_spells) {
+      const list = this.getOrCreateSpellsList('Innate');
+      list.type = 'Innate';
+      list.attack = level + (level >= 12 ? 4 : 2) + chaMod;
+      list.dc = 10 + list.attack;
+      const spell = this.makeSpell(entry.spell, level, list.name);
+      spell.innate = true;
+      spell.castsPerDay = entry.casts_max;
+      list.known[entry.rank].push(spell);
+    }
     const maxCount = (prev: number, curr: number, id: number) =>
       curr > 0 ? id : prev;
     this.lists.sort(
@@ -81,23 +89,25 @@ export default class Spells {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private makeSpell(entry: any, level: number): Spell {
+  private makeSpell(entry: any, level: number, listName: string): Spell {
     let cost = Action.None;
     let maxCost = Action.None;
-    if (entry.cast.includes('_TO_')) {
-      const actions = entry.cast.split('_TO_');
+    if (entry.cast.includes('TO')) {
+      const actions = entry.cast.split(/[_-]TO[_-]/gi);
       cost = actions[0] == 'ONE' ? Action.One : Action.Two;
       maxCost = Util.getActions(actions[1]);
     } else {
       cost = Util.getActions(entry.cast);
     }
     return {
-      name: entry.name,
+      name: entry.name.replaceAll(' (legacy)', 'ᴸ'),
       id: entry.id,
-      level: entry.rank,
+      level: entry.rank ?? 1,
       description: Util.parseDescription(entry.description, level) ?? '',
-      source: getSource(entry.content_source_id), // TODO: Sources
-      traits: Trait.map(entry.traits),
+      source: getSource(entry.content_source_id),
+      traits: Trait.map(entry.traits).filter(
+        (t) => t.id != 1856 && t.name != listName
+      ), // "Focus" filter
       cost: cost,
       maxCost: maxCost,
       castTime: entry.cast.replaceAll('_', ' '),
@@ -107,6 +117,7 @@ export default class Spells {
       targets: entry.targets ?? '',
       duration: entry.duration ?? '',
       save: entry.defense ?? '',
+      innate: false,
     };
   }
 

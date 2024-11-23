@@ -28,7 +28,7 @@ export default class Abilities extends Array<Ability> {
       id: feature.id ?? -1,
       level: feature.level ?? -1,
       type: type,
-      source: getSource(feature.content_source_id), // TODO: Map to string
+      source: getSource(feature.content_source_id),
       description: Util.parseDescription(feature.description),
       activity: feature.actions != null,
       traits: Trait.map(feature.traits),

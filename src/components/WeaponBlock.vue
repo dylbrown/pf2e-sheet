@@ -28,7 +28,10 @@
           <div class="labello compact">Reload</div>
         </div>
         <div class="line">
-          <div class="underlined weapon-traits bounded-line second-pass">
+          <div
+            class="underlined weapon-traits bounded-line second-pass"
+            data-max="1.5"
+          >
             {{ weapon.traits.map((t) => t.name).join(', ') }}
           </div>
           <div class="labello compact">Traits</div>

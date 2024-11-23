@@ -27,7 +27,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Strength]) }}
+                {{ signed(abilityMod(character.scores[Score.Strength])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -45,7 +45,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Intelligence]) }}
+                {{ signed(abilityMod(character.scores[Score.Intelligence])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -63,7 +63,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -81,7 +81,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -99,7 +99,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Constitution]) }}
+                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -117,7 +117,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Charisma]) }}
+                {{ signed(abilityMod(character.scores[Score.Charisma])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -188,7 +188,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="box-label">DEX</div>
             </div>
@@ -227,7 +227,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -258,7 +258,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Constitution]) }}
+                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
               </div>
               <div class="labello">CON</div>
             </div>
@@ -289,7 +289,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="labello">DEX</div>
             </div>
@@ -316,7 +316,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -619,10 +619,13 @@ onMounted(() => {
     root.value.querySelectorAll('.bounded-line.second-pass').forEach((val) => {
       const value = val as HTMLElement;
       let size = parseFloat(getComputedStyle(value).fontSize);
+      const bound =
+        parseFloat(val.getAttribute('data-max') ?? '2.1') *
+        parseFloat(getComputedStyle(value).lineHeight);
       const row = value.parentElement?.parentElement;
       if (!row) return;
       const oldHeight = row.offsetHeight;
-      while (oldHeight >= row.offsetHeight) {
+      while (oldHeight >= row.offsetHeight && value.offsetHeight < bound) {
         size += 0.25;
         value.style.fontSize = size.toString() + 'px';
       }

@@ -206,6 +206,8 @@ export class Spell {
   targets = '';
   duration = '';
   save = '';
+  innate = false;
+  castsPerDay?: number;
 
   constructor(name: string, id: number) {
     this.name = name;
@@ -240,7 +242,7 @@ export class Trait {
   private static trait_map: { [id: number]: Trait } = {};
 
   private constructor(name: string, id: number, description: string) {
-    this.name = name.replace('(legacy)', '(L)').replace(' - Item', '');
+    this.name = name.replace(' (legacy)', 'ᴸ').replace(' - Item', '');
     this.id = id;
     this.description = description ?? '';
   }
@@ -304,7 +306,9 @@ const sources: { [id: number]: string } = {
   21: 'Fbs',
   23: 'GB',
   24: 'IL',
+  25: 'KoL',
   28: 'ME',
+  29: 'PFS',
   31: 'WG',
   35: 'P#183',
   41: 'P#176',
@@ -318,5 +322,6 @@ const sources: { [id: number]: string } = {
 };
 
 export function getSource(id: number) {
+  if (!sources[id]) console.log('Missing Source Name: ' + id);
   return sources[id] ?? id.toString();
 }

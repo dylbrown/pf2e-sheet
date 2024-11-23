@@ -13,7 +13,7 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { getProficiency, signed } from './util';
+import { abilityMod, getProficiency, signed } from './util';
 
 export default class Character {
   remaster = false;
@@ -150,6 +150,8 @@ export default class Character {
     this.ac = data.content?.ac ?? 0;
     this.combat.armor.ac =
       data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
+    this.combat.armor.ac +=
+      data.content?.armor_item?.item?.meta_data?.runes.potency ?? 0;
     this.combat.shield.ac =
       data.content?.shield_item?.item?.meta_data?.ac_bonus ?? 0;
     this.hp = data.content?.max_hp ?? 0;
@@ -176,7 +178,7 @@ export default class Character {
         this.lore[capitalize(a.substring(11)) + ' Lore'] = {
           proficiency: entry?.parts?.profValue as Proficiency,
           total: parseInt(entry?.total ?? '0'),
-          itemBonus: 0, // TODO: Support
+          itemBonus: entry.parts.breakdown.bonusValue ?? 0,
         };
       }
     }
@@ -233,7 +235,12 @@ export default class Character {
       this.inventory.push(item);
     }
     this.abilities.loadRemaster(data.content.feats_features);
-    this.spells.loadRemaster(data.content, this.class, this.level);
+    this.spells.loadRemaster(
+      data.content,
+      this.class,
+      this.level,
+      abilityMod(this.scores[Score.Charisma])
+    );
 
     return [];
   }
