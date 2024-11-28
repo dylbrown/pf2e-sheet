@@ -160,18 +160,7 @@ let storedHeight = 0;
 
 // Positioning Function
 const position = () => {
-  if (
-    !abilities.value ||
-    !page.value ||
-    !classAbilities.value ||
-    !classLabel.value ||
-    !generalAbilities.value ||
-    !generalLabel.value ||
-    !ancestryAbilities.value ||
-    !ancestryLabel.value ||
-    !inventoryGrid.value
-  )
-    return;
+  if (!abilities.value || !page.value) return;
 
   const height =
     storedHeight == 0
@@ -180,38 +169,47 @@ const position = () => {
   page.value.style.top = height + 'px';
   const pos = new Positioning.Positioning(height);
 
-  // Class Feats & Features
-  pos.apply(classLabel.value);
-  for (const block of classAbilities.value) {
-    block.position(pos);
-  }
+  if (classAbilities.value && classLabel.value) {
+    // Class Feats & Features
+    pos.apply(classLabel.value);
+    for (const block of classAbilities.value) {
+      block.position(pos);
+    }
+  } else console.log('Class abilities missing!');
 
-  // Skill & General Feats
-  pos.apply(generalLabel.value);
-  for (const block of generalAbilities.value) {
-    block.position(pos);
-  }
+  if (generalAbilities.value && generalLabel.value) {
+    // Skill & General Feats
+    pos.apply(generalLabel.value);
+    for (const block of generalAbilities.value) {
+      block.position(pos);
+    }
+  } else console.log('Skill/General abilities missing!');
 
-  // Ancestry Feats
-  pos.apply(ancestryLabel.value);
-  for (const block of ancestryAbilities.value) {
-    block.position(pos);
-  }
+  if (ancestryAbilities.value && ancestryLabel.value) {
+    // Ancestry Feats
+    pos.apply(ancestryLabel.value);
+    for (const block of ancestryAbilities.value) {
+      block.position(pos);
+    }
+  } else console.log('Ancestry abilities missing!');
 
-  // Inventory
-  pos.moveLeftIfPast(0.7, 0.7, 0.5);
-  /*
-  for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
-    const item = inventoryGrid.value.children.item(i);
-    if (!item || item.classList.contains('fixed-item')) break;
-    inventoryGrid.value.removeChild(item);
+  if (inventoryGrid.value) {
+    // Inventory
+    pos.moveLeftIfPast(0.7, 0.7, 0.5);
+    /*
+    for (let i = inventoryGrid.value.children.length - 1; i >= 0; i--) {
+      const item = inventoryGrid.value.children.item(i);
+      if (!item || item.classList.contains('fixed-item')) break;
+      inventoryGrid.value.removeChild(item);
+    }
+    while (inventoryGrid.value.getBoundingClientRect().height < height) {
+      inventoryGrid.value.appendChild(document.createElement('div'));
+    }
+    if (inventoryGrid.value.lastElementChild)
+      inventoryGrid.value.removeChild(inventoryGrid.value.lastElementChild);
+    */
+    Positioning.positionGrid(pos, inventoryGrid.value);
   }
-  while (inventoryGrid.value.getBoundingClientRect().height < height) {
-    inventoryGrid.value.appendChild(document.createElement('div'));
-  }
-  if (inventoryGrid.value.lastElementChild)
-    inventoryGrid.value.removeChild(inventoryGrid.value.lastElementChild);*/
-  Positioning.positionGrid(pos, inventoryGrid.value);
 
   // Spells
   if (spells.value) {

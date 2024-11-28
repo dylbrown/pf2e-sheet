@@ -6,6 +6,17 @@
     label="Export to PDF"
     @click="makePDF"
   />
+  <div id="notice" v-if="character.abilities.excluded.length > 0">
+    <div class="notice-header">Hidden Abilities</div>
+    <ul>
+      <li v-for="excluded of character.abilities.excluded" :key="excluded.name">
+        {{ excluded.name }}<br /><span
+          class="excluded-desc"
+          v-html="excluded.description"
+        />
+      </li>
+    </ul>
+  </div>
   <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>

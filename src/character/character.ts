@@ -165,10 +165,11 @@ export default class Character {
     );
     const armorCategory = data.content?.armor_item?.item?.meta_data?.category;
     if (armorCategory) {
+      const attributeName = armorCategory.startsWith('un')
+        ? 'UNARMORED_DEFENSE'
+        : armorCategory.toUpperCase() + '_ARMOR';
       this.combat.armor.proficiency =
-        this.attributes[
-          weaponsAndArmor[armorCategory.toUpperCase() + '_ARMOR']
-        ].proficiency;
+        this.attributes[weaponsAndArmor[attributeName]].proficiency;
     }
 
     // Lores
@@ -234,7 +235,10 @@ export default class Character {
       }
       this.inventory.push(item);
     }
-    this.abilities.loadRemaster(data.content.feats_features);
+    this.abilities.loadRemaster(
+      data.content.feats_features,
+      data.character.operation_data.selections
+    );
     this.spells.loadRemaster(
       data.content,
       this.class,

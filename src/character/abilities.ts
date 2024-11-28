@@ -5,11 +5,19 @@ import { capitalize } from 'vue';
 
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
+  excluded: Ability[] = [];
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  loadRemaster(feats_features: any) {
+  loadRemaster(feats_features: any, selections: any) {
+    const type: { [id: number]: AbilityType } = {};
+    for (const [key, value] of Object.entries(selections)) {
+      const id = value as number;
+      if (key.startsWith('ancestry-section')) {
+        type[id] = AbilityType.AncestryFeat;
+      }
+    }
     feats_features.otherFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.ClassFeature)
+      this.loadFeat(feature, type[feature.id] ?? AbilityType.ClassFeature)
     );
     feats_features.ancestryFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.AncestryFeat)
@@ -20,6 +28,7 @@ export default class Abilities extends Array<Ability> {
     feats_features.classFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.ClassFeat)
     );
+    this.sort((a, b) => b.level - a.level);
   }
 
   loadFeat(feature: any, type: AbilityType) {
@@ -46,6 +55,19 @@ export default class Abilities extends Array<Ability> {
       feat.trigger = feature.trigger;
     }
     // TODO: Conditionals
+    for (const entry of feature.operations ?? []) {
+      const givesOtherThings =
+        ['ABILITY_BLOCK', 'SPELL'].includes(entry?.data?.optionType) ||
+        entry.type == 'giveAbilityBlock';
+      const substringExceptions = ['In addition', 'Enhancement'];
+      if (
+        givesOtherThings &&
+        !substringExceptions.some((s) => feat.description.includes(s))
+      ) {
+        this.excluded.push(feat);
+        return;
+      }
+    }
     this.push(feat);
   }
 
