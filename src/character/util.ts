@@ -218,11 +218,10 @@ export function parseDescription(s: string, level = 0) {
     ) {
       const open = tablecut.indexOf('{{', heighten) + 2;
       const close = tablecut.indexOf('}}', heighten);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const ceil = Math.ceil;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const floor = Math.floor;
       const result = eval(tablecut.substring(open, close));
+      ceil(floor(0));
       tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
     }
   }
