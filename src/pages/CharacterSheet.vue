@@ -532,7 +532,10 @@
             <div class="labello">Stat</div>
             <div class="labello">Prof</div>
             <div class="labello">Item</div>
-            <template v-for="skill of skills" :key="skill">
+            <template
+              v-for="skill of character.starfinder ? sfSkills : skills"
+              :key="skill"
+            >
               <div class="skill-label">{{ Attribute[skill] }}</div>
               <div class="line">
                 <div class="underlined-roll">
@@ -594,7 +597,7 @@
 <script setup lang="ts">
 import { abilityMod, nonzero, signed } from 'src/character/util';
 import Character from 'src/character/character';
-import { Attribute, skills, Score } from 'src/character/model';
+import { Attribute, skills, sfSkills, Score } from 'src/character/model';
 import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';

@@ -10,6 +10,7 @@ import {
   skills,
   weaponsAndArmor,
   Trait,
+  sfSkills,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
@@ -17,6 +18,7 @@ import { abilityMod, getProficiency, signed } from './util';
 
 export default class Character {
   remaster = false;
+  starfinder = false;
   name = 'Dave';
   player = '';
   level = 0;
@@ -91,6 +93,7 @@ export default class Character {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private loadRemaster(data: any) {
     this.remaster = true;
+    this.starfinder = data.character.content_sources.enabled.includes(276);
     Trait.setDB(data.content.all_traits);
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
@@ -130,7 +133,7 @@ export default class Character {
     }
 
     this.languages = (data.content?.languages ?? []).map((lang: string) =>
-      capitalize(lang.toLowerCase())
+      capitalize(lang.toLowerCase().replaceAll(' (playtest)', 'ᴾ'))
     );
 
     // Speed
@@ -159,7 +162,9 @@ export default class Character {
     this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
     this.setProficiency(data, Attribute.Will, 'SAVE_');
-    skills.forEach((s) => this.setProficiency(data, s, 'SKILL_'));
+    (this.starfinder ? sfSkills : skills).forEach((s) =>
+      this.setProficiency(data, s, 'SKILL_')
+    );
     Object.entries(weaponsAndArmor).forEach(([k, v]) =>
       this.setProficiency(data, v, k, true)
     );

@@ -171,7 +171,7 @@ export function parseDescription(s: string, level = 0) {
     '<u>$&</u>'
   );
   const damageReminders = attackReminders.replaceAll(
-    /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points))/gi,
+    /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points)( die)?)/gi,
     '$1 <b>$3</b>'
   );
   const conditionReminders = damageReminders
