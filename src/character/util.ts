@@ -216,12 +216,12 @@ export function parseDescription(s: string, level = 0) {
       heighten != -1;
       heighten = tablecut.indexOf('⬆️')
     ) {
-      const open = tablecut.indexOf('{{', heighten) + 2;
-      const close = tablecut.indexOf('}}', heighten);
       const ceil = Math.ceil;
       const floor = Math.floor;
+      // Weird hack here to ensure ceil and floor aren't optimized out
+      const open = tablecut.indexOf('{{', heighten) + ceil(floor(2));
+      const close = tablecut.indexOf('}}', heighten);
       const result = eval(tablecut.substring(open, close));
-      ceil(floor(0));
       tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
     }
   }
