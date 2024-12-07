@@ -95,6 +95,37 @@ body,
   }
 }
 
+#notice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px;
+  width: calc(50vw - 60vh);
+  text-wrap: wrap;
+  background: repeating-linear-gradient(
+    45deg,
+    #89cff011,
+    #89cff011 10px,
+    white 10px,
+    white 20px
+  );
+  border: 1px dashed black;
+}
+#notice .notice-header {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.25em;
+}
+#notice ul {
+  padding-left: 1em;
+  margin-top: 0.5em;
+}
+.excluded-desc {
+  font-size: 0.5em;
+  font-style: italic;
+}
+
 #leftThird {
   position: absolute;
   left: 0;
@@ -115,6 +146,7 @@ body,
   box-sizing: border-box;
   display: flex;
   padding: 0 5px;
+  overflow: hidden;
 }
 
 #rightThird {
@@ -706,7 +738,7 @@ div.ability-section {
 }
 .ability-description > p,
 .description-chunk > p {
-  margin: 0 0 0.25em;
+  margin: 0 0 0.4em;
 }
 .ability-description > p:last-child,
 .description-chunk > p:last-child {
@@ -718,7 +750,18 @@ div.ability-section {
   line-break: anywhere;
 }
 .ability-description ul {
-  padding-left: 16px;
+  padding-left: 12px;
+}
+ul p {
+  margin: 0;
+  padding: 0;
+}
+ul br,
+ol br,
+p + br,
+ul + br,
+ol + br {
+  display: none;
 }
 .description-header {
   background-color: black;
@@ -812,7 +855,7 @@ div.col-section-label {
 .spells-spontaneous,
 .spells-spontaneous-grid,
 .header-chunk {
-  position: relative;
+  position: absolute;
   break-before: avoid;
   display: block;
   flex-basis: 100%;
@@ -1026,7 +1069,6 @@ div.spell-cost-optional.spell-cost-yes {
   color: transparent;
 }
 div.spell-cost-optional > span {
-  border: 1px solid black;
   width: 100%;
   height: 0;
   transform: rotate(135deg);

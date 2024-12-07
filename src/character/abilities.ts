@@ -1,12 +1,78 @@
-import { Ability, AbilityType, Action } from './model';
+import { Ability, AbilityType, Action, getSource, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
 
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
+  excluded: Ability[] = [];
+
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  load(data: any, metaData: any, level: number): Promise<void>[] {
+  loadRemaster(feats_features: any, selections: any) {
+    const type: { [id: number]: AbilityType } = {};
+    for (const [key, value] of Object.entries(selections)) {
+      const id = value as number;
+      if (key.startsWith('ancestry-section')) {
+        type[id] = AbilityType.AncestryFeat;
+      }
+    }
+    feats_features.otherFeats.forEach((feature: any) =>
+      this.loadFeat(feature, type[feature.id] ?? AbilityType.ClassFeature)
+    );
+    feats_features.ancestryFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.AncestryFeat)
+    );
+    feats_features.generalAndSkillFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.GeneralFeat)
+    );
+    feats_features.classFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.ClassFeat)
+    );
+    this.sort((a, b) => b.level - a.level);
+  }
+
+  loadFeat(feature: any, type: AbilityType) {
+    const feat: Ability = {
+      name: feature.name ?? '',
+      id: feature.id ?? -1,
+      level: feature.level ?? -1,
+      type: type,
+      source: getSource(feature.content_source_id),
+      description: Util.parseDescription(feature.description),
+      activity: feature.actions != null,
+      traits: Trait.map(feature.traits),
+    };
+    if (
+      type == AbilityType.GeneralFeat &&
+      feature.traits &&
+      feature.traits.includes(1438)
+    )
+      feat.type = AbilityType.SkillFeat;
+    if (feat.activity) {
+      feat.cost = Util.getActions(feature.actions);
+      feat.frequency = feature.frequency;
+      feat.requirements = feature.requirements;
+      feat.trigger = feature.trigger;
+    }
+    // TODO: Conditionals
+    for (const entry of feature.operations ?? []) {
+      const givesOtherThings =
+        ['ABILITY_BLOCK', 'SPELL'].includes(entry?.data?.optionType) ||
+        entry.type == 'giveAbilityBlock';
+      const substringExceptions = ['In addition', 'Enhancement'];
+      if (
+        givesOtherThings &&
+        !substringExceptions.some((s) => feat.description.includes(s))
+      ) {
+        this.excluded.push(feat);
+        return;
+      }
+    }
+    this.push(feat);
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  loadLegacy(data: any, metaData: any, level: number): Promise<void>[] {
     const promises: Array<Promise<void>> = [];
 
     // Class Features

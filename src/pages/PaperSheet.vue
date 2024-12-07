@@ -6,6 +6,17 @@
     label="Export to PDF"
     @click="makePDF"
   />
+  <div id="notice" v-if="character.abilities.excluded.length > 0">
+    <div class="notice-header">Hidden Abilities</div>
+    <ul>
+      <li v-for="excluded of character.abilities.excluded" :key="excluded.name">
+        {{ excluded.name }}<br /><span
+          class="excluded-desc"
+          v-html="excluded.description"
+        />
+      </li>
+    </ul>
+  </div>
   <div ref="root">
     <div class="page first-page">
       <div class="printBorder"></div>
@@ -27,7 +38,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Strength]) }}
+                {{ signed(abilityMod(character.scores[Score.Strength])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -45,7 +56,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Intelligence]) }}
+                {{ signed(abilityMod(character.scores[Score.Intelligence])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -63,7 +74,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -81,7 +92,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -99,7 +110,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Constitution]) }}
+                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -117,7 +128,7 @@
             </div>
             <div class="line">
               <div class="underlined-roll">
-                {{ abilityMod(character.scores[Score.Charisma]) }}
+                {{ signed(abilityMod(character.scores[Score.Charisma])) }}
               </div>
               <div class="labello">Mod</div>
             </div>
@@ -188,7 +199,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="box-label">DEX</div>
             </div>
@@ -227,7 +238,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -258,7 +269,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Constitution]) }}
+                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
               </div>
               <div class="labello">CON</div>
             </div>
@@ -289,7 +300,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Dexterity]) }}
+                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
               </div>
               <div class="labello">DEX</div>
             </div>
@@ -316,7 +327,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ abilityMod(character.scores[Score.Wisdom]) }}
+                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -442,16 +453,12 @@
               <div class="labello">Deity</div>
             </div>
             <div class="line">
-              <div class="underlined">{{ character.alignment }}</div>
-              <div class="labello">Alignment</div>
-            </div>
-            <div class="line">
               <div class="underlined">{{ character.size }}</div>
               <div class="labello">Size</div>
             </div>
-            <div class="line" style="grid-column-end: span 2">
+            <div class="line" style="grid-column-end: span 3">
               <div class="underlined bounded-line" data-max="1.7">
-                {{ character.traits.join(', ') }}
+                {{ character.traits.map((t) => t.name).join(', ') }}
               </div>
               <div class="labello">Traits</div>
             </div>
@@ -525,7 +532,10 @@
             <div class="labello">Stat</div>
             <div class="labello">Prof</div>
             <div class="labello">Item</div>
-            <template v-for="skill of skills" :key="skill">
+            <template
+              v-for="skill of character.starfinder ? sfSkills : skills"
+              :key="skill"
+            >
               <div class="skill-label">{{ Attribute[skill] }}</div>
               <div class="line">
                 <div class="underlined-roll">
@@ -587,7 +597,7 @@
 <script setup lang="ts">
 import { abilityMod, nonzero, signed } from 'src/character/util';
 import Character from 'src/character/character';
-import { Attribute, skills, Score } from 'src/character/model';
+import { Attribute, skills, sfSkills, Score } from 'src/character/model';
 import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
@@ -623,10 +633,13 @@ onMounted(() => {
     root.value.querySelectorAll('.bounded-line.second-pass').forEach((val) => {
       const value = val as HTMLElement;
       let size = parseFloat(getComputedStyle(value).fontSize);
+      const bound =
+        parseFloat(val.getAttribute('data-max') ?? '2.1') *
+        parseFloat(getComputedStyle(value).lineHeight);
       const row = value.parentElement?.parentElement;
       if (!row) return;
       const oldHeight = row.offsetHeight;
-      while (oldHeight >= row.offsetHeight) {
+      while (oldHeight >= row.offsetHeight && value.offsetHeight < bound) {
         size += 0.25;
         value.style.fontSize = size.toString() + 'px';
       }

@@ -2,10 +2,7 @@
   <div class="spell-box" ref="box">
     <div class="spell-attrs">
       <div class="spell-title">{{ spell.name }}</div>
-      <div
-        class="spell-cost"
-        v-if="!isNaN(Number(spell.cost)) && !spell.maxCost"
-      >
+      <div class="spell-cost" v-if="spell.cost && !spell.maxCost">
         <div
           :class="Number(spell.cost) >= 1 ? 'spell-cost-yes' : 'spell-cost-no'"
         >
@@ -22,10 +19,7 @@
           <span>♦</span>
         </div>
       </div>
-      <div
-        class="spell-cost"
-        v-if="!isNaN(Number(spell.cost)) && spell.maxCost"
-      >
+      <div class="spell-cost" v-if="spell.cost && spell.maxCost">
         <div class="spell-cost-yes">
           <span>♦</span>
         </div>
@@ -48,13 +42,26 @@
           <span>♦</span>
         </div>
       </div>
+      <LinePart
+        label="Cast Time"
+        :content="spell.castTime"
+        v-if="!spell.cost"
+      />
       <LinePart label="Level" :content="spell.level.toString()" />
-      <div v-if="isNaN(Number(spell.cost))">
-        <LinePart label="Cast Time" :content="spell.castTime" />
-      </div>
-      <LinePart label="Components" :content="spell.components.join(', ')" />
+      <LinePart
+        label="Components"
+        v-if="spell.components"
+        :content="spell.components.join(', ')"
+      />
+      <LinePart
+        label="Per Day"
+        :content="spell.castsPerDay ? spell.castsPerDay.toString() : ''"
+      />
       <LinePart label="Source" :content="spell.source" />
-      <LinePart label="Traits" :content="spell.traits.join(', ')" />
+      <LinePart
+        label="Traits"
+        :content="spell.traits.map((t) => t.name).join(', ')"
+      />
       <LinePart label="Requirements" :content="spell.requirements" />
       <LinePart label="Range" :content="spell.range" />
       <LinePart label="Area" :content="spell.area" />

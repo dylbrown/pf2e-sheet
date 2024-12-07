@@ -1,8 +1,8 @@
 import { marked } from 'marked';
-import { Ability, AbilityType, Action, Score } from './model';
+import { Ability, AbilityType, Action, Proficiency, Score } from './model';
 
-export function abilityMod(score: number) {
-  return signed(Math.floor((score - 10) / 2));
+export function abilityMod(score: number): number {
+  return Math.floor((score - 10) / 2);
 }
 
 export function nonzero(num: number) {
@@ -10,7 +10,7 @@ export function nonzero(num: number) {
 }
 
 export function signed(num: number) {
-  return num < 0 ? num : '+' + num;
+  return num < 0 ? num.toString() : '+' + num;
 }
 
 export function types(
@@ -41,6 +41,22 @@ export function getScore(s: string) {
       return Score.Charisma;
   }
   return -1 as Score;
+}
+
+export function getProficiency(prof: string) {
+  switch (prof.substring(0, 1).toUpperCase()) {
+    case 'U':
+      return Proficiency.Untrained;
+    case 'T':
+      return Proficiency.Trained;
+    case 'E':
+      return Proficiency.Expert;
+    case 'M':
+      return Proficiency.Master;
+    case 'L':
+      return Proficiency.Legendary;
+  }
+  return Proficiency.Untrained;
 }
 
 export function getAbilityType(type: string) {
@@ -110,18 +126,20 @@ export function numberAppendOrdinal(i: number) {
 }
 
 export function getActions(s: string) {
-  switch (s) {
+  switch (s.replaceAll(/[_-]/g, '')) {
+    case 'ONEACTION':
     case 'ACTION':
       return Action.One;
-    case 'TWO_ACTIONS':
+    case 'TWOACTIONS':
       return Action.Two;
-    case 'THREE_ACTIONS':
+    case 'THREEACTIONS':
       return Action.Three;
     case 'REACTION':
       return Action.Reaction;
-    case 'TWO_ROUNDS':
+    case 'TWOROUNDS':
       return Action.TwoRounds;
     case 'FREE':
+    case 'FREEACTION':
       return Action.Free;
   }
   return Action.None;
@@ -133,7 +151,7 @@ export function makeSource(s: string) {
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
-export function parseDescription(s: string) {
+export function parseDescription(s: string, level = 0) {
   const cleaned = marked
     .parse(s)
     .replaceAll(
@@ -144,12 +162,16 @@ export function parseDescription(s: string) {
     .replaceAll('ONE-ACTION', '⯁')
     .replaceAll('TWO-ACTIONS', '⯁⯁')
     .replaceAll('THREE-ACTIONS', '⯁⯁⯁');
-  const attackReminders = actions.replaceAll(
+
+  const conditions = actions
+    .replaceAll(/\[\[\w+\]\]\{([A-Za-z1-9 ]+)\}/gi, '$1')
+    .replaceAll(/\[\[(\w+)\]\]/gi, '$1');
+  const attackReminders = conditions.replaceAll(
     /make a (ranged )?spell attack( rolls?)?/gi,
     '<u>$&</u>'
   );
   const damageReminders = attackReminders.replaceAll(
-    /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points))/gi,
+    /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points)( die)?)/gi,
     '$1 <b>$3</b>'
   );
   const conditionReminders = damageReminders
@@ -169,11 +191,15 @@ export function parseDescription(s: string) {
     '<b>$2</b>'
   );
   const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
-  const colons = links.replaceAll(/(<li>)\s*:\s*/gi, '$1');
+  const remasterLinks = links
+    .replaceAll(/<a[^>]*>([^<]*)<\/a>/gi, '$1')
+    .replaceAll(/<a[^>]*><em>([^<]*)<\/em><\/a>/gi, '<em>$1</em>');
+  const traits = remasterLinks.replaceAll(/\((\w+)\)\{\w+\}/gi, '($1)');
+  const colons = traits.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
   const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
   const spaced = featReferences.replaceAll(/[\n\r]+/gi, '<br>');
-  const tablecut = spaced
+  let tablecut = spaced
     .replaceAll(
       /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
       '$1$3'
@@ -183,5 +209,21 @@ export function parseDescription(s: string) {
       '$1$3'
     )
     .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
-  return tablecut.replaceAll(/(<ul>|<\/p>|<\/li>)<br>/gi, '$1');
+
+  if (level > 0) {
+    for (
+      let heighten = tablecut.indexOf('⬆️');
+      heighten != -1;
+      heighten = tablecut.indexOf('⬆️')
+    ) {
+      const ceil = Math.ceil;
+      const floor = Math.floor;
+      // Weird hack here to ensure ceil and floor aren't optimized out
+      const open = tablecut.indexOf('{{', heighten) + ceil(floor(2));
+      const close = tablecut.indexOf('}}', heighten);
+      const result = eval(tablecut.substring(open, close));
+      tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
+    }
+  }
+  return tablecut;
 }

@@ -1,6 +1,15 @@
-import { Attribute, Score, Spell, SpellList } from './model';
+import {
+  Action,
+  Attribute,
+  getSource,
+  Score,
+  Spell,
+  SpellList,
+  Trait,
+} from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
+import { capitalize } from 'vue';
 
 export default class Spells {
   focusPoints = 0;
@@ -8,6 +17,7 @@ export default class Spells {
   lookup = {} as { [key: string]: SpellList };
 
   private getOrCreateSpellsList(spellSRC: string) {
+    spellSRC = capitalize(spellSRC.toLowerCase());
     let list = this.lookup[spellSRC];
     if (list == null && spellSRC.length > 0) {
       list = this.lookup[spellSRC] = {
@@ -29,7 +39,90 @@ export default class Spells {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  load(data: any, metaData: any): Promise<void>[] {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  loadRemaster(content: any, className: string, level: number, chaMod: number) {
+    for (const entry of content.spells.all) {
+      const list = this.getOrCreateSpellsList(
+        entry.casting_source || className
+      );
+      const spell = this.makeSpell(entry, level, list.name);
+      list.known[spell.level].push(spell);
+    }
+    for (const entry of content.spell_sources) {
+      const list = this.getOrCreateSpellsList(entry.source.name || className);
+      list.attack_attr = Attribute.SpellAttacks;
+      list.dc_attr = Attribute.SpellDCs;
+      list.attack = entry.stats.spell_attack.total[0];
+      list.dc = entry.stats.spell_dc.total;
+      list.type = capitalize(entry.source.type.split('-')[0].toLowerCase());
+      list.tradition = capitalize(entry.source.tradition.toLowerCase());
+      list.score = Util.getScore(entry.source.attribute.split('_')[1]);
+    }
+    for (const entry of content.spell_slots) {
+      const list = this.getOrCreateSpellsList(entry.source || className);
+      list.slots[entry.rank]++;
+    }
+    for (const entry of content.focus_spells) {
+      const list = this.getOrCreateSpellsList(
+        entry.casting_source || className
+      );
+      const spell = this.makeSpell(entry, level, list.name);
+      list.focus.push(spell);
+    }
+    this.focusPoints = Math.min(content.focus_spells.length, 3);
+
+    for (const entry of content.innate_spells) {
+      const list = this.getOrCreateSpellsList('Innate');
+      list.type = 'Innate';
+      list.attack = level + (level >= 12 ? 4 : 2) + chaMod;
+      list.dc = 10 + list.attack;
+      const spell = this.makeSpell(entry.spell, level, list.name);
+      spell.innate = true;
+      spell.castsPerDay = entry.casts_max;
+      list.known[entry.rank].push(spell);
+    }
+    const maxCount = (prev: number, curr: number, id: number) =>
+      curr > 0 ? id : prev;
+    this.lists.sort(
+      (a, b) => b.slots.reduce(maxCount, 0) - a.slots.reduce(maxCount, 0)
+    );
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  private makeSpell(entry: any, level: number, listName: string): Spell {
+    let cost = Action.None;
+    let maxCost = Action.None;
+    if (entry.cast.includes('TO')) {
+      const actions = entry.cast.split(/[_-]TO[_-]/gi);
+      cost = actions[0] == 'ONE' ? Action.One : Action.Two;
+      maxCost = Util.getActions(actions[1]);
+    } else {
+      cost = Util.getActions(entry.cast);
+    }
+    return {
+      name: entry.name.replaceAll(' (legacy)', 'ᴸ'),
+      id: entry.id,
+      level: entry.rank ?? 1,
+      description: Util.parseDescription(entry.description, level) ?? '',
+      source: getSource(entry.content_source_id),
+      traits: Trait.map(entry.traits).filter(
+        (t) => t.id != 1856 && t.name != listName
+      ), // "Focus" filter
+      cost: cost,
+      maxCost: maxCost,
+      castTime: entry.cast.replaceAll('_', ' '),
+      requirements: entry.requirements ?? '',
+      range: entry.range ?? '',
+      area: entry.area ?? '',
+      targets: entry.targets ?? '',
+      duration: entry.duration ?? '',
+      save: entry.defense ?? '',
+      innate: false,
+    };
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  loadLegacy(data: any, metaData: any): Promise<void>[] {
     /* eslint-enable @typescript-eslint/no-explicit-any */
     const promises: Array<Promise<void>> = [];
 
