@@ -691,7 +691,12 @@ div.action-label {
 }
 #skills-grid {
   display: grid;
-  grid-template-columns: 2fr 1.3fr 1fr;
+  .paper & {
+    grid-template-columns: 2fr 1.3fr 0.7fr 1fr 1fr;
+  }
+  .interactive & {
+    grid-template-columns: 2fr 1.3fr 1fr;
+  }
   column-gap: 3px;
   row-gap: 3px;
   align-items: start;
