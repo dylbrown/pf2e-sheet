@@ -15,7 +15,11 @@
       label="Trigger"
       :content="ability.trigger || ''"
     />
-    <div class="ability-description" ref="description" />
+    <div
+      class="ability-description"
+      ref="description"
+      v-html="interactive ? ability.description : ''"
+    />
   </div>
 </template>
 
@@ -26,6 +30,7 @@ import { Ability } from 'src/character/model';
 import * as Positioning from './positioning';
 const props = defineProps<{
   ability: Ability;
+  interactive: boolean;
 }>();
 const box = ref<HTMLDivElement | null>(null);
 const description = ref<HTMLDivElement | null>(null);

@@ -13,6 +13,7 @@
         :key="index"
         ref="classAbilities"
         :ability="ability"
+        :interactive="false"
       />
       <div class="ability-box ability-section do-not-break" ref="generalLabel">
         General & Skill Feats
@@ -30,6 +31,7 @@
         :key="index"
         ref="generalAbilities"
         :ability="ability"
+        :interactive="false"
       />
       <div class="ability-box ability-section do-not-break" ref="ancestryLabel">
         Ancestry Feats
@@ -43,6 +45,7 @@
         :key="index"
         ref="ancestryAbilities"
         :ability="ability"
+        :interactive="false"
       />
       <div class="inventory-grid" ref="inventoryGrid">
         <div class="grid-chunk first-chunk">

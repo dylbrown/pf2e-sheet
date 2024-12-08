@@ -125,9 +125,9 @@ html {
   }
 }
 #middleThird {
-  padding: 0 5px;
   overflow: hidden;
   .paper & {
+    padding: 0 5px;
     position: absolute;
     left: 30%;
     top: 0;
@@ -185,7 +185,9 @@ div {
   flex-flow: row nowrap;
   justify-content: flex-start;
   display: flex;
-  margin: 0 -5px;
+  .paper & {
+    margin: 0 -5px;
+  }
 }
 .row-wrap {
   flex-flow: row wrap;
@@ -197,14 +199,18 @@ div {
   display: flex;
   justify-content: stretch;
   align-content: stretch;
-  margin: 0 -5px;
+  .paper & {
+    margin: 0 -5px;
+  }
 }
 .row-between {
   flex-flow: row nowrap;
   display: flex;
   justify-content: space-between;
   align-content: stretch;
-  margin: 0 -5px;
+  .paper & {
+    margin: 0 -5px;
+  }
 }
 .row-center {
   flex-flow: row nowrap;
@@ -239,11 +245,13 @@ div {
   align-self: center;
   padding-right: 5px;
 }
-.row > div,
-.row-stretch > div,
-.row-between > div,
-.row-center > div {
-  margin: 0 5px;
+.paper {
+  .row > div,
+  .row-stretch > div,
+  .row-between > div,
+  .row-center > div {
+    margin: 0 5px;
+  }
 }
 
 .line {
@@ -301,6 +309,10 @@ div {
   vertical-align: bottom;
   text-align: center;
   font-size: 1.25em;
+  &.odd {
+    text-decoration: overline;
+    text-decoration-thickness: 1px;
+  }
 }
 
 .wrap {
@@ -327,11 +339,11 @@ div {
   min-height: 1.8em;
 }
 .numBox > input {
+  border-radius: 5px;
   border: none;
   height: 100%;
-  min-width: 5em;
-  max-width: 10em;
   text-align: center;
+  width: 4em;
 }
 .prof-box {
   border: 2px solid black;
@@ -405,12 +417,19 @@ div {
 .sectionLabel {
   font-size: 0.7em;
   color: #333;
-  flex-grow: 0;
   font-weight: bold;
   text-transform: uppercase;
-  align-self: flex-start;
-  margin-left: 3px;
-  margin-bottom: 3px;
+  .paper & {
+    margin-left: 3px;
+    align-self: flex-start;
+    flex-grow: 0;
+    margin-bottom: 3px;
+  }
+  .interactive .q-expansion-item & {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+  }
 }
 .combined-label .sectionLabel {
   font-size: 1.4em;
@@ -456,13 +475,15 @@ div.weapon-label {
 .weapon .underlined {
   text-align: center;
 }
-.weapon.row-stretch,
-.weapon .row-stretch {
-  margin: 0 -2px;
-}
-.weapon.row-stretch > div,
-.weapon .row-stretch > div {
-  margin: 0 2px;
+.paper {
+  .weapon.row-stretch > div,
+  .weapon .row-stretch > div {
+    margin: 0 2px;
+  }
+  .weapon.row-stretch,
+  .weapon .row-stretch {
+    margin: 0 -2px;
+  }
 }
 .weapon-info {
   font-size: 0.8em;
@@ -516,12 +537,20 @@ div.action-label {
   flex-grow: 0;
   text-align: center;
   margin: 0;
+
+  &.inline {
+    display: inline-flex;
+  }
 }
 .action-details .underlined {
   font-size: 0.8em;
 }
 .action {
   font-size: 0.8em;
+}
+
+.abilities-scroll {
+  height: 100%;
 }
 
 .column.compact {
@@ -713,11 +742,16 @@ div.action-label {
 }
 .ability-box,
 .spell-box {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(100% / 3);
-  flex-grow: 0;
+  .paper & {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% / 3);
+    flex-grow: 0;
+  }
+  .interactive & {
+    background-color: white;
+  }
   padding: 6px 3px;
   border: 1px dashed grey;
   margin: 0;
@@ -1131,4 +1165,12 @@ div.spell-cost-optional > span {
   right: 0;
   z-index: 100;
   user-select: none;
+}
+
+// ===== Interactive Only =====
+
+.q-table tbody td.table-traits {
+  font-size: 9.75px;
+  text-wrap: wrap;
+  font-style: italic;
 }

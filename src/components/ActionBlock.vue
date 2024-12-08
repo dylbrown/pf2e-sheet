@@ -7,10 +7,17 @@
     <div class="column-wrap action-details">
       <div class="line" v-if="action.traits.length > 0">
         <div class="underlined bounded-line" data-max="1.6">
-          <template v-for="(trait, index) in action.traits">
-            {{ trait.name
-            }}<template v-if="action.traits.length - 1 > index">, </template>
-          </template>
+          <span
+            ><template v-for="(trait, index) in action.traits">
+              <ClickableTrait
+                v-if="interactive"
+                :trait="trait"
+                :key="trait.name"
+              />
+              <template v-else>{{ trait.name }}</template
+              ><template v-if="action.traits.length - 1 > index">, </template>
+            </template></span
+          >
         </div>
         <div class="labello">Traits</div>
       </div>

@@ -4,6 +4,12 @@
       <div id="leftThird">
         <div class="column" style="justify-content: stretch">
           <div>PATHFINDER CHARACTER SHEET</div>
+          <div
+            class="underlined wrap"
+            style="font-size: 0.75em; border: none; font-style: italic"
+          >
+            {{ character.name }}
+          </div>
           <div class="sectionDivider">
             <hr />
           </div>
@@ -11,78 +17,26 @@
             Ability Scores
           </div>
           <div id="ability-grid">
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                STR
+            <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
+              <div class="line">
+                <div class="inverted numBox rounded" style="font-weight: bold">
+                  {{ Score[score].substring(0, 3).toUpperCase() }}
+                </div>
+                <div class="labello invisible">A</div>
               </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Strength])) }}
+              <div class="line">
+                <div
+                  :class="'underlined-roll' + (character.scores[score as Score] % 2 == 1 ? ' odd' : '')"
+                >
+                  {{
+                    Util.signed(
+                      Util.abilityMod(character.scores[score as Score])
+                    )
+                  }}
+                </div>
+                <div class="labello">Mod</div>
               </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                INT
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Intelligence])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                DEX
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                WIS
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                CON
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                CHA
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Charisma])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
+            </template>
           </div>
           <div class="sectionDivider">
             <hr />
@@ -101,31 +55,62 @@
               </div>
               <div class="labello">Class DC</div>
             </div>
-            <div class="line" style="flex-grow: 0">
-              <div class="hero-grid">
-                <div class="hero-box"></div>
-                <div class="hero-box"></div>
-                <div class="hero-box"></div>
-              </div>
-              <div class="labello">Hero Points</div>
-            </div>
           </div>
           <div class="sectionDivider">
             <hr />
           </div>
           <div class="sectionLabel">Health</div>
           <div class="row-between">
-            <div class="line" style="flex-grow: 0">
+            <div class="line">
               <div class="numBox rounded">{{ character.hp }}</div>
               <div class="labello">Max</div>
             </div>
             <div class="line">
-              <div class="numBox"><input type="number" min="0" /></div>
+              <div class="numBox rounded">
+                <q-linear-progress
+                  :value="currHP / character.hp"
+                  color="blue-2"
+                  track-color="white"
+                  class="rounded"
+                >
+                  <div
+                    class="absolute-full flex flex-center"
+                    style="color: black; font-size: calc(1rem + 0.5px)"
+                  >
+                    {{ currHP }}
+                  </div>
+                  <q-popup-proxy
+                    @show="workingHP = currHP"
+                    @hide="currHP = workingHP"
+                  >
+                    <q-linear-progress
+                      :value="workingHP / character.hp"
+                      color="blue-2"
+                      track-color="white"
+                      style="height: 28px"
+                    >
+                      <div
+                        class="absolute-full flex flex-center"
+                        style="color: black; font-size: 14px"
+                      >
+                        {{ workingHP }}
+                        <span style="color: gray"
+                          >&nbsp;({{ Util.signed(workingHP - currHP) }})</span
+                        >
+                      </div></q-linear-progress
+                    >
+                    <q-btn-group>
+                      <q-btn label="-10" @click="workingHP -= 10" />
+                      <q-btn label="-5" @click="workingHP -= 5" />
+                      <q-btn label="-1" @click="workingHP -= 1" />
+                      <q-btn label="+1" @click="workingHP += 1" />
+                      <q-btn label="+5" @click="workingHP += 5" />
+                      <q-btn label="+10" @click="workingHP += 10" />
+                    </q-btn-group>
+                  </q-popup-proxy>
+                </q-linear-progress>
+              </div>
               <div class="labello">Current</div>
-            </div>
-            <div class="line">
-              <div class="numBox"></div>
-              <div class="labello">Conditions</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -140,7 +125,7 @@
             </div>
             <div class="line">
               <div class="numBox" style="border-radius: 40%">
-                {{ nonzero(character.combat.shield.ac) }}
+                {{ Util.nonzero(character.combat.shield.ac) }}
               </div>
               <div class="box-label">Shield</div>
             </div>
@@ -150,152 +135,248 @@
           </div>
           <div class="sectionLabel">Perception + Saves</div>
           <div id="rolls-grid">
-            <div class="center-right rollLabel">PERCEPTION</div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(character.attributes[Attribute.Perception].total) }}
+            <template
+              v-for="attr of [
+                Attribute.Perception,
+                Attribute.Fortitude,
+                Attribute.Reflex,
+                Attribute.Will,
+              ]"
+              :key="attr"
+            >
+              <div class="center-right rollLabel">
+                <ClickableAttribute :attribute="attr" :character="character" />
               </div>
-              <div class="labello">Mod</div>
-            </div>
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.Perception].proficiency
-              "
-              :grid="true"
-            />
-            <div class="center-right rollLabel">FORTITUDE</div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(character.attributes[Attribute.Fortitude].total) }}
+              <div class="line">
+                <div class="underlined-roll">
+                  {{ Util.signed(character.attributes[attr].total) }}
+                </div>
+                <div class="labello">Mod</div>
               </div>
-              <div class="labello">Mod</div>
-            </div>
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.Fortitude].proficiency
-              "
-              :grid="true"
-            />
-            <div class="center-right rollLabel">REFLEX</div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(character.attributes[Attribute.Reflex].total) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <ProficiencyDisplay
-              :proficiency="character.attributes[Attribute.Reflex].proficiency"
-              :grid="true"
-            />
-            <div class="center-right rollLabel">WILL</div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(character.attributes[Attribute.Will].total) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <ProficiencyDisplay
-              :proficiency="character.attributes[Attribute.Will].proficiency"
-              :grid="true"
-            />
+              <ProficiencyDisplay
+                :proficiency="character.attributes[attr].proficiency"
+                :grid="true"
+              />
+            </template>
           </div>
         </div>
       </div>
       <div id="middleThird">
         <div class="column" style="justify-content: flex-start">
-          <div class="sectionDivider">
-            <hr />
-          </div>
-          <div class="sectionLabel" style="margin-bottom: 0">
-            Character Info
-          </div>
-          <div id="info-grid">
-            <div
-              class="line"
-              style="grid-row-end: span 2; grid-column-end: span 2"
-            >
-              <div class="underlined wrap">
-                {{ character.name }}
+          <q-scroll-area ref="middleScroll">
+            <q-list bordered>
+              <div class="sectionDivider">
+                <hr />
               </div>
-              <div class="labello">Character Name</div>
-            </div>
-            <div class="line" style="grid-column-end: span 2; min-height: 2em">
-              <div class="underlined bounded-line" data-max="1.6">
-                {{ character.ancestry }}
-              </div>
-              <div class="labello">Ancestry & Heritage</div>
-            </div>
-            <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">{{ character.background }}</div>
-              <div class="labello">Background</div>
-            </div>
-            <div class="line" style="grid-column-end: span 2">
-              <div class="underlined">
-                {{ character.class }} {{ character.level }}
-              </div>
-              <div class="labello">Class</div>
-            </div>
-            <div class="line">
-              <div class="underlined">{{ character.player }}</div>
-              <div class="labello">Player</div>
-            </div>
-            <div class="line">
-              <div class="underlined">{{ character.deity }}</div>
-              <div class="labello">Deity</div>
-            </div>
-            <div class="line">
-              <div class="underlined">{{ character.size }}</div>
-              <div class="labello">Size</div>
-            </div>
-            <div class="line" style="grid-column-end: span 3">
-              <div class="underlined bounded-line" data-max="1.7">
-                {{ character.traits.map((t) => t.name).join(', ') }}
-              </div>
-              <div class="labello">Traits</div>
-            </div>
-            <div class="line" style="grid-column-end: span 2">
-              <div class="underlined bounded-line" data-max="1.7">
-                {{ character.languages.join(', ') }}
-              </div>
-              <div class="labello">Languages</div>
-            </div>
-            <div class="line" style="grid-column-end: span 2">
-              <div class="underlined bounded-line">
-                {{ character.senses.join(', ') }}
-              </div>
-              <div class="labello">Senses</div>
-            </div>
-          </div>
-          <div class="sectionDivider">
-            <hr />
-          </div>
-          <div class="sectionLabel">Strikes</div>
-          <WeaponBlock
-            v-for="attack in character.combat.attacks"
-            :key="attack.name"
-            :weapon="attack"
-            :interactive="true"
-          />
-          <div class="sectionDivider">
-            <hr />
-          </div>
-          <div class="sectionLabel">Actions and Activities</div>
-          <q-scroll-area ref="abilities" style="flex-grow: 1">
-            <div ref="abilityBlock" class="column abilities">
-              <template
-                v-for="[index, ability] in Array.from(
-                  character.abilities.entries()
-                ).filter(([_, a]) => a.activity)"
-                :key="index"
+              <q-expansion-item
+                group="middle"
+                label="Character Info"
+                header-class="sectionLabel"
+                default-opened
+                dense
+                dense-toggle
+                expand-separator
+                ref="expInfo"
               >
-                <div class="action-divider" v-if="index > 0"></div>
-                <ActionBlock :action="ability" :interactive="true" />
-              </template>
-            </div>
+                <div id="info-grid">
+                  <div
+                    class="line"
+                    style="grid-row-end: span 2; grid-column-end: span 2"
+                  >
+                    <div class="underlined wrap">
+                      {{ character.name }}
+                    </div>
+                    <div class="labello">Character Name</div>
+                  </div>
+                  <div
+                    class="line"
+                    style="grid-column-end: span 2; min-height: 2em"
+                  >
+                    <div class="underlined bounded-line" data-max="1.6">
+                      {{ character.ancestry }}
+                    </div>
+                    <div class="labello">Ancestry & Heritage</div>
+                  </div>
+                  <div class="line" style="grid-column-end: span 2">
+                    <div class="underlined">{{ character.background }}</div>
+                    <div class="labello">Background</div>
+                  </div>
+                  <div class="line" style="grid-column-end: span 2">
+                    <div class="underlined">
+                      {{ character.class }} {{ character.level }}
+                    </div>
+                    <div class="labello">Class</div>
+                  </div>
+                  <div class="line">
+                    <div class="underlined">{{ character.player }}</div>
+                    <div class="labello">Player</div>
+                  </div>
+                  <div class="line">
+                    <div class="underlined">{{ character.deity }}</div>
+                    <div class="labello">Deity</div>
+                  </div>
+                  <div class="line">
+                    <div class="underlined">{{ character.size }}</div>
+                    <div class="labello">Size</div>
+                  </div>
+                  <div class="line" style="grid-column-end: span 3">
+                    <div class="underlined bounded-line" data-max="1.7">
+                      <span>
+                        <template
+                          v-for="(trait, index) in character.traits"
+                          :key="trait.name"
+                        >
+                          <template v-if="index > 0">, </template
+                          ><ClickableTrait :trait="trait" />
+                        </template>
+                      </span>
+                    </div>
+                    <div class="labello">Traits</div>
+                  </div>
+                  <div class="line" style="grid-column-end: span 2">
+                    <div class="underlined bounded-line" data-max="1.7">
+                      {{ character.languages.join(', ') }}
+                    </div>
+                    <div class="labello">Languages</div>
+                  </div>
+                  <div class="line" style="grid-column-end: span 2">
+                    <div class="underlined bounded-line">
+                      {{ character.senses.join(', ') }}
+                    </div>
+                    <div class="labello">Senses</div>
+                  </div>
+                </div>
+              </q-expansion-item>
+              <div class="sectionDivider">
+                <hr />
+              </div>
+              <q-expansion-item
+                group="middle"
+                label="Strikes"
+                header-class="sectionLabel"
+                default-opened
+                dense
+                dense-toggle
+                expand-separator
+                ref="expStrike"
+              >
+                <WeaponBlock
+                  v-for="attack in character.combat.attacks"
+                  :key="attack.name"
+                  :weapon="attack"
+                  :interactive="true"
+                />
+              </q-expansion-item>
+              <div class="sectionDivider">
+                <hr />
+              </div>
+              <q-expansion-item
+                group="middle"
+                label="Actions + Activities"
+                header-class="sectionLabel"
+                default-opened
+                dense
+                dense-toggle
+                expand-separator
+                ref="expAct"
+              >
+                <AbilitiesTable
+                  :character="character"
+                  :abilities="character.abilities.filter((a) => a.activity)"
+                />
+              </q-expansion-item>
+              <div class="sectionDivider">
+                <hr />
+              </div>
+              <q-expansion-item
+                group="middle"
+                label="Class Feats + Features"
+                header-class="sectionLabel"
+                default-opened
+                dense
+                dense-toggle
+                expand-separator
+              >
+                <AbilitiesTable
+                  :character="character"
+                  :abilities="
+                    Util.types(
+                      character.abilities,
+                      [AbilityType.ClassFeat, AbilityType.ClassFeature],
+                      []
+                    ).filter((a) => !a.activity)
+                  "
+                />
+              </q-expansion-item>
+              <div class="sectionDivider">
+                <hr />
+              </div>
+              <q-expansion-item
+                group="middle"
+                label="General + Skill Feats"
+                header-class="sectionLabel"
+                default-opened
+                dense
+                dense-toggle
+                expand-separator
+              >
+                <AbilitiesTable
+                  :character="character"
+                  :abilities="
+                    Util.types(
+                      character.abilities,
+                      [AbilityType.SkillFeat, AbilityType.GeneralFeat],
+                      []
+                    ).filter((a) => !a.activity)
+                  "
+                />
+              </q-expansion-item>
+              <template
+                v-if="
+                  Util.types(
+                    character.abilities,
+                    [AbilityType.AncestryFeat],
+                    []
+                  ).filter((a) => !a.activity).length > 0
+                "
+              >
+                <div class="sectionDivider">
+                  <hr />
+                </div>
+                <q-expansion-item
+                  group="middle"
+                  label="Ancestry Feats + Features"
+                  header-class="sectionLabel"
+                  default-opened
+                  dense
+                  dense-toggle
+                  expand-separator
+                >
+                  <AbilitiesTable
+                    :character="character"
+                    :abilities="
+                      Util.types(
+                        character.abilities,
+                        [AbilityType.AncestryFeat],
+                        []
+                      ).filter((a) => !a.activity)
+                    "
+                  /> </q-expansion-item
+              ></template>
+            </q-list>
           </q-scroll-area>
           <div id="focus" v-if="character.spells.focusPoints > 0">
             <div class="line">
-              <div class="numBox rounded"></div>
+              <div class="numBox rounded">
+                <q-input
+                  v-model.number="focus"
+                  type="number"
+                  :max="character.spells.focusPoints"
+                  min="0"
+                  input-class="text-right"
+                  style="font-size: 1em"
+                />
+              </div>
               <div
                 class="labello"
                 style="align-self: center; text-align: center"
@@ -333,7 +414,7 @@
               </div>
               <div class="line">
                 <div class="underlined-roll">
-                  {{ signed(character.attributes[skill].total) }}
+                  {{ Util.signed(character.attributes[skill].total) }}
                 </div>
               </div>
               <ProficiencyDisplay
@@ -345,10 +426,12 @@
               v-for="[name, lore] of Object.entries(character.lore)"
               :key="name"
             >
-              <div class="skill-label lore-label">{{ name }}</div>
+              <div class="skill-label lore-label">
+                <ClickableAttribute :lore="name" :character="character" />
+              </div>
               <div class="line">
                 <div class="underlined-roll">
-                  {{ signed(lore.total) }}
+                  {{ Util.signed(lore.total) }}
                 </div>
               </div>
               <ProficiencyDisplay
@@ -367,27 +450,57 @@
 </template>
 
 <script setup lang="ts">
-import { abilityMod, nonzero, signed } from 'src/character/util';
+import * as Util from 'src/character/util';
+import * as LS from 'src/pages/localStorage';
 import Character from 'src/character/character';
-import { Attribute, skills, sfSkills, Score } from 'src/character/model';
-import ActionBlock from 'src/components/ActionBlock.vue';
+import {
+  AbilityType,
+  Attribute,
+  skills,
+  sfSkills,
+  Score,
+} from 'src/character/model';
+import ClickableTrait from 'src/components/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
-import { onMounted, ref } from 'vue';
-import { QScrollArea } from 'quasar';
+import { onMounted, ref, watch } from 'vue';
+import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/ClickableAttribute.vue';
+import AbilitiesTable from 'src/components/AbilitiesTable.vue';
 
 document.documentElement.classList.add('interactive');
 
-defineProps<{
+const props = defineProps<{
   character: Character;
 }>();
 
 const root = ref<HTMLDivElement | null>(null);
 const abilityBlock = ref<HTMLDivElement | null>(null);
-const abilities = ref<QScrollArea | null>(null);
+const middleScroll = ref<QScrollArea | null>(null);
+const expInfo = ref<QExpansionItem | null>(null);
+const expStrike = ref<QExpansionItem | null>(null);
+const expAct = ref<QExpansionItem | null>(null);
+const currHP = ref<number>(
+  LS.load(props.character.name, 'hp') ?? props.character.hp
+);
+const workingHP = ref<number>(
+  LS.load(props.character.name, 'hp') ?? props.character.hp
+);
+const focus = ref<number>(
+  LS.load(props.character.name, 'focus') ?? props.character.spells.focusPoints
+);
+
+watch(currHP, (value) => {
+  LS.save(props.character.name, 'hp', value);
+});
+watch(focus, (value) => {
+  LS.save(props.character.name, 'focus', value);
+});
 
 onMounted(() => {
+  if (expInfo.value) {
+    expInfo.value.show();
+  }
   const boundedCheck = () => {
     if (!root.value) return;
     root.value
@@ -422,9 +535,9 @@ onMounted(() => {
   };
   boundedCheck();
   if (
-    abilities.value &&
-    abilities.value.getScroll().verticalContainerSize <
-      abilities.value.getScroll().verticalSize
+    middleScroll.value &&
+    middleScroll.value.getScroll().verticalContainerSize <
+      middleScroll.value.getScroll().verticalSize
   ) {
     abilityBlock.value?.classList.add('compact');
   }

@@ -1,13 +1,8 @@
 <template>
-  <span ref="name" class="clickable-trait">{{ Attribute[attribute] }}</span>
+  <span ref="name" class="clickable-trait">{{ name }}</span>
   <q-popup-proxy :class="popupClass + ' trait-popup'" :target="$refs.name">
-    {{
-      Util.signed(
-        Util.abilityMod(character.scores[character.attributes[attribute].score])
-      )
-    }}
-    {{ Score[character.attributes[attribute].score] }},
-    {{ profBonus }} Proficiency<template v-if="item"
+    {{ abilityMod }}
+    {{ scoreName }}, {{ profBonus }} Proficiency<template v-if="item"
       >, {{ item }} Item.</template
     >
   </q-popup-proxy>
@@ -19,20 +14,45 @@ import { Attribute, Proficiency, Score } from 'src/character/model';
 import * as Util from 'src/character/util';
 
 const props = defineProps<{
-  attribute: Attribute;
+  attribute?: Attribute;
+  lore?: string;
   character: Character;
   popupClass?: string;
 }>();
 
+const isAt = props.attribute != undefined;
+
+const name = isAt ? Attribute[props.attribute] : props.lore ?? '';
+
+const abilityMod = Util.signed(
+  Util.abilityMod(
+    props.character.scores[
+      isAt
+        ? props.character.attributes[props.attribute].score
+        : Score.Intelligence
+    ]
+  )
+);
+
+const scoreName = isAt
+  ? Score[props.character.attributes[props.attribute].score]
+  : 'Intelligence';
+
+const prof = isAt
+  ? props.character.attributes[props.attribute].proficiency
+  : props.lore
+  ? props.character.lore[props.lore].proficiency
+  : Proficiency.Untrained;
+
 const profBonus = Util.signed(
-  props.character.attributes[props.attribute].proficiency +
-    (props.character.attributes[props.attribute].proficiency !=
-    Proficiency.Untrained
-      ? props.character.level
-      : 0)
+  prof + (prof != Proficiency.Untrained ? props.character.level : 0)
 );
 
 const item = Util.nonzero(
-  props.character.attributes[props.attribute].itemBonus
+  props.attribute
+    ? props.character.attributes[props.attribute].itemBonus
+    : props.lore
+    ? props.character.lore[props.lore].itemBonus
+    : 0
 );
 </script>

@@ -267,7 +267,10 @@ export class Trait {
   private static trait_map: { [id: number]: Trait } = {};
 
   private constructor(name: string, id: number, description: string) {
-    this.name = name.replace(' (legacy)', 'ᴸ').replace(' - Item', '');
+    this.name = name
+      .replace(' (legacy)', 'ᴸ')
+      .replace(' - Item', 'ᴵ')
+      .replace(' Archetype', 'ᴬ');
     this.id = id;
     this.description = description ? parseDescription(description) : '';
   }

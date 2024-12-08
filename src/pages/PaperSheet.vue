@@ -30,114 +30,26 @@
             Ability Scores
           </div>
           <div id="ability-grid">
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                STR
+            <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
+              <div class="line">
+                <div class="inverted numBox rounded" style="font-weight: bold">
+                  {{ Score[score].substring(0, 3).toUpperCase() }}
+                </div>
+                <div class="labello invisible">A</div>
               </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Strength])) }}
+              <div class="line">
+                <div class="underlined-roll">
+                  {{ signed(abilityMod(character.scores[score as Score])) }}
+                </div>
+                <div class="labello">Mod</div>
               </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Strength] }}
+              <div class="line">
+                <div class="numBox rounded">
+                  {{ character.scores[score as Score] }}
+                </div>
+                <div class="labello">Score</div>
               </div>
-              <div class="labello">Score</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                INT
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Intelligence])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Intelligence] }}
-              </div>
-              <div class="labello">Score</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                DEX
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Dexterity] }}
-              </div>
-              <div class="labello">Score</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                WIS
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Wisdom] }}
-              </div>
-              <div class="labello">Score</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                CON
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Constitution] }}
-              </div>
-              <div class="labello">Score</div>
-            </div>
-            <div class="line">
-              <div class="inverted numBox rounded" style="font-weight: bold">
-                CHA
-              </div>
-              <div class="labello invisible">A</div>
-            </div>
-            <div class="line">
-              <div class="underlined-roll">
-                {{ signed(abilityMod(character.scores[Score.Charisma])) }}
-              </div>
-              <div class="labello">Mod</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.scores[Score.Charisma] }}
-              </div>
-              <div class="labello">Score</div>
-            </div>
+            </template>
           </div>
           <div class="sectionDivider">
             <hr />
