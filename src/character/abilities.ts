@@ -59,20 +59,30 @@ export default class Abilities extends Array<Ability> {
       feat.trigger = feature.trigger;
     }
     // TODO: Conditionals
+    let exclude = 0;
     for (const entry of feature.operations ?? []) {
-      const givesOtherThings =
-        ['ABILITY_BLOCK', 'SPELL'].includes(entry?.data?.optionType) ||
-        entry.type == 'giveAbilityBlock';
-      const substringExceptions = ['In addition', 'Enhancement'];
       if (
-        givesOtherThings &&
-        !substringExceptions.some((s) => feat.description.includes(s))
+        ['ABILITY_BLOCK', 'SPELL'].includes(entry?.data?.optionType) ||
+        entry.type == 'giveAbilityBlock'
       ) {
-        this.excluded.push(feat);
-        return;
+        exclude++;
+      }
+      if (
+        entry.type == 'injectText' ||
+        entry.data?.trueOperations?.some(
+          (entry: any) => entry.type == 'injectText'
+        )
+      ) {
+        exclude -= feature.operations.length;
       }
     }
-    this.push(feat);
+    const substringExceptions = ['In addition', 'Enhancement'];
+    if (
+      exclude > 0 &&
+      !substringExceptions.some((s) => feat.description.includes(s))
+    )
+      this.excluded.push(feat);
+    else this.push(feat);
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
