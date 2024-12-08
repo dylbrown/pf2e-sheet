@@ -1,6 +1,12 @@
 <template>
   <div v-if="!ready" id="load-box">
     <h5>Pathfinder Second Edition Character Sheet for Wanderer's Guide</h5>
+    <q-toggle
+      :label="`Generating ${
+        interactiveMode ? 'Interactive (WIP)' : 'Paper'
+      } Sheet`"
+      v-model="interactiveMode"
+    />
     <q-file
       v-model="file"
       label="Pick one file"
@@ -12,7 +18,8 @@
     />
     <q-linear-progress :value="progress" />
   </div>
-  <CharacterSheet v-if="ready" :character="character" />
+  <InteractiveSheet v-if="ready && interactiveMode" :character="character" />
+  <PaperSheet v-if="ready && !interactiveMode" :character="character" />
 </template>
 
 <style>
@@ -31,10 +38,12 @@
 
 <script setup lang="ts">
 import Character from 'src/character/character';
-import CharacterSheet from 'src/pages/CharacterSheet.vue';
+import InteractiveSheet from 'src/pages/InteractiveSheet.vue';
+import PaperSheet from 'src/pages/PaperSheet.vue';
 import { ref } from 'vue';
 let file = ref<File | null>(null);
 let ready = ref(false);
+let interactiveMode = ref(false);
 let progress = ref(0);
 const character = new Character();
 

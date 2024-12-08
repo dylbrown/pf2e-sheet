@@ -40,8 +40,13 @@
             <template v-if="action.traits.length > 0"
               >(<i
                 ><template v-for="(trait, index) in action.traits">
-                  {{ trait.name
-                  }}<template v-if="action.traits.length - 1 > index"
+                  <ClickableTrait
+                    v-if="interactive"
+                    :trait="trait"
+                    :key="trait.name"
+                  />
+                  <template v-else>{{ trait.name }}</template>
+                  <template v-if="action.traits.length - 1 > index"
                     >,
                   </template>
                 </template></i
@@ -63,8 +68,10 @@
 
 <script setup lang="ts">
 import { Ability, Action } from 'src/character/model';
+import ClickableTrait from './ClickableTrait.vue';
 
 defineProps<{
   action: Ability;
+  interactive: boolean;
 }>();
 </script>
