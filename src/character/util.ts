@@ -218,8 +218,10 @@ export function parseDescription(s: string, level = 0) {
     ) {
       const ceil = Math.ceil;
       const floor = Math.floor;
+      const max = Math.max;
+      const min = Math.min;
       // Weird hack here to ensure ceil and floor aren't optimized out
-      const open = tablecut.indexOf('{{', heighten) + ceil(floor(2));
+      const open = tablecut.indexOf('{{', heighten) + ceil(floor(max(min(2))));
       const close = tablecut.indexOf('}}', heighten);
       const result = eval(tablecut.substring(open, close));
       tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);

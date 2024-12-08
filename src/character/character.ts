@@ -242,7 +242,8 @@ export default class Character {
     }
     this.abilities.loadRemaster(
       data.content.feats_features,
-      data.character.operation_data.selections
+      data.character.operation_data.selections,
+      this.level
     );
     this.spells.loadRemaster(
       data.content,

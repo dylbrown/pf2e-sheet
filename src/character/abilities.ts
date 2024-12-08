@@ -8,7 +8,7 @@ export default class Abilities extends Array<Ability> {
   excluded: Ability[] = [];
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  loadRemaster(feats_features: any, selections: any) {
+  loadRemaster(feats_features: any, selections: any, level: number) {
     const type: { [id: number]: AbilityType } = {};
     for (const [key, value] of Object.entries(selections)) {
       const id = value as number;
@@ -17,28 +17,32 @@ export default class Abilities extends Array<Ability> {
       }
     }
     feats_features.otherFeats.forEach((feature: any) =>
-      this.loadFeat(feature, type[feature.id] ?? AbilityType.ClassFeature)
+      this.loadFeat(
+        feature,
+        type[feature.id] ?? AbilityType.ClassFeature,
+        level
+      )
     );
     feats_features.ancestryFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.AncestryFeat)
+      this.loadFeat(feature, AbilityType.AncestryFeat, level)
     );
     feats_features.generalAndSkillFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.GeneralFeat)
+      this.loadFeat(feature, AbilityType.GeneralFeat, level)
     );
     feats_features.classFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.ClassFeat)
+      this.loadFeat(feature, AbilityType.ClassFeat, level)
     );
     this.sort((a, b) => b.level - a.level);
   }
 
-  loadFeat(feature: any, type: AbilityType) {
+  loadFeat(feature: any, type: AbilityType, level: number) {
     const feat: Ability = {
       name: feature.name ?? '',
       id: feature.id ?? -1,
       level: feature.level ?? -1,
       type: type,
       source: getSource(feature.content_source_id),
-      description: Util.parseDescription(feature.description),
+      description: Util.parseDescription(feature.description, level),
       activity: feature.actions != null,
       traits: Trait.map(feature.traits),
     };
