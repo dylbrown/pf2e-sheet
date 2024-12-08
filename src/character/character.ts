@@ -99,7 +99,10 @@ export default class Character {
     this.level = data.character?.level ?? 0;
 
     // Ancestry & Heritage name
-    this.ancestry = data.character?.details?.ancestry?.name;
+    this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
+      ' (Playtest)',
+      ''
+    );
     const heritages = data.content?.feats_features?.heritages;
     if (heritages && heritages[0] && heritages[0].name) {
       this.ancestry = heritages[0].name.includes(this.ancestry)
@@ -181,11 +184,12 @@ export default class Character {
     for (const [a, e] of Object.entries(data.content?.proficiencies)) {
       if (a.startsWith('SKILL_LORE_') && a.charAt(11) != '_') {
         const entry: any = e;
-        this.lore[capitalize(a.substring(11)) + ' Lore'] = {
-          proficiency: entry?.parts?.profValue as Proficiency,
-          total: parseInt(entry?.total ?? '0'),
-          itemBonus: entry.parts.breakdown.bonusValue ?? 0,
-        };
+        this.lore[capitalize(a.substring(11).replaceAll('_', ' ')) + ' Lore'] =
+          {
+            proficiency: entry?.parts?.profValue as Proficiency,
+            total: parseInt(entry?.total ?? '0'),
+            itemBonus: entry.parts.breakdown.bonusValue ?? 0,
+          };
       }
     }
 

@@ -291,7 +291,7 @@ export class Trait {
     if (this.trait_map[id]) return this.trait_map[id];
     if (!this.trait_map[id] && this.db[id]) {
       this.trait_map[id] = new Trait(
-        this.db[id].name,
+        this.db[id].name.replaceAll(' (Playtest)', 'ᴾ'),
         id,
         this.db[id].description
       );
