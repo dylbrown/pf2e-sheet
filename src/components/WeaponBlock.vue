@@ -32,7 +32,18 @@
             class="underlined weapon-traits bounded-line second-pass"
             data-max="1.5"
           >
-            {{ weapon.traits.map((t) => t.name).join(', ') }}
+            <span v-if="interactive">
+              <template
+                v-for="(trait, index) in weapon.traits"
+                :key="trait.name"
+              >
+                <template v-if="index > 0">, </template>
+                <ClickableTrait :trait="trait" />
+              </template>
+            </span>
+            <template v-else>{{
+              weapon.traits.map((t) => t.name).join(', ')
+            }}</template>
           </div>
           <div class="labello compact">Traits</div>
         </div>
@@ -43,8 +54,10 @@
 
 <script setup lang="ts">
 import { Weapon } from 'src/character/model';
+import ClickableTrait from './ClickableTrait.vue';
 
 defineProps<{
   weapon: Weapon;
+  interactive: boolean;
 }>();
 </script>

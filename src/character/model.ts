@@ -269,7 +269,7 @@ export class Trait {
   private constructor(name: string, id: number, description: string) {
     this.name = name.replace(' (legacy)', 'ᴸ').replace(' - Item', '');
     this.id = id;
-    this.description = description ?? '';
+    this.description = description ? parseDescription(description) : '';
   }
 
   // DB

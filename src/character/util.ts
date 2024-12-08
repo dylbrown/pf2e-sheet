@@ -225,5 +225,5 @@ export function parseDescription(s: string, level = 0) {
       tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
     }
   }
-  return tablecut;
+  return tablecut.replaceAll(/(<br>)+$/gi, '');
 }

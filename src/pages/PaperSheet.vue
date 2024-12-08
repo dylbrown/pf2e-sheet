@@ -483,6 +483,7 @@
             v-for="attack in character.combat.attacks"
             :key="attack.name"
             :weapon="attack"
+            :interactive="false"
           />
           <div class="sectionDivider">
             <hr />
@@ -496,7 +497,7 @@
               :key="index"
             >
               <div class="action-divider" v-if="index > 0"></div>
-              <ActionBlock :action="ability" />
+              <ActionBlock :action="ability" :interactive="false" />
             </template>
           </div>
           <div id="focus" v-if="character.spells.focusPoints > 0">
@@ -604,6 +605,8 @@ import WeaponBlock from 'src/components/WeaponBlock.vue';
 import AbilitiesBlock from 'src/components/AbilitiesBlock.vue';
 import { onMounted, ref } from 'vue';
 import makeSheet from './pdf-sheet';
+
+document.documentElement.classList.add('paper');
 
 const props = defineProps<{
   character: Character;

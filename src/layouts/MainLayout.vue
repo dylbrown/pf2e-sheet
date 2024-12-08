@@ -2,7 +2,9 @@
   <div v-if="!ready" id="load-box">
     <h5>Pathfinder Second Edition Character Sheet for Wanderer's Guide</h5>
     <q-toggle
-      :label="`Generating ${interactiveMode ? 'Interactive' : 'Paper'} Sheet`"
+      :label="`Generating ${
+        interactiveMode ? 'Interactive (WIP)' : 'Paper'
+      } Sheet`"
       v-model="interactiveMode"
     />
     <q-file
