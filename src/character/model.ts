@@ -179,7 +179,9 @@ export interface Weapon extends Item {
   damage: string;
   hands: string;
   range?: number;
-  reload?: number;
+  reload?: string;
+  capacity?: number;
+  usage?: number;
 }
 
 export class Ability {

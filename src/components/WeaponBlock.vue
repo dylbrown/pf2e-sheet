@@ -20,12 +20,20 @@
           <div class="labello compact">Hands</div>
         </div>
         <div class="line" v-if="weapon.range">
-          <div class="underlined weapon-info">{{ weapon.range }} ft.</div>
+          <div class="underlined weapon-info">{{ weapon.range }}</div>
           <div class="labello compact">Range</div>
         </div>
         <div class="line" v-if="weapon.reload">
           <div class="underlined weapon-info">{{ weapon.reload }}</div>
           <div class="labello compact">Reload</div>
+        </div>
+        <div class="line" v-if="weapon.capacity">
+          <div class="underlined weapon-info">{{ weapon.capacity }}</div>
+          <div class="labello compact">Capacity</div>
+        </div>
+        <div class="line" v-if="weapon.usage">
+          <div class="underlined weapon-info">{{ weapon.usage }}</div>
+          <div class="labello compact">Usage</div>
         </div>
         <div class="line">
           <div

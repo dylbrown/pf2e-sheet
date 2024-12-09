@@ -213,7 +213,12 @@ export default class Character {
         traits: Trait.map(entry.item.traits),
         weapon: true,
       };
-      // TODO: Range and reload
+      attack.range = entry.item.meta_data.range;
+      attack.reload = entry.item.meta_data.reload;
+      if (entry.item.meta_data.starfinder) {
+        attack.capacity = entry.item.meta_data.starfinder.capacity;
+        attack.usage = entry.item.meta_data.starfinder.usage;
+      }
       attackMap.set(attack.name, attack);
       this.combat.attacks.push(attack);
     }
