@@ -31,7 +31,6 @@ body,
   background-color: lightgray;
 }
 body {
-  height: 200vh;
   margin: 0;
 }
 .page {
@@ -65,7 +64,12 @@ body {
 html {
   font-size: calc(2.5vh - 4px);
   &.interactive {
-    overflow: hidden;
+    &,
+    body,
+    #q-app {
+      overflow: hidden;
+      height: 100vh;
+    }
   }
 }
 @media (max-height: 600px) {
