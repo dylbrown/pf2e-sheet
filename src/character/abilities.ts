@@ -26,6 +26,9 @@ export default class Abilities extends Array<Ability> {
     feats_features.ancestryFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.AncestryFeat, level)
     );
+    feats_features.heritages.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.AncestryFeat, level)
+    );
     feats_features.generalAndSkillFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.GeneralFeat, level)
     );
