@@ -8,7 +8,7 @@
         v-for="[index, ability] in types(
           character.abilities,
           [AbilityType.ClassFeat, AbilityType.ClassFeature],
-          []
+          [],
         ).entries()"
         :key="index"
         ref="classAbilities"
@@ -26,7 +26,7 @@
             AbilityType.ClassFeat,
             AbilityType.ClassFeature,
             AbilityType.AncestryFeat,
-          ]
+          ],
         ).entries()"
         :key="index"
         ref="generalAbilities"
@@ -40,7 +40,7 @@
         v-for="[index, ability] in types(
           character.abilities,
           [AbilityType.AncestryFeat],
-          []
+          [],
         ).entries()"
         :key="index"
         ref="ancestryAbilities"
@@ -96,7 +96,7 @@
         </div>
         <template
           v-for="list of character.spells.lists.filter(
-            (l) => l.focus.length > 0
+            (l) => l.focus.length > 0,
           )"
           :key="list.name"
         >
@@ -135,7 +135,7 @@ import InnateList from 'src/components/InnateList.vue';
 import PreparedList from 'src/components/PreparedList.vue';
 import SpontaneousList from 'src/components/SpontaneousList.vue';
 import { signed, types } from 'src/character/util';
-import Character from 'src/character/character';
+import type Character from 'src/character/character';
 import { AbilityType } from 'src/character/model';
 
 import { ref, onMounted } from 'vue';
@@ -159,7 +159,7 @@ const inventoryGrid = ref<HTMLDivElement | null>(null);
 const spells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusSpells = ref<InstanceType<typeof SpellBlock>[] | null>(null);
 const focusLabel = ref<HTMLDivElement | null>(null);
-let storedHeight = 0;
+const storedHeight = 0;
 
 // Positioning Function
 const position = () => {
@@ -219,12 +219,12 @@ const position = () => {
     for (const list of props.character.spells.lists) {
       pos.moveLeftIfPast(0.7, 0.7, 0.5);
       const header = document.querySelector(
-        `[data-list='${list.name}']`
+        `[data-list='${list.name}']`,
       ) as HTMLElement;
       if (header) {
         Positioning.positionHeader(pos, header);
         const grid = document.querySelector(
-          `[data-grid='${list.name}']`
+          `[data-grid='${list.name}']`,
         ) as HTMLElement;
         if (grid) {
           Positioning.positionGrid(pos, grid);
@@ -241,7 +241,7 @@ const position = () => {
     pos.apply(focusLabel.value);
     for (const list of props.character.spells.lists) {
       const header = document.querySelector(
-        `[data-focus='${list.name}']`
+        `[data-focus='${list.name}']`,
       ) as HTMLElement;
       if (header) Positioning.positionHeader(pos, header);
       for (const block of focusSpells.value) {

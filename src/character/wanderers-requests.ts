@@ -1,5 +1,6 @@
 import { LocalStorage } from 'quasar';
-import { Ability, Action, Item, Spell, Trait, Weapon } from './model';
+import type { Ability, Item, Spell, Weapon } from './model';
+import { Action, Trait } from './model';
 import * as Util from './util';
 import runeLookupJSON from './examples/rune_lookup.json';
 const runeLookup = runeLookupJSON as { [key: string]: number };
@@ -8,7 +9,7 @@ async function load(
   url_prefix: string,
   ls_key: string,
   id: number,
-  store?: boolean
+  store?: boolean,
 ) {
   // First, try to retrieve from LocalStorage
   const full_key = '2e-sheet:' + ls_key;
@@ -28,7 +29,7 @@ async function load(
   // Wait a bit and then try one more time
   if (!res.ok) {
     await new Promise((resolve) =>
-      setTimeout(resolve, 2500 + Math.random() * 5500)
+      setTimeout(resolve, 2500 + Math.random() * 5500),
     );
     res = await fetch(url);
   }
@@ -53,7 +54,7 @@ export async function loadClass(id: number) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=class&id=',
     'class',
-    id
+    id,
   );
   return data;
 }
@@ -62,12 +63,12 @@ export async function loadFeat(feat: Ability) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=feat&id=',
     'feat',
-    feat.id
+    feat.id,
   );
   feat.source = Util.makeSource(data.feat.contentSrc);
   feat.traits = data.traits.map(
     (o: { name: string; description: string; id: number }) =>
-      Trait.createIfAbsent(o.name, o.id, o.description)
+      Trait.createIfAbsent(o.name, o.id, o.description),
   );
 }
 
@@ -75,12 +76,12 @@ export async function loadItem(item: Item) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=item&id=',
     'item',
-    item.id
+    item.id,
   );
   const entry = data.item;
   item.traits = data.traits.map(
     (o: { name: string; description: string; id: number }) =>
-      Trait.createIfAbsent(o.name, o.id, o.description)
+      Trait.createIfAbsent(o.name, o.id, o.description),
   );
   if (item.weapon) {
     const weapon = item as Weapon;
@@ -96,7 +97,7 @@ export async function loadSpell(spell: Spell) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=spell&id=',
     'spell',
-    spell.id
+    spell.id,
   );
   const entry = data.spell;
   spell.name = entry.name;
@@ -110,7 +111,7 @@ export async function loadSpell(spell: Spell) {
     if (val == 'CUSTOM') {
       const text = entry['heightened' + ordinal + 'Text'].replaceAll(
         /~ (\(\d{1,2}\w\w\))/gi,
-        '<br><b>$1</b>'
+        '<br><b>$1</b>',
       );
       spell.description += Util.parseDescription(text);
       break;
@@ -123,14 +124,14 @@ export async function loadSpell(spell: Spell) {
       label = Util.numberAppendOrdinal(parseInt(type_and_num[1]));
     }
     const heightened = Util.parseDescription(
-      `<b>(${label})</b> ` + entry['heightened' + ordinal + 'Text']
+      `<b>(${label})</b> ` + entry['heightened' + ordinal + 'Text'],
     );
     heightenedArray.push(heightened.replace(/(^<p>)(.*)<\/p>$/gi, '$2'));
   }
   spell.description += heightenedArray.join('<br>');
   spell.description = spell.description.replaceAll(
     /<br>([\s\n\r]*<br>)+/gi,
-    '<br>'
+    '<br>',
   );
 
   if (entry.cast.includes('_TO_')) {
@@ -142,12 +143,12 @@ export async function loadSpell(spell: Spell) {
   }
   spell.castTime = entry.cast.replaceAll('_', ' ');
   spell.components = JSON.parse(entry?.castingComponents).map((o: string) =>
-    o[0].toUpperCase()
+    o[0] ? o[0].toUpperCase() : '',
   );
   spell.source = Util.makeSource(entry.contentSrc);
   spell.traits = data.traits.map(
     (o: { name: string; description: string; id: number }) =>
-      Trait.createIfAbsent(o.name, o.id, o.description)
+      Trait.createIfAbsent(o.name, o.id, o.description),
   );
   spell.requirements = entry?.requirements || '';
   spell.range = entry?.range?.replaceAll(/f(ee|oo)t/gi, 'ft.') || '';
@@ -160,7 +161,8 @@ export async function loadSpell(spell: Spell) {
           .split('_')
           .map(
             (bit: string) =>
-              bit[0].toUpperCase() + bit.substring(1).toLowerCase()
+              bit.substring(0, 1).toUpperCase() +
+              bit.substring(1).toLowerCase(),
           )
           .join(' ')
       : '';
@@ -170,7 +172,7 @@ export async function loadRune(weapon: Weapon, key: string) {
     '/.netlify/functions/wanderers-request?type=item&id=',
     'item',
     runeLookup[key] ?? -1,
-    false
+    false,
   );
   const entry = data.item;
   for (const line of entry.code.split('\n')) {

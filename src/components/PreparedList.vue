@@ -45,7 +45,7 @@
           <div class="spells-slot" v-if="index == 0"></div>
           <div
             class="spells-slot"
-            v-for="n in Math.max(3, list.slots[index])"
+            v-for="n in Math.max(3, list.slots[index] ?? 0)"
             :key="n"
           ></div>
         </div>
@@ -56,8 +56,8 @@
 
 <script setup lang="ts">
 import { signed } from 'src/character/util';
-import { SpellList } from 'src/character/model';
-import Character from 'src/character/character';
+import type { SpellList } from 'src/character/model';
+import type Character from 'src/character/character';
 
 defineProps<{
   character: Character;

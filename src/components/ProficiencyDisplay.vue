@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { Proficiency } from 'src/character/model';
+import type { Proficiency } from 'src/character/model';
 
 defineProps<{
   grid: boolean;

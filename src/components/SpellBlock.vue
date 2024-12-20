@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { Spell } from 'src/character/model';
+import type { Spell } from 'src/character/model';
 import LinePart from './LinePart.vue';
 import { ref } from 'vue';
 import * as Positioning from './positioning';
@@ -91,7 +91,7 @@ const position = (pos: Positioning.Positioning) => {
     pos,
     box.value,
     description.value,
-    props.spell.description
+    props.spell.description,
   );
 };
 

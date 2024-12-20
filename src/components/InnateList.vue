@@ -16,8 +16,8 @@
 
 <script setup lang="ts">
 import { signed } from 'src/character/util';
-import { SpellList } from 'src/character/model';
-import Character from 'src/character/character';
+import type { SpellList } from 'src/character/model';
+import type Character from 'src/character/character';
 
 defineProps<{
   character: Character;

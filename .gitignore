@@ -132,3 +132,5 @@ src/character/feats.json
 src/character/items.json
 src/character/spells.json
 .quasar/client-entry.js
+/quasar.config.*.temporary.compiled*
+.env.local*

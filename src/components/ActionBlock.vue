@@ -74,7 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { Ability, Action } from 'src/character/model';
+import type { Ability } from 'src/character/model';
+import { Action } from 'src/character/model';
 import ClickableTrait from './ClickableTrait.vue';
 
 defineProps<{

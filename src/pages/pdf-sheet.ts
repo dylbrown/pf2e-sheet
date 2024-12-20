@@ -1,11 +1,11 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Loading, QSpinnerHourglass } from 'quasar';
-import Character from 'src/character/character';
+import type Character from 'src/character/character';
 
 export default function makeSheet(
   character: Character,
-  pages: HTMLCollectionOf<HTMLElement>
+  pages: HTMLCollectionOf<HTMLElement>,
 ) {
   Loading.show({
     spinner: QSpinnerHourglass,
@@ -25,11 +25,12 @@ export default function makeSheet(
             const existingStyle = e.getAttribute('style') || '';
             e.setAttribute(
               'style',
-              existingStyle + '; font-family: Roboto Mono, monospace !important'
+              existingStyle +
+                '; font-family: Roboto Mono, monospace !important',
             );
           });
         },
-      })
+      }),
     );
   }
   Promise.all(pagePromises).then((canvases) => {
@@ -38,6 +39,8 @@ export default function makeSheet(
       unit: 'in',
       format: 'letter',
     });
+
+    if (!canvases[0]) return;
 
     const ctx = canvases[0].getContext('2d');
     if (ctx) {
@@ -49,10 +52,13 @@ export default function makeSheet(
       0.4,
       0.4,
       10.2,
-      7.7
+      7.7,
     );
 
     const multicanvas = canvases[1];
+
+    if (!pages[1] || !multicanvas) return;
+
     const numPages = parseInt(pages[1].dataset.pages ?? '1');
     // Inspiration: https://stackoverflow.com/questions/14017442/capturing-only-a-portion-of-canvas-with-todataurl-javascript-html5
     for (let page = 0; page < numPages; page++) {
@@ -62,7 +68,7 @@ export default function makeSheet(
           0,
           (page * multicanvas.height) / 1.0 / numPages,
           multicanvas.width,
-          multicanvas.height / 1.0 / numPages
+          multicanvas.height / 1.0 / numPages,
         );
       if (!imageContentRaw) continue;
       doc.addPage('letter', 'landscape');
@@ -82,7 +88,7 @@ export default function makeSheet(
         ctx.fillText(
           (page + 1).toString(),
           canvas.width - 5,
-          canvas.height - 5
+          canvas.height - 5,
         );
         ctx.imageSmoothingEnabled = true;
       }
@@ -93,7 +99,7 @@ export default function makeSheet(
         0.4,
         0.4,
         10.2,
-        7.7
+        7.7,
       );
     }
     doc

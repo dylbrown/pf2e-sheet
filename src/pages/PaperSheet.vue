@@ -33,7 +33,7 @@
             <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
-                  {{ Score[score].substring(0, 3).toUpperCase() }}
+                  {{ Score[score]?.substring(0, 3).toUpperCase() }}
                 </div>
                 <div class="labello invisible">A</div>
               </div>
@@ -404,7 +404,7 @@
           <div class="column abilities" ref="abilities" style="flex-grow: 0">
             <template
               v-for="[index, ability] in Array.from(
-                character.abilities.entries()
+                character.abilities.entries(),
               ).filter(([_, a]) => a.activity)"
               :key="index"
             >
@@ -509,7 +509,7 @@
 
 <script setup lang="ts">
 import { abilityMod, nonzero, signed } from 'src/character/util';
-import Character from 'src/character/character';
+import type Character from 'src/character/character';
 import { Attribute, skills, sfSkills, Score } from 'src/character/model';
 import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
@@ -578,7 +578,7 @@ const makePDF = () => {
   if (!root.value) return;
   makeSheet(
     props.character,
-    root.value.children as HTMLCollectionOf<HTMLElement>
+    root.value.children as HTMLCollectionOf<HTMLElement>,
   );
 };
 </script>

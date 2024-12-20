@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { Weapon } from 'src/character/model';
+import type { Weapon } from 'src/character/model';
 import ClickableTrait from './ClickableTrait.vue';
 
 defineProps<{

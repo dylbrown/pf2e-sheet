@@ -1,4 +1,5 @@
-import { Ability, AbilityType, Action, getSource, Trait } from './model';
+import type { Ability } from './model';
+import { AbilityType, Action, getSource, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -20,20 +21,20 @@ export default class Abilities extends Array<Ability> {
       this.loadFeat(
         feature,
         type[feature.id] ?? AbilityType.ClassFeature,
-        level
-      )
+        level,
+      ),
     );
     feats_features.ancestryFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.AncestryFeat, level)
+      this.loadFeat(feature, AbilityType.AncestryFeat, level),
     );
     feats_features.heritages.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.AncestryFeat, level)
+      this.loadFeat(feature, AbilityType.AncestryFeat, level),
     );
     feats_features.generalAndSkillFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.GeneralFeat, level)
+      this.loadFeat(feature, AbilityType.GeneralFeat, level),
     );
     feats_features.classFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.ClassFeat, level)
+      this.loadFeat(feature, AbilityType.ClassFeat, level),
     );
     this.sort((a, b) => b.level - a.level);
   }
@@ -73,7 +74,7 @@ export default class Abilities extends Array<Ability> {
       if (
         entry.type == 'injectText' ||
         entry.data?.trueOperations?.some(
-          (entry: any) => entry.type == 'injectText'
+          (entry: any) => entry.type == 'injectText',
         )
       ) {
         exclude -= feature.operations.length;
@@ -118,7 +119,7 @@ export default class Abilities extends Array<Ability> {
           // Feat Slot / Ability Boost / Free Feat / Profiency givers // Basic spell stuff
           if (
             /^(GIVE-((\w+-FEAT|ABILITY-BOOST-MULTIPLE)=\d+|FEAT-NAME=[\w ]+|PROF-IN=[\w_]+:\w|SKILL-INCREASE)\n?)+$/.test(
-              feature.code as string
+              feature.code as string,
             ) ||
             (feature.code as string).includes('SET-SPELL-SLOTS') ||
             (feature.name as string) == 'Spell Repertoire'
@@ -139,7 +140,7 @@ export default class Abilities extends Array<Ability> {
           if (feat.code) this.checkConditionals(feat.code);
           this.push(feat);
         }
-      })
+      }),
     );
     /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -183,7 +184,7 @@ export default class Abilities extends Array<Ability> {
     promises.push(
       Promise.all(promises).then(() => {
         this.sort((a, b) => b.level - a.level);
-      })
+      }),
     );
     return promises;
   }
@@ -204,9 +205,9 @@ export default class Abilities extends Array<Ability> {
             value
               .replaceAll(
                 /(\d+)~(\w+) bonus/gi,
-                `+$1 $2 to ${capitalize(subvalue.toLowerCase())}`
+                `+$1 $2 to ${capitalize(subvalue.toLowerCase())}`,
               )
-              .replaceAll('circumstance', 'circ.')
+              .replaceAll('circumstance', 'circ.'),
           );
           break;
         }

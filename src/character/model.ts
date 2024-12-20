@@ -205,7 +205,7 @@ export class Ability {
     level: number,
     type: AbilityType,
     activity: boolean,
-    description: string
+    description: string,
   ) {
     this.name = name;
     this.id = id;
@@ -295,17 +295,18 @@ export class Trait {
       this.trait_map[id] = new Trait(
         this.db[id].name.replaceAll(' (Playtest)', 'ᴾ'),
         id,
-        this.db[id].description
+        this.db[id].description,
       );
+      return this.trait_map[id];
     }
-    return this.trait_map[id];
+    return new Trait(id.toString(), id, '');
   }
 
   // === Legacy stuff ===
   public static createIfAbsent(
     name: string,
     id: number,
-    description = ''
+    description = '',
   ): Trait {
     if (this.trait_map[id]) return this.trait_map[id];
     const trait = new Trait(name, id, description);

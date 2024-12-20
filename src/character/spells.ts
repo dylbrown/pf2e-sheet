@@ -1,12 +1,5 @@
-import {
-  Action,
-  Attribute,
-  getSource,
-  Score,
-  Spell,
-  SpellList,
-  Trait,
-} from './model';
+import type { Score, SpellList } from './model';
+import { Action, Attribute, getSource, Spell, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -16,7 +9,7 @@ export default class Spells {
   lists = new Array<SpellList>();
   lookup = {} as { [key: string]: SpellList };
 
-  private getOrCreateSpellsList(spellSRC: string) {
+  private getOrCreateSpellsList(spellSRC: string): SpellList | null {
     spellSRC = capitalize(spellSRC.toLowerCase());
     let list = this.lookup[spellSRC];
     if (list == null && spellSRC.length > 0) {
@@ -35,21 +28,23 @@ export default class Spells {
       };
       this.lists.push(list);
     }
-    return list;
+    return list ?? null;
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   loadRemaster(content: any, className: string, level: number, chaMod: number) {
     for (const entry of content.spells.all) {
       const list = this.getOrCreateSpellsList(
-        entry.casting_source || className
+        entry.casting_source || className,
       );
+      if (!list) continue;
       const spell = this.makeSpell(entry, level, list.name);
-      list.known[spell.level].push(spell);
+      list.known[spell.level]?.push(spell);
     }
     for (const entry of content.spell_sources) {
       const list = this.getOrCreateSpellsList(entry.source.name || className);
+      if (!list) continue;
       list.attack_attr = Attribute.SpellAttacks;
       list.dc_attr = Attribute.SpellDCs;
       list.attack = entry.stats.spell_attack.total[0];
@@ -60,12 +55,15 @@ export default class Spells {
     }
     for (const entry of content.spell_slots) {
       const list = this.getOrCreateSpellsList(entry.source || className);
-      list.slots[entry.rank]++;
+      if (!list || !entry.rank || !list.slots[entry.rank]) continue;
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      list.slots[entry.rank];
     }
     for (const entry of content.focus_spells) {
       const list = this.getOrCreateSpellsList(
-        entry.casting_source || className
+        entry.casting_source || className,
       );
+      if (!list) continue;
       const spell = this.makeSpell(entry, level, list.name);
       list.focus.push(spell);
     }
@@ -73,18 +71,19 @@ export default class Spells {
 
     for (const entry of content.innate_spells) {
       const list = this.getOrCreateSpellsList('Innate');
+      if (!list) continue;
       list.type = 'Innate';
       list.attack = level + (level >= 12 ? 4 : 2) + chaMod;
       list.dc = 10 + list.attack;
       const spell = this.makeSpell(entry.spell, level, list.name);
       spell.innate = true;
       spell.castsPerDay = entry.casts_max;
-      list.known[entry.rank].push(spell);
+      list.known[entry.rank]?.push(spell);
     }
     const maxCount = (prev: number, curr: number, id: number) =>
       curr > 0 ? id : prev;
     this.lists.sort(
-      (a, b) => b.slots.reduce(maxCount, 0) - a.slots.reduce(maxCount, 0)
+      (a, b) => b.slots.reduce(maxCount, 0) - a.slots.reduce(maxCount, 0),
     );
   }
 
@@ -106,7 +105,7 @@ export default class Spells {
       description: Util.parseDescription(entry.description, level) ?? '',
       source: getSource(entry.content_source_id),
       traits: Trait.map(entry.traits).filter(
-        (t) => t.id != 1856 && t.name != listName
+        (t) => t.id != 1856 && t.name != listName,
       ), // "Focus" filter
       cost: cost,
       maxCost: maxCost,
@@ -129,18 +128,19 @@ export default class Spells {
     if (data.spellBookSpells instanceof Array) {
       for (const entry of data.spellBookSpells) {
         const list = this.getOrCreateSpellsList(entry.spellSRC);
+        if (!list) continue;
         const spell = new Spell(entry._spellName, entry.spellID);
         promises.push(Wanderer.loadSpell(spell));
-        list.known[entry.spellLevel].push(spell);
+        list.known[entry.spellLevel]?.push(spell);
       }
     }
     function setTradition(list: SpellList, value: string) {
       list.tradition = value[0] + value.toLowerCase().substring(1);
       list.attack_attr = Object.values(Attribute).indexOf(
-        list.tradition + 'SpellAttacks'
+        list.tradition + 'SpellAttacks',
       ) as Attribute;
       list.dc_attr = Object.values(Attribute).indexOf(
-        list.tradition + 'SpellDCs'
+        list.tradition + 'SpellDCs',
       ) as Attribute;
     }
     for (const entry of metaData) {
@@ -148,6 +148,7 @@ export default class Spells {
       const key: string = entry.value.substring(0, i);
       const value: string = entry.value.substring(i + 1);
       const list = this.getOrCreateSpellsList(key);
+      if (!list) continue;
       switch (entry.source) {
         case 'spellCastingType': {
           if (value.startsWith('SPONTANEOUS')) list.type = 'Spontaneous';
@@ -188,6 +189,7 @@ export default class Spells {
         }
         case 'innateSpell': {
           const innateList = this.getOrCreateSpellsList(entry.sourceType);
+          if (!innateList) break;
           innateList.type = 'Innate';
           const bits = entry.value.split(':::');
           const spell = new Spell(bits[0], Number(bits[0]));
@@ -195,8 +197,8 @@ export default class Spells {
           innateList.score = Util.getScore(bits[4]);
           promises.push(
             Wanderer.loadSpell(spell).then(() => {
-              innateList.known[spell.level].push(spell);
-            })
+              innateList.known[spell.level]?.push(spell);
+            }),
           );
         }
       }

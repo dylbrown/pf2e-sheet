@@ -26,14 +26,14 @@ export class Positioning {
         Number(
           getComputedStyle(block.firstElementChild).paddingTop.replaceAll(
             'px',
-            ''
-          )
+            '',
+          ),
         ) || 0;
     }
     const height = block.getBoundingClientRect().height ?? 0;
     if (this.top + shift + height >= this.pageHeight) this.moveLeft();
     this.top += shift;
-    block.style.left = this.left;
+    block.style.left = this.left ?? '0';
     block.style.top = this.totalTop;
     this.top += height;
   }
@@ -99,7 +99,7 @@ export function positionHeader(pos: Positioning, box: HTMLElement) {
     }
   }
 
-  box.style.left = pos.left;
+  box.style.left = pos.left ?? '0';
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
   let height = box.getBoundingClientRect().height;
@@ -123,7 +123,7 @@ function makeHeaderChunk(
   box: HTMLElement,
   contents: Element[],
   boxPos: Position,
-  pos: Positioning
+  pos: Positioning,
 ) {
   const chunk = document.createElement('div');
   chunk.classList.add('header-chunk');
@@ -158,7 +158,7 @@ export function position(
   pos: Positioning,
   box: HTMLElement,
   description: HTMLElement,
-  descriptionHTML: string
+  descriptionHTML: string,
 ) {
   box.style.removeProperty('border-bottom');
   box.style.removeProperty('top');
@@ -171,7 +171,7 @@ export function position(
   if (pos.top + infoHeight >= pos.pageHeight) {
     pos.moveLeft();
   }
-  box.style.left = pos.left;
+  box.style.left = pos.left ?? '0';
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
   let height = box.getBoundingClientRect().height;
@@ -183,7 +183,7 @@ export function position(
       left: pos.pos.left,
       top: pos.pos.top - infoHeight,
     },
-    pos
+    pos,
   );
   chunk.classList.add('first-chunk');
   let descSpace = pos.pageHeight - pos.top - infoHeight;
@@ -203,7 +203,7 @@ export function position(
 function searchAndTraverseFix(
   box: HTMLElement,
   text: HTMLElement,
-  maxHeight: number
+  maxHeight: number,
 ) {
   const contents = text.innerHTML;
   const split = binaryHeightSearch(box, text, maxHeight);
@@ -230,7 +230,7 @@ function searchAndTraverseFix(
 function binaryHeightSearch(
   box: HTMLElement,
   text: HTMLElement,
-  maxHeight: number
+  maxHeight: number,
 ): number {
   const contents = text.innerHTML;
   if (contents === null || contents === undefined) return -1;
@@ -267,7 +267,7 @@ function makeChunk(
   description: HTMLElement,
   contents: string,
   boxPos: Position,
-  pos: Positioning
+  pos: Positioning,
 ) {
   const chunk = document.createElement('div');
   chunk.classList.add('description-chunk');
@@ -289,7 +289,7 @@ export function positionGrid(pos: Positioning, box: HTMLElement) {
     }
   }
 
-  box.style.left = pos.left;
+  box.style.left = pos.left ?? '0';
   box.style.top = pos.totalTop;
   const boxPos = pos.pos;
   const all = Array.from(box.children);
@@ -313,7 +313,7 @@ function makeGridChunk(
   box: HTMLElement,
   contents: Element[],
   boxPos: Position,
-  pos: Positioning
+  pos: Positioning,
 ) {
   const chunk = document.createElement('div');
   chunk.classList.add('grid-chunk');

@@ -1,11 +1,10 @@
 import { capitalize } from 'vue';
 import Abilities from './abilities';
+import type { Weapon, Item } from './model';
 import {
   Proficiency,
   Attribute,
   Score,
-  Weapon,
-  Item,
   attrScore,
   skills,
   weaponsAndArmor,
@@ -68,7 +67,7 @@ export default class Character {
       if (isNaN(a as number)) return;
       this.attributes[a as Attribute] = {
         total: -1,
-        score: attrScore[Attribute[a as Attribute]],
+        score: attrScore[Attribute[a as Attribute]] as Score,
         itemBonus: 0,
         proficiency: Proficiency.Untrained,
       };
@@ -76,7 +75,7 @@ export default class Character {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   load(data: any): Array<Promise<void>> {
     switch (data.version) {
       case 3:
@@ -90,7 +89,7 @@ export default class Character {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   private loadRemaster(data: any) {
     this.remaster = true;
     this.starfinder = data.character.content_sources.enabled.includes(276);
@@ -101,7 +100,7 @@ export default class Character {
     // Ancestry & Heritage name
     this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
       ' (Playtest)',
-      ''
+      '',
     );
     const heritages = data.content?.feats_features?.heritages;
     if (heritages && heritages[0] && heritages[0].name) {
@@ -114,7 +113,7 @@ export default class Character {
     this.class = data.character?.details?.class?.name ?? '';
     this.size = data.content?.size ?? '';
     this.traits = (data.content?.character_traits ?? []).map(
-      (e: { id: number }) => Trait.getFromDB(e.id)
+      (e: { id: number }) => Trait.getFromDB(e.id),
     );
 
     // Ability Scores
@@ -136,7 +135,7 @@ export default class Character {
     }
 
     this.languages = (data.content?.languages ?? []).map((lang: string) =>
-      capitalize(lang.toLowerCase().replaceAll(' (playtest)', 'ᴾ'))
+      capitalize(lang.toLowerCase().replaceAll(' (playtest)', 'ᴾ')),
     );
 
     // Speed
@@ -166,18 +165,21 @@ export default class Character {
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
     this.setProficiency(data, Attribute.Will, 'SAVE_');
     (this.starfinder ? sfSkills : skills).forEach((s) =>
-      this.setProficiency(data, s, 'SKILL_')
+      this.setProficiency(data, s, 'SKILL_'),
     );
     Object.entries(weaponsAndArmor).forEach(([k, v]) =>
-      this.setProficiency(data, v, k, true)
+      this.setProficiency(data, v, k, true),
     );
     const armorCategory = data.content?.armor_item?.item?.meta_data?.category;
     if (armorCategory) {
       const attributeName = armorCategory.startsWith('un')
         ? 'UNARMORED_DEFENSE'
         : armorCategory.toUpperCase() + '_ARMOR';
-      this.combat.armor.proficiency =
-        this.attributes[weaponsAndArmor[attributeName]].proficiency;
+      if (weaponsAndArmor[attributeName])
+        this.combat.armor.proficiency =
+          this.attributes[
+            weaponsAndArmor[attributeName] as Attribute
+          ].proficiency;
     }
 
     // Lores
@@ -252,13 +254,13 @@ export default class Character {
     this.abilities.loadRemaster(
       data.content.feats_features,
       data.character.operation_data.selections,
-      this.level
+      this.level,
     );
     this.spells.loadRemaster(
       data.content,
       this.class,
       this.level,
-      abilityMod(this.scores[Score.Charisma])
+      abilityMod(this.scores[Score.Charisma]),
     );
 
     return [];
@@ -268,7 +270,7 @@ export default class Character {
     data: any,
     attribute: Attribute,
     prefix = '',
-    prefixOnly = false
+    prefixOnly = false,
   ) {
     const proficiencies = data.content?.proficiencies;
     if (!proficiencies) return;
@@ -301,7 +303,7 @@ export default class Character {
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',
-      (k, v) => (this.scores[Object.values(Score).indexOf(k) as Score] = v)
+      (k, v) => (this.scores[Object.values(Score).indexOf(k) as Score] = v),
     );
 
     if (data.build?.senses instanceof Array) {
@@ -334,7 +336,7 @@ export default class Character {
 
     for (const [a, prof] of Object.entries(data.profs)) {
       const proficiency: Proficiency = getProficiency(
-        prof ? prof.toString() : ''
+        prof ? prof.toString() : '',
       );
       if (a.includes('Lore')) {
         if (this.lore[a]) {
@@ -352,7 +354,7 @@ export default class Character {
         continue;
       }
       const attr: Attribute = Object.values(Attribute).indexOf(
-        a.replaceAll('_', '')
+        a.replaceAll('_', ''),
       ) as Attribute;
       if ((attr as number) == -1) continue;
       this.attributes[attr].proficiency = proficiency;
@@ -437,7 +439,7 @@ export default class Character {
       }
     }
     promises.push(
-      ...this.abilities.loadLegacy(data, metaData.class_features, this.level)
+      ...this.abilities.loadLegacy(data, metaData.class_features, this.level),
     );
     promises.push(...this.spells.loadLegacy(data, metaData.spells));
 
@@ -463,9 +465,8 @@ export default class Character {
 function parseAndSet(
   data: string,
   valName: string,
-  set: (key: string, val: number) => void
+  set: (key: string, val: number) => void,
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const scores: any = JSON.parse(data);
   if (scores instanceof Array) {
     for (const entry of scores) {

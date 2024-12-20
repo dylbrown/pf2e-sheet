@@ -20,17 +20,20 @@
             <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
-                  {{ Score[score].substring(0, 3).toUpperCase() }}
+                  {{ Score[score]?.substring(0, 3).toUpperCase() }}
                 </div>
                 <div class="labello invisible">A</div>
               </div>
               <div class="line">
                 <div
-                  :class="'underlined-roll' + (character.scores[score as Score] % 2 == 1 ? ' odd' : '')"
+                  :class="
+                    'underlined-roll' +
+                    (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  "
                 >
                   {{
                     Util.signed(
-                      Util.abilityMod(character.scores[score as Score])
+                      Util.abilityMod(character.scores[score as Score]),
                     )
                   }}
                 </div>
@@ -303,7 +306,7 @@
                     Util.types(
                       character.abilities,
                       [AbilityType.ClassFeat, AbilityType.ClassFeature],
-                      []
+                      [],
                     ).filter((a) => !a.activity)
                   "
                 />
@@ -326,7 +329,7 @@
                     Util.types(
                       character.abilities,
                       [AbilityType.SkillFeat, AbilityType.GeneralFeat],
-                      []
+                      [],
                     ).filter((a) => !a.activity)
                   "
                 />
@@ -336,7 +339,7 @@
                   Util.types(
                     character.abilities,
                     [AbilityType.AncestryFeat],
-                    []
+                    [],
                   ).filter((a) => !a.activity).length > 0
                 "
               >
@@ -358,7 +361,7 @@
                       Util.types(
                         character.abilities,
                         [AbilityType.AncestryFeat],
-                        []
+                        [],
                       ).filter((a) => !a.activity)
                     "
                   /> </q-expansion-item
@@ -452,7 +455,7 @@
 <script setup lang="ts">
 import * as Util from 'src/character/util';
 import * as LS from 'src/pages/localStorage';
-import Character from 'src/character/character';
+import type Character from 'src/character/character';
 import {
   AbilityType,
   Attribute,
@@ -481,13 +484,13 @@ const expInfo = ref<QExpansionItem | null>(null);
 const expStrike = ref<QExpansionItem | null>(null);
 const expAct = ref<QExpansionItem | null>(null);
 const currHP = ref<number>(
-  LS.load(props.character.name, 'hp') ?? props.character.hp
+  LS.load(props.character.name, 'hp') ?? props.character.hp,
 );
 const workingHP = ref<number>(
-  LS.load(props.character.name, 'hp') ?? props.character.hp
+  LS.load(props.character.name, 'hp') ?? props.character.hp,
 );
 const focus = ref<number>(
-  LS.load(props.character.name, 'focus') ?? props.character.spells.focusPoints
+  LS.load(props.character.name, 'focus') ?? props.character.spells.focusPoints,
 );
 
 watch(currHP, (value) => {

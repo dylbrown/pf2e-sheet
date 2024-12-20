@@ -7,6 +7,7 @@ addEventListener('message', async (message) => {
     unit: 'in',
     format: 'letter',
   });
+  if (!blobs[0] || !blobs[1]) return;
   doc.addImage(URL.createObjectURL(blobs[0]), 'JPEG', 0.4, 0.4, 10.2, 7.7);
 
   const bmp = await createImageBitmap(blobs[1]);
@@ -25,7 +26,7 @@ addEventListener('message', async (message) => {
         0,
         (page * multicanvas.height) / 1.0 / numPages,
         multicanvas.width,
-        multicanvas.height / 1.0 / numPages
+        multicanvas.height / 1.0 / numPages,
       );
     if (!imageContentRaw) continue;
     doc.addPage('letter', 'landscape');
@@ -33,7 +34,7 @@ addEventListener('message', async (message) => {
     // with the correct size
     const canvas = new OffscreenCanvas(
       multicanvas.width,
-      multicanvas.height / 1.0 / numPages
+      multicanvas.height / 1.0 / numPages,
     );
     // put there raw image data
     // expected to be faster as there are no scaling, etc
@@ -53,7 +54,7 @@ addEventListener('message', async (message) => {
       0.4,
       0.4,
       10.2,
-      7.7
+      7.7,
     );
   }
   postMessage(doc.output('datauristring'));

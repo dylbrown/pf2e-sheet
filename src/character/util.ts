@@ -1,5 +1,6 @@
 import { marked } from 'marked';
-import { Ability, AbilityType, Action, Proficiency, Score } from './model';
+import type { Ability } from './model';
+import { AbilityType, Action, Proficiency, Score } from './model';
 
 export function abilityMod(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -16,12 +17,12 @@ export function signed(num: number) {
 export function types(
   abilities: Array<Ability>,
   include: Array<AbilityType>,
-  exclude: Array<AbilityType>
+  exclude: Array<AbilityType>,
 ) {
   return abilities.filter(
     (value: Ability) =>
       (include.length == 0 || include.includes(value.type)) &&
-      !exclude.includes(value.type)
+      !exclude.includes(value.type),
   );
 }
 
@@ -147,16 +148,16 @@ export function getActions(s: string) {
 
 export function makeSource(s: string) {
   const parts = s.split('-');
-  if (parts.length == 1) return parts[0];
+  if (parts.length == 1) return s;
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
 export function parseDescription(s: string, level = 0) {
   const cleaned = marked
-    .parse(s)
+    .parse(s, { async: false })
     .replaceAll(
       /\((feat|action|activity|trait|spell): ([\w ]+\w)( ?\|[\w ]+)?\)/gi,
-      '$2'
+      '$2',
     );
   const actions = cleaned
     .replaceAll('ONE-ACTION', '⯁')
@@ -168,28 +169,25 @@ export function parseDescription(s: string, level = 0) {
     .replaceAll(/\[\[(\w+)\]\]/gi, '$1');
   const attackReminders = conditions.replaceAll(
     /make a (ranged )?spell attack( rolls?)?/gi,
-    '<u>$&</u>'
+    '<u>$&</u>',
   );
   const damageReminders = attackReminders.replaceAll(
     /(takes?|deal(s|ing)?|restores?|drains|gains|gain a)( \+?\d[\w\d]*( [\d\w]+)* (bonus|damage|hit points)( die)?)/gi,
-    '$1 <b>$3</b>'
+    '$1 <b>$3</b>',
   );
   const conditionReminders = damageReminders
     .replaceAll(
       /(Invisible|Friendly|Helpful|Hostile|Indifferent|Unfriendly|Doomed|Dying|Frightened|Unconscious|Wounded|Hidden|Observed|Undetected|Unnoticed|Clumsy|Drained|Enfeebled|Stupefied|Blinded|Concealed|Dazzled|Deafened|Invisible) (\d|for \d+ (rounds?|minutes?|hours?|days?))/gi,
-      '<b>$&</b>'
+      '<b>$&</b>',
     )
     .replaceAll(/(gains? the )(\w+)( condition)/gi, '$1<b>$2</b>$3');
   const degrees = conditionReminders.replaceAll(
     /((Critical )?(Success|Failure)):/gi,
-    '&nbsp;&nbsp;<b>$1</b>'
+    '&nbsp;&nbsp;<b>$1</b>',
   );
   const HEADING = '\n<span class="description-header">$2</span> ';
   const header = degrees.replaceAll(/(\n~ )([^:]+):/gi, HEADING);
-  const kineticist = header.replaceAll(
-    /(~ )(Level \([^\)]*\)):/gi,
-    '<b>$2</b>'
-  );
+  const kineticist = header.replaceAll(/(~ )(Level \([^)]*\)):/gi, '<b>$2</b>');
   const links = kineticist.replaceAll(/\[(\s|\n|\r)*<a[^\]]*\]/gi, '');
   const remasterLinks = links
     .replaceAll(/<a[^>]*>([^<]*)<\/a>/gi, '$1')
@@ -197,16 +195,16 @@ export function parseDescription(s: string, level = 0) {
   const traits = remasterLinks.replaceAll(/\((\w+)\)\{\w+\}/gi, '($1)');
   const colons = traits.replaceAll(/(<li>)\s*:\s*/gi, '$1');
   const hs = colons.replaceAll(/(<h\d[^>]*>|<\/h\d>)/gi, '');
-  const featReferences = hs.replaceAll(/(\(feat: )([^\)]*)\)/gi, '<i>$2</i>');
+  const featReferences = hs.replaceAll(/(\(feat: )([^)]*)\)/gi, '<i>$2</i>');
   const spaced = featReferences.replaceAll(/[\n\r]+/gi, '<br>');
   let tablecut = spaced
     .replaceAll(
       /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
-      '$1$3'
+      '$1$3',
     )
     .replaceAll(
       /(<\/t(d|r|head|h|able|body)>)<br>(<\/?t(d|r|head|h|able|body))/gi,
-      '$1$3'
+      '$1$3',
     )
     .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
 
@@ -224,7 +222,7 @@ export function parseDescription(s: string, level = 0) {
       const open = tablecut.indexOf('{{', heighten) + ceil(floor(max(min(2))));
       const close = tablecut.indexOf('}}', heighten);
       const result = eval(tablecut.substring(open, close));
-      tablecut = tablecut.replace(/⬆️\{\{([^\}])*\}\}/i, '<b>⇮</b> ' + result);
+      tablecut = tablecut.replace(/⬆️\{\{([^}])*\}\}/i, '<b>⇮</b> ' + result);
     }
   }
   return tablecut.replaceAll(/(<br>)+$/gi, '');

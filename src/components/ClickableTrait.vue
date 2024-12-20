@@ -9,7 +9,7 @@
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import { Trait } from 'src/character/model';
+import type { Trait } from 'src/character/model';
 
 defineProps<{
   trait: Trait;

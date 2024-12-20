@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 const API_ENDPOINT = 'https://legacy.wanderersguide.app/api/';
 
-import { Handler } from '@netlify/functions';
+import type { Handler } from '@netlify/functions';
 
 const handler: Handler = async (event) => {
   try {

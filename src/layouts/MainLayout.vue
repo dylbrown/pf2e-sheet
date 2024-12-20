@@ -41,17 +41,17 @@ import Character from 'src/character/character';
 import InteractiveSheet from 'src/pages/InteractiveSheet.vue';
 import PaperSheet from 'src/pages/PaperSheet.vue';
 import { ref } from 'vue';
-let file = ref<File | null>(null);
-let ready = ref(false);
-let interactiveMode = ref(false);
-let progress = ref(0);
+const file = ref<File | null>(null);
+const ready = ref(false);
+const interactiveMode = ref(false);
+const progress = ref(0);
 const character = new Character();
 
 const load = () => {
   if (file.value instanceof File) {
     const reader = new FileReader();
     reader.onload = () => {
-      let promises = character.load(JSON.parse(reader.result as string));
+      const promises = character.load(JSON.parse(reader.result as string));
       Promise.all(promises)
         .then(() => (ready.value = true))
         .catch((a) => {

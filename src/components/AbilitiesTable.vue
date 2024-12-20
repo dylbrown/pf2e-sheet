@@ -46,15 +46,16 @@
       ref="classAbilities"
       :ability="currentAbility"
       :interactive="true"
+      v-if="currentAbility"
     />
   </q-dialog>
 </template>
 <script setup lang="ts">
 import AbilityBlock from 'src/components/AbilityBlock.vue';
 import ClickableTrait from 'src/components/ClickableTrait.vue';
-import { QTableColumn } from 'quasar';
-import Character from 'src/character/character';
-import { Ability } from 'src/character/model';
+import type { QTableColumn } from 'quasar';
+import type Character from 'src/character/character';
+import type { Ability } from 'src/character/model';
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -62,8 +63,8 @@ const props = defineProps<{
   abilities: Ability[];
 }>();
 
-let showAbility = ref<boolean>(false);
-let currentAbility = props.character.abilities[0];
+const showAbility = ref<boolean>(false);
+const currentAbility = props.character.abilities[0];
 
 const ABILITY_COLUMNS: QTableColumn[] = [
   { name: 'name', label: 'Name', field: 'name', align: 'left' },

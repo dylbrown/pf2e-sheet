@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
-import { Ability } from 'src/character/model';
+import type { Ability } from 'src/character/model';
 import * as Positioning from './positioning';
 const props = defineProps<{
   ability: Ability;
@@ -41,7 +41,7 @@ const position = (pos: Positioning.Positioning) => {
     pos,
     box.value,
     description.value,
-    props.ability.description
+    props.ability.description,
   );
 };
 
