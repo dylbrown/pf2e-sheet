@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 import { defineConfig } from '#q-app/wrappers';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -51,7 +52,7 @@ export default defineConfig((/* ctx */) => {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node16',
       },
-      // devtool: 'source-map',
+      devtool: 'source-map',
       vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
@@ -67,7 +68,9 @@ export default defineConfig((/* ctx */) => {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf(viteConf) {
+        viteConf.plugins?.push(nodePolyfills({ include: ['vm'] }));
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [

@@ -3,6 +3,7 @@ import { Action, Attribute, getSource, Spell, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
+import type vm from 'node:vm';
 
 export default class Spells {
   focusPoints = 0;
@@ -33,13 +34,18 @@ export default class Spells {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
 
-  loadRemaster(content: any, className: string, level: number, chaMod: number) {
+  loadRemaster(
+    content: any,
+    className: string,
+    context: vm.Context,
+    chaMod: number,
+  ) {
     for (const entry of content.spells.all) {
       const list = this.getOrCreateSpellsList(
         entry.casting_source || className,
       );
       if (!list) continue;
-      const spell = this.makeSpell(entry, level, list.name);
+      const spell = this.makeSpell(entry, context, list.name);
       list.known[spell.level]?.push(spell);
     }
     for (const entry of content.spell_sources) {
@@ -64,7 +70,7 @@ export default class Spells {
         entry.casting_source || className,
       );
       if (!list) continue;
-      const spell = this.makeSpell(entry, level, list.name);
+      const spell = this.makeSpell(entry, context, list.name);
       list.focus.push(spell);
     }
     this.focusPoints = Math.min(content.focus_spells.length, 3);
@@ -73,9 +79,9 @@ export default class Spells {
       const list = this.getOrCreateSpellsList('Innate');
       if (!list) continue;
       list.type = 'Innate';
-      list.attack = level + (level >= 12 ? 4 : 2) + chaMod;
+      list.attack = context.level + (context.level >= 12 ? 4 : 2) + chaMod;
       list.dc = 10 + list.attack;
-      const spell = this.makeSpell(entry.spell, level, list.name);
+      const spell = this.makeSpell(entry.spell, context, list.name);
       spell.innate = true;
       spell.castsPerDay = entry.casts_max;
       list.known[entry.rank]?.push(spell);
@@ -88,7 +94,7 @@ export default class Spells {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private makeSpell(entry: any, level: number, listName: string): Spell {
+  private makeSpell(entry: any, context: vm.Context, listName: string): Spell {
     let cost = Action.None;
     let maxCost = Action.None;
     if (entry.cast.includes('TO')) {
@@ -102,7 +108,7 @@ export default class Spells {
       name: entry.name.replaceAll(' (legacy)', 'ᴸ'),
       id: entry.id,
       level: entry.rank ?? 1,
-      description: Util.parseDescription(entry.description, level) ?? '',
+      description: Util.parseDescription(entry.description, context) ?? '',
       source: getSource(entry.content_source_id),
       traits: Trait.map(entry.traits).filter(
         (t) => t.id != 1856 && t.name != listName,

@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import type { Ability } from './model';
 import { AbilityType, Action, Proficiency, Score } from './model';
+import vm from 'node:vm';
 
 export function abilityMod(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -152,7 +153,7 @@ export function makeSource(s: string) {
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
-export function parseDescription(s: string, level = 0) {
+export function parseDescription(s: string, context?: vm.Context) {
   const cleaned = marked
     .parse(s, { async: false })
     .replaceAll(
@@ -208,21 +209,36 @@ export function parseDescription(s: string, level = 0) {
     )
     .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
 
-  if (level > 0) {
+  if (context) {
     for (
-      let heighten = tablecut.indexOf('⬆️');
-      heighten != -1;
-      heighten = tablecut.indexOf('⬆️')
+      let openTag = tablecut.indexOf('{{');
+      openTag != -1;
+      openTag = tablecut.indexOf('{{')
     ) {
-      const ceil = Math.ceil;
-      const floor = Math.floor;
-      const max = Math.max;
-      const min = Math.min;
-      // Weird hack here to ensure ceil and floor aren't optimized out
-      const open = tablecut.indexOf('{{', heighten) + ceil(floor(max(min(2))));
-      const close = tablecut.indexOf('}}', heighten);
-      const result = eval(tablecut.substring(open, close));
-      tablecut = tablecut.replace(/⬆️\{\{([^}])*\}\}/i, '<b>⇮</b> ' + result);
+      const open = openTag + 2;
+      const close = tablecut.indexOf('}}', openTag);
+      console.log('Parsing String: ' + tablecut.substring(open, close));
+      const result = vm.runInContext(
+        tablecut
+          .substring(open, close)
+          .replaceAll('&gt;', '>')
+          .replaceAll('&quot;', '"'),
+        vm.createContext(context),
+      );
+      if (
+        tablecut.substring(openTag - 2, openTag) == '⬆️' ||
+        tablecut.substring(openTag - 3, openTag - 1) == '⬆️'
+      ) {
+        tablecut = tablecut.replace(
+          /⬆️ ?([+-]?)\{\{([^}])*\}\}/i,
+          '<b>⇮</b> $1' + result,
+        );
+      } else {
+        tablecut = tablecut.replace(
+          /(⬆️)? ?([+-]?)\{\{([^}])*\}\}/i,
+          '$2' + result.toString().replace('⬆️', ' ✓'),
+        );
+      }
     }
   }
   return tablecut.replaceAll(/(<br>)+$/gi, '');

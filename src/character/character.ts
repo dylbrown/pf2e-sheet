@@ -14,6 +14,7 @@ import {
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
 import { abilityMod, getProficiency, signed } from './util';
+import vm from 'node:vm';
 
 export default class Character {
   remaster = false;
@@ -91,11 +92,18 @@ export default class Character {
   /* eslint-disable @typescript-eslint/no-explicit-any */
 
   private loadRemaster(data: any) {
+    const contextRaw: { [key: string]: any } = {
+      ceil: Math.ceil,
+      floor: Math.floor,
+      max: Math.max,
+      min: Math.min,
+    };
     this.remaster = true;
     this.starfinder = data.character.content_sources.enabled.includes(276);
     Trait.setDB(data.content.all_traits);
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
+    contextRaw.level = this.level;
 
     // Ancestry & Heritage name
     this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
@@ -119,10 +127,11 @@ export default class Character {
     // Ability Scores
     for (let i = 0; i < 6; i++) {
       const score = i as Score;
-      const key = Score[score].substring(0, 3).toUpperCase();
-      const entry = data.content?.attributes['ATTRIBUTE_' + key];
+      const key = 'ATTRIBUTE_' + Score[score].substring(0, 3).toUpperCase();
+      const entry = data.content?.attributes[key];
       if (!entry) continue;
       this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
+      contextRaw[key] = abilityMod(this.scores[score]);
     }
 
     // Senses
@@ -152,6 +161,7 @@ export default class Character {
 
     this.classDC =
       10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
+    contextRaw.CLASS_DC = this.classDC;
     this.ac = data.content?.ac ?? 0;
     this.combat.armor.ac =
       data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
@@ -251,15 +261,23 @@ export default class Character {
       }
       this.inventory.push(item);
     }
+    for (const [key, e] of Object.entries(
+      data.content.raw_data_dump.variables,
+    )) {
+      const entry = e as any;
+      if (entry && entry.value && entry.type == 'num')
+        contextRaw[key] = Number(entry.value);
+    }
+    const context = vm.createContext(contextRaw);
     this.abilities.loadRemaster(
       data.content.feats_features,
       data.character.operation_data.selections,
-      this.level,
+      context,
     );
     this.spells.loadRemaster(
       data.content,
       this.class,
-      this.level,
+      context,
       abilityMod(this.scores[Score.Charisma]),
     );
 

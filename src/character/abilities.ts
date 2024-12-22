@@ -3,13 +3,14 @@ import { AbilityType, Action, getSource, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
+import type vm from 'node:vm';
 
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
   excluded: Ability[] = [];
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  loadRemaster(feats_features: any, selections: any, level: number) {
+  loadRemaster(feats_features: any, selections: any, context: vm.Context) {
     const type: { [id: number]: AbilityType } = {};
     for (const [key, value] of Object.entries(selections)) {
       const id = value as number;
@@ -21,32 +22,32 @@ export default class Abilities extends Array<Ability> {
       this.loadFeat(
         feature,
         type[feature.id] ?? AbilityType.ClassFeature,
-        level,
+        context,
       ),
     );
     feats_features.ancestryFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.AncestryFeat, level),
+      this.loadFeat(feature, AbilityType.AncestryFeat, context),
     );
     feats_features.heritages.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.AncestryFeat, level),
+      this.loadFeat(feature, AbilityType.AncestryFeat, context),
     );
     feats_features.generalAndSkillFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.GeneralFeat, level),
+      this.loadFeat(feature, AbilityType.GeneralFeat, context),
     );
     feats_features.classFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.ClassFeat, level),
+      this.loadFeat(feature, AbilityType.ClassFeat, context),
     );
     this.sort((a, b) => b.level - a.level);
   }
 
-  loadFeat(feature: any, type: AbilityType, level: number) {
+  loadFeat(feature: any, type: AbilityType, context: vm.Context) {
     const feat: Ability = {
       name: feature.name ?? '',
       id: feature.id ?? -1,
       level: feature.level ?? -1,
       type: type,
       source: getSource(feature.content_source_id),
-      description: Util.parseDescription(feature.description, level),
+      description: Util.parseDescription(feature.description, context),
       activity: feature.actions != null,
       traits: Trait.map(feature.traits),
     };

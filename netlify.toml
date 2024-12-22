@@ -6,7 +6,7 @@
   to = "/index.html"
   status = 200
 [dev]
-  command = "yarn quasar dev"
+  command = "yarn quasar dev -T chrome"
   targetPort = 9000
   port = 8888
   publish = "dist/spa"
