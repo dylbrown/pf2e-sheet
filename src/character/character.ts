@@ -132,6 +132,7 @@ export default class Character {
       if (!entry) continue;
       this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
       contextRaw[key] = abilityMod(this.scores[score]);
+      contextRaw[key.toLowerCase()] = abilityMod(this.scores[score]);
     }
 
     // Senses
