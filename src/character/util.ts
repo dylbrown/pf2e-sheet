@@ -209,36 +209,41 @@ export function parseDescription(s: string, context?: vm.Context) {
     )
     .replaceAll(/((able|r|head|body)>)<br>(<t)/gi, '$1$3');
 
+  let currString = '';
   if (context) {
-    for (
-      let openTag = tablecut.indexOf('{{');
-      openTag != -1;
-      openTag = tablecut.indexOf('{{')
-    ) {
-      const open = openTag + 2;
-      const close = tablecut.indexOf('}}', openTag);
-      console.log('Parsing String: ' + tablecut.substring(open, close));
-      const result = vm.runInContext(
-        tablecut
+    try {
+      for (
+        let openTag = tablecut.indexOf('{{');
+        openTag != -1;
+        openTag = tablecut.indexOf('{{')
+      ) {
+        const open = openTag + 2;
+        const close = tablecut.indexOf('}}', openTag);
+        currString = tablecut
           .substring(open, close)
           .replaceAll('&gt;', '>')
-          .replaceAll('&quot;', '"'),
-        vm.createContext(context),
-      );
-      if (
-        tablecut.substring(openTag - 2, openTag) == '⬆️' ||
-        tablecut.substring(openTag - 3, openTag - 1) == '⬆️'
-      ) {
-        tablecut = tablecut.replace(
-          /⬆️ ?([+-]?)\{\{([^}])*\}\}/i,
-          '<b>⇮</b> $1' + result,
-        );
-      } else {
-        tablecut = tablecut.replace(
-          /(⬆️)? ?([+-]?)\{\{([^}])*\}\}/i,
-          '$2' + result.toString().replace('⬆️', ' ✓'),
-        );
+          .replaceAll('&quot;', '"');
+        const result = vm.runInContext(currString, vm.createContext(context));
+        if (
+          tablecut.substring(openTag - 2, openTag) == '⬆️' ||
+          tablecut.substring(openTag - 3, openTag - 1) == '⬆️'
+        ) {
+          tablecut = tablecut.replace(
+            /⬆️ ?([+-]?)\{\{([^}])*\}\}/i,
+            '<b>⇮</b> $1' + result,
+          );
+        } else {
+          tablecut = tablecut.replace(
+            /(⬆️)? ?([+-]?)\{\{([^}])*\}\}/i,
+            '$2' + result.toString().replace('⬆️', ' ✓'),
+          );
+        }
       }
+    } catch (e) {
+      if (e)
+        alert(
+          'Failed to parse "' + currString + '". Please notify the developer!',
+        );
     }
   }
   return tablecut.replaceAll(/(<br>)+$/gi, '');
