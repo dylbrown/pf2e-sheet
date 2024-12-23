@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import type { Weapon } from 'src/character/model';
-import ClickableTrait from './ClickableTrait.vue';
+import ClickableTrait from './interactive/ClickableTrait.vue';
 
 defineProps<{
   weapon: Weapon;

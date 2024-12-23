@@ -153,21 +153,6 @@ html {
   }
 }
 
-.interactive {
-  .page {
-    display: flex;
-    align-items: stretch;
-  }
-  #leftThird,
-  #rightThird {
-    flex-grow: 0;
-    max-width: 30%;
-  }
-  .page > * {
-    height: 100%;
-  }
-}
-
 #leftThird > div,
 #rightThird > div {
   max-width: 100%;
@@ -266,6 +251,9 @@ div {
   align-items: stretch;
   align-self: stretch;
   justify-self: stretch;
+}
+.column.tab {
+  height: 100%;
 }
 .column:not(.compact) {
   flex-flow: column nowrap;
@@ -1173,8 +1161,38 @@ div.spell-cost-optional > span {
 
 // ===== Interactive Only =====
 
-.q-table tbody td.table-traits {
-  font-size: 9.75px;
-  text-wrap: wrap;
-  font-style: italic;
+.interactive {
+  .page {
+    display: flex;
+    align-items: stretch;
+  }
+  #leftThird {
+    flex-grow: 0;
+    max-width: 30%;
+  }
+  #rightThird {
+    width: fit-content;
+    flex-grow: 0;
+    & > div.column {
+      height: 100%;
+      width: fit-content;
+      overflow: hidden;
+      transition: width 0.1s ease-in-out;
+    }
+  }
+  .page > * {
+    height: 100%;
+  }
+
+  .q-table tbody td.table-traits {
+    font-size: 9.75px;
+    text-wrap: wrap;
+    font-style: italic;
+  }
+
+  #rightTabHolder {
+    max-width: fit-content;
+    flex-grow: 1;
+    display: flex;
+  }
 }

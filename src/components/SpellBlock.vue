@@ -77,7 +77,7 @@
 import type { Spell } from 'src/character/model';
 import LinePart from './LinePart.vue';
 import { ref } from 'vue';
-import * as Positioning from './positioning';
+import * as Positioning from './paper/positioning';
 
 const props = defineProps<{
   spell: Spell;

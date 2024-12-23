@@ -52,7 +52,7 @@
 </template>
 <script setup lang="ts">
 import AbilityBlock from 'src/components/AbilityBlock.vue';
-import ClickableTrait from 'src/components/ClickableTrait.vue';
+import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import type { QTableColumn } from 'quasar';
 import type Character from 'src/character/character';
 import type { Ability } from 'src/character/model';

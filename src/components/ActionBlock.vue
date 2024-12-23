@@ -76,7 +76,7 @@
 <script setup lang="ts">
 import type { Ability } from 'src/character/model';
 import { Action } from 'src/character/model';
-import ClickableTrait from './ClickableTrait.vue';
+import ClickableTrait from './interactive/ClickableTrait.vue';
 
 defineProps<{
   action: Ability;

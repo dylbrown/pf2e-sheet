@@ -53,7 +53,7 @@
           <div class="col-section-label">#</div>
           <div class="col-section-label">Item Name</div>
           <div class="col-section-label">Wt.</div>
-          <template v-for="item of character.inventory" :key="item">
+          <template v-for="item of character.items" :key="item">
             <div class="fixed-item">{{ item.count }}</div>
             <div class="fixed-item">{{ item.name }}</div>
             <div class="fixed-item">{{ item.weight }}</div></template
@@ -139,7 +139,7 @@ import type Character from 'src/character/character';
 import { AbilityType } from 'src/character/model';
 
 import { ref, onMounted } from 'vue';
-import * as Positioning from './positioning';
+import * as Positioning from './paper/positioning';
 
 const props = defineProps<{
   character: Character;

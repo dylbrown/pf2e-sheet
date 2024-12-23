@@ -397,55 +397,43 @@
         </div>
       </div>
       <div id="rightThird">
-        <div class="column" style="justify-content: stretch">
-          <div class="sectionDivider">
-            <hr />
-          </div>
-          <div id="skills-grid">
-            <div class="labello combined-label">
-              <div class="sectionLabel">Skills</div>
-              <span>Skill</span>
-            </div>
-            <div class="labello">Total</div>
-            <div class="labello">Prof</div>
-            <template
-              v-for="skill of character.starfinder ? sfSkills : skills"
-              :key="skill"
+        <div
+          class="column"
+          style="justify-content: stretch; align-items: end"
+          ref="rightThird"
+        >
+          <q-tabs
+            v-model="currentRightTab"
+            dense
+            class="text-grey"
+            active-color="primary"
+            indicator-color="primary"
+            align="justify"
+            narrow-indicator
+            style="flex-grow: 0"
+          >
+            <q-tab name="items" label="Items" />
+            <q-tab name="skills" label="Skills" />
+          </q-tabs>
+          <span id="rightTabHolder">
+            <q-resize-observer @resize="tabsResize" />
+            <q-tab-panels
+              v-model="currentRightTab"
+              keep-alive
+              animated
+              transition-duration="200"
+              transition-next="slide-right"
+              transition-prev="slide-left"
+              @transition="afterTransition"
             >
-              <div class="skill-label">
-                <ClickableAttribute :attribute="skill" :character="character" />
-              </div>
-              <div class="line">
-                <div class="underlined-roll">
-                  {{ Util.signed(character.attributes[skill].total) }}
-                </div>
-              </div>
-              <ProficiencyDisplay
-                :grid="false"
-                :proficiency="character.attributes[skill].proficiency"
-              />
-            </template>
-            <template
-              v-for="[name, lore] of Object.entries(character.lore)"
-              :key="name"
-            >
-              <div class="skill-label lore-label">
-                <ClickableAttribute :lore="name" :character="character" />
-              </div>
-              <div class="line">
-                <div class="underlined-roll">
-                  {{ Util.signed(lore.total) }}
-                </div>
-              </div>
-              <ProficiencyDisplay
-                :grid="false"
-                :proficiency="lore.proficiency"
-              />
-            </template>
-            <div class="line conditionals">
-              {{ character.abilities.conditionals.join(', ') }}
-            </div>
-          </div>
+              <q-tab-panel name="items" style="padding: 0" ref="itemsTab">
+                <InteractiveItems :character="character" />
+              </q-tab-panel>
+              <q-tab-panel name="skills" style="padding: 0" ref="skillsTab">
+                <InteractiveSkills :character="character" />
+              </q-tab-panel>
+            </q-tab-panels>
+          </span>
         </div>
       </div>
     </div>
@@ -456,20 +444,22 @@
 import * as Util from 'src/character/util';
 import * as LS from 'src/pages/localStorage';
 import type Character from 'src/character/character';
-import {
-  AbilityType,
-  Attribute,
-  skills,
-  sfSkills,
-  Score,
-} from 'src/character/model';
-import ClickableTrait from 'src/components/ClickableTrait.vue';
+import InteractiveSkills from 'src/components/interactive/InteractiveSkills.vue';
+import { AbilityType, Attribute, Score } from 'src/character/model';
+import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
 import { onMounted, ref, watch } from 'vue';
-import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
-import ClickableAttribute from 'src/components/ClickableAttribute.vue';
-import AbilitiesTable from 'src/components/AbilitiesTable.vue';
+import {
+  QExpansionItem,
+  QPopupProxy,
+  QScrollArea,
+  QTabPanel,
+  QTabPanels,
+} from 'quasar';
+import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
+import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
+import InteractiveItems from 'src/components/interactive/InteractiveItems.vue';
 
 document.documentElement.classList.add('interactive');
 
@@ -546,6 +536,18 @@ onMounted(() => {
   }
   boundedCheck();
 });
+
+const currentRightTab = ref('skills');
+
+const rightThird = ref<HTMLDivElement | null>(null);
+let newTabWidth = -1;
+const tabsResize = (size: { height: number; width: number }) => {
+  newTabWidth = size.width;
+};
+const afterTransition = () => {
+  if (!rightThird.value) return;
+  rightThird.value.style.width = newTabWidth + 'px';
+};
 </script>
 
 <style>

@@ -27,7 +27,7 @@
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
 import type { Ability } from 'src/character/model';
-import * as Positioning from './positioning';
+import * as Positioning from './paper/positioning';
 const props = defineProps<{
   ability: Ability;
   interactive: boolean;

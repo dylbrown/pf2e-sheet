@@ -56,7 +56,7 @@ export default class Character {
       itemBonus: number;
     };
   };
-  inventory = Array<Item>();
+  items = Array<Item>();
 
   spells = new Spells();
 
@@ -260,7 +260,7 @@ export default class Character {
         // const weapon = item as Weapon;
         // TODO: Rune check
       }
-      this.inventory.push(item);
+      this.items.push(item);
     }
     for (const [key, e] of Object.entries(
       data.content.raw_data_dump.variables,
@@ -434,7 +434,7 @@ export default class Character {
             }
           }
         }
-        this.inventory.push(item);
+        this.items.push(item);
         promises.push(Wanderer.loadItem(item));
       }
     }
