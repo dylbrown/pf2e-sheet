@@ -28,7 +28,7 @@ export default defineConfig((/* ctx */) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    //boot: ['buffer.js'],
+    boot: ['rpg-awesome.ts'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss', '~rpg-awesome/scss/rpg-awesome.scss'],

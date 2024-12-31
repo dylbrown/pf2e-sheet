@@ -249,13 +249,21 @@ export type SpellList = {
   dc_attr: Attribute;
   attack: number;
   dc: number;
-  type: string;
+  type: SpellListType;
   tradition: string;
   score: Score;
   known: Array<Array<Spell>>;
   slots: Array<number>;
   focus: Array<Spell>;
 };
+
+export enum SpellListType {
+  None = '',
+  Prepared = 'Prepared',
+  Spontaneous = 'Spontaneous',
+  Innate = 'Innate',
+  FocusOnly = 'Focus Only',
+}
 
 interface DataEntry {
   id: number;

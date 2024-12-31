@@ -396,46 +396,7 @@
           </div>
         </div>
       </div>
-      <div id="rightThird">
-        <div
-          class="column"
-          style="justify-content: stretch; align-items: end"
-          ref="rightThird"
-        >
-          <q-tabs
-            v-model="currentRightTab"
-            dense
-            class="text-grey"
-            active-color="primary"
-            indicator-color="primary"
-            align="justify"
-            narrow-indicator
-            style="flex-grow: 0"
-          >
-            <q-tab name="items" label="Items" />
-            <q-tab name="skills" label="Skills" />
-          </q-tabs>
-          <span id="rightTabHolder">
-            <q-resize-observer @resize="tabsResize" />
-            <q-tab-panels
-              v-model="currentRightTab"
-              keep-alive
-              animated
-              transition-duration="200"
-              transition-next="slide-right"
-              transition-prev="slide-left"
-              @transition="afterTransition"
-            >
-              <q-tab-panel name="items" style="padding: 0" ref="itemsTab">
-                <InteractiveItems :character="character" />
-              </q-tab-panel>
-              <q-tab-panel name="skills" style="padding: 0" ref="skillsTab">
-                <InteractiveSkills :character="character" />
-              </q-tab-panel>
-            </q-tab-panels>
-          </span>
-        </div>
-      </div>
+      <RightThird :character="character" />
     </div>
   </div>
 </template>
@@ -444,22 +405,15 @@
 import * as Util from 'src/character/util';
 import * as LS from 'src/pages/localStorage';
 import type Character from 'src/character/character';
-import InteractiveSkills from 'src/components/interactive/InteractiveSkills.vue';
+import RightThird from 'src/components/interactive/RightThird.vue';
 import { AbilityType, Attribute, Score } from 'src/character/model';
 import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
 import { onMounted, ref, watch } from 'vue';
-import {
-  QExpansionItem,
-  QPopupProxy,
-  QScrollArea,
-  QTabPanel,
-  QTabPanels,
-} from 'quasar';
+import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
 import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
-import InteractiveItems from 'src/components/interactive/InteractiveItems.vue';
 
 document.documentElement.classList.add('interactive');
 
@@ -536,18 +490,6 @@ onMounted(() => {
   }
   boundedCheck();
 });
-
-const currentRightTab = ref('skills');
-
-const rightThird = ref<HTMLDivElement | null>(null);
-let newTabWidth = -1;
-const tabsResize = (size: { height: number; width: number }) => {
-  newTabWidth = size.width;
-};
-const afterTransition = () => {
-  if (!rightThird.value || newTabWidth == 0) return;
-  rightThird.value.style.width = newTabWidth + 'px';
-};
 </script>
 
 <style>

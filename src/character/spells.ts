@@ -1,5 +1,12 @@
 import type { Score, SpellList } from './model';
-import { Action, Attribute, getSource, Spell, Trait } from './model';
+import {
+  Action,
+  Attribute,
+  getSource,
+  Spell,
+  SpellListType,
+  Trait,
+} from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -20,7 +27,7 @@ export default class Spells {
         dc_attr: -1 as Attribute,
         attack: 0,
         dc: 10,
-        type: '',
+        type: SpellListType.None,
         known: [[], [], [], [], [], [], [], [], [], [], []],
         slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         focus: [],
@@ -55,15 +62,19 @@ export default class Spells {
       list.dc_attr = Attribute.SpellDCs;
       list.attack = entry.stats.spell_attack.total[0];
       list.dc = entry.stats.spell_dc.total;
-      list.type = capitalize(entry.source.type.split('-')[0].toLowerCase());
+      list.type =
+        (capitalize(
+          entry.source.type.split('-')[0].toLowerCase(),
+        ) as SpellListType) ?? SpellListType.None;
       list.tradition = capitalize(entry.source.tradition.toLowerCase());
       list.score = Util.getScore(entry.source.attribute.split('_')[1]);
     }
     for (const entry of content.spell_slots) {
       const list = this.getOrCreateSpellsList(entry.source || className);
-      if (!list || !entry.rank || !list.slots[entry.rank]) continue;
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      list.slots[entry.rank];
+      if (!list) continue;
+      const slots = list.slots[entry.rank];
+      if (slots === undefined) continue;
+      list.slots[entry.rank] = slots + 1;
     }
     for (const entry of content.focus_spells) {
       const list = this.getOrCreateSpellsList(
@@ -78,7 +89,7 @@ export default class Spells {
     for (const entry of content.innate_spells) {
       const list = this.getOrCreateSpellsList('Innate');
       if (!list) continue;
-      list.type = 'Innate';
+      list.type = SpellListType.Innate;
       list.attack = context.level + (context.level >= 12 ? 4 : 2) + chaMod;
       list.dc = 10 + list.attack;
       const spell = this.makeSpell(entry.spell, context, list.name);
@@ -157,8 +168,10 @@ export default class Spells {
       if (!list) continue;
       switch (entry.source) {
         case 'spellCastingType': {
-          if (value.startsWith('SPONTANEOUS')) list.type = 'Spontaneous';
-          else if (value.startsWith('PREPARED')) list.type = 'Prepared';
+          if (value.startsWith('SPONTANEOUS'))
+            list.type = SpellListType.Spontaneous;
+          else if (value.startsWith('PREPARED'))
+            list.type = SpellListType.Prepared;
           break;
         }
         case 'spellKeyAbilities': {
@@ -196,7 +209,7 @@ export default class Spells {
         case 'innateSpell': {
           const innateList = this.getOrCreateSpellsList(entry.sourceType);
           if (!innateList) break;
-          innateList.type = 'Innate';
+          innateList.type = SpellListType.Innate;
           const bits = entry.value.split(':::');
           const spell = new Spell(bits[0], Number(bits[0]));
           setTradition(innateList, bits[2]);
@@ -211,7 +224,7 @@ export default class Spells {
       if (list && list.type == '') {
         switch (key) {
           case 'SORCERER':
-            list.type = 'Spontaneous';
+            list.type = SpellListType.Spontaneous;
             break;
         }
       }

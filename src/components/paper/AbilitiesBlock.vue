@@ -104,7 +104,7 @@
             <div class="spells-title col-section-title">
               {{ list.name }}
             </div>
-            <div class="spells-stats" v-if="list.type == 'None'">
+            <div class="spells-stats" v-if="list.type == SpellListType.None">
               <div class="rollLabel">Spell Attack</div>
               <div class="numBox rounded">
                 {{ signed(list.attack) }}
@@ -136,10 +136,10 @@ import PreparedList from 'src/components/PreparedList.vue';
 import SpontaneousList from 'src/components/SpontaneousList.vue';
 import { signed, types } from 'src/character/util';
 import type Character from 'src/character/character';
-import { AbilityType } from 'src/character/model';
+import { AbilityType, SpellListType } from 'src/character/model';
 
 import { ref, onMounted } from 'vue';
-import * as Positioning from './paper/positioning';
+import * as Positioning from './positioning';
 
 const props = defineProps<{
   character: Character;

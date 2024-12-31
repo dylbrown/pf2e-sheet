@@ -4,39 +4,6 @@ body,
   font-family: 'Roboto Mono', monospace;
   line-height: 1.5;
 }
-
-:root {
-  --scrollbar-width-height: 10px;
-  --scrollbar-track: #eeeeee;
-  --scrollbar-thumb: rgb(209, 209, 209);
-  --scrollbar-thumb-hover: rgb(205, 205, 205);
-  --scrollbar-track-dark: #eeeeee;
-  --scrollbar-thumb-dark: rgb(193, 193, 193);
-  --scrollbar-thumb-hover-dark: rgb(178, 178, 178);
-}
-::-webkit-scrollbar {
-  width: var(--scrollbar-width-height);
-  height: var(--scrollbar-width-height);
-}
-// the track (progress bar) of the scrollbar
-::-webkit-scrollbar-track {
-  // border-top: var(--markdown-border)
-  background: var(--scrollbar-track-dark);
-  box-shadow: inset 0 0 4px var(--scrollbar-track-dark);
-}
-// the bottom corner of the scrollbar, where both horizontal and vertical scrollbars meet
-::-webkit-scrollbar-corner {
-  background: var(--scrollbar-track-dark);
-}
-// the draggable scrolling handle
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb-dark);
-  border-radius: 5px;
-
-  &:hover {
-    background: var(--scrollbar-thumb-hover-dark);
-  }
-}
 .height_measure {
   position: fixed;
   top: 0;
@@ -1047,6 +1014,10 @@ div.col-section-label {
 .spells-stats .numBox {
   font-size: 1.5em;
   border-width: 3px;
+  .interactive & {
+    min-width: 2.5em;
+    min-height: 2.5em;
+  }
 }
 .spells-prepared > div.col-section-label {
   border-bottom: none;
@@ -1217,6 +1188,11 @@ div.spell-cost-optional > span {
     height: 100%;
   }
 
+  .right-tabs .q-tab {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
   .q-table tbody td.table-traits {
     font-size: 9.75px;
     text-wrap: wrap;
@@ -1227,25 +1203,5 @@ div.spell-cost-optional > span {
     max-width: fit-content;
     flex-grow: 1;
     display: flex;
-  }
-  .vertical-scroll-table {
-    .q-table__top,
-    .q-table__bottom,
-    thead tr:first-child th {
-      /* bg color is important for th; just specify one */
-      background-color: #c1f4cd;
-    }
-    thead tr th {
-      position: sticky;
-      z-index: 1;
-    }
-    thead tr:first-child th {
-      top: 0;
-    }
-    /* this is when the loading indicator appears */
-    &.q-table--loading thead tr:last-child th {
-      /* height of all previous header rows */
-      top: 48px;
-    }
   }
 }

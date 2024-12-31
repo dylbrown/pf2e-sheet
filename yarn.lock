@@ -10412,7 +10412,7 @@ __metadata:
     postcss: "npm:^8.4.49"
     prettier: "npm:^3.4.2"
     quasar: "npm:^2.17.5"
-    rpg-awesome: "npm:^0.2.0"
+    rpg-awesome: "patch:rpg-awesome@npm%3A0.2.0#~/.yarn/patches/rpg-awesome-npm-0.2.0-a2026686fd.patch"
     typescript: "npm:^5.7.2"
     vite: "npm:^6.0.4"
     vite-plugin-checker: "npm:^0.8.0"
@@ -11408,10 +11408,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rpg-awesome@npm:^0.2.0":
+"rpg-awesome@npm:0.2.0":
   version: 0.2.0
   resolution: "rpg-awesome@npm:0.2.0"
   checksum: 10c0/f5174db80e182800ff8f0fad4c2834f4fc0fc0cec44793c77e2e9421d2a7a3bd2024afdcc20e5b84d13d5b38ea898c26d72736aa5e180204620131834c2f187b
+  languageName: node
+  linkType: hard
+
+"rpg-awesome@patch:rpg-awesome@npm%3A0.2.0#~/.yarn/patches/rpg-awesome-npm-0.2.0-a2026686fd.patch":
+  version: 0.2.0
+  resolution: "rpg-awesome@patch:rpg-awesome@npm%3A0.2.0#~/.yarn/patches/rpg-awesome-npm-0.2.0-a2026686fd.patch::version=0.2.0&hash=29cef3"
+  checksum: 10c0/b312bb4a584ebe76af1c6584e84e9aad2090cc5f2f38439a32c73891fba0468d073e7db5692c63d20affea661b29da5129de10c78dc5fbfeca92ddadaf01fed9
   languageName: node
   linkType: hard
 

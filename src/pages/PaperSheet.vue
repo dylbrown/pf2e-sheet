@@ -514,7 +514,7 @@ import { Attribute, skills, sfSkills, Score } from 'src/character/model';
 import ActionBlock from 'src/components/ActionBlock.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import WeaponBlock from 'src/components/WeaponBlock.vue';
-import AbilitiesBlock from 'src/components/AbilitiesBlock.vue';
+import AbilitiesBlock from 'src/components/paper/AbilitiesBlock.vue';
 import { onMounted, ref } from 'vue';
 import makeSheet from './pdf-sheet';
 

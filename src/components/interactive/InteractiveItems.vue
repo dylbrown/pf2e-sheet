@@ -7,8 +7,7 @@
       :rows="character.items"
       :columns="COLUMNS"
       row-key="name"
-      style="max-height: 100%"
-      class="vertical-scroll-table"
+      class="no-scroll"
       hide-header
       hide-title
       hide-bottom
