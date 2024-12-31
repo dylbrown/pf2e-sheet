@@ -8,7 +8,11 @@
       :columns="COLUMNS"
       row-key="name"
       style="max-height: 50%"
-      :rows-per-page-options="[8]"
+      class="vertical-scroll-table"
+      hide-header
+      hide-title
+      hide-bottom
+      :rows-per-page-options="[0]"
     />
   </div>
 </template>

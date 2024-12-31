@@ -545,7 +545,7 @@ const tabsResize = (size: { height: number; width: number }) => {
   newTabWidth = size.width;
 };
 const afterTransition = () => {
-  if (!rightThird.value) return;
+  if (!rightThird.value || newTabWidth == 0) return;
   rightThird.value.style.width = newTabWidth + 'px';
 };
 </script>
