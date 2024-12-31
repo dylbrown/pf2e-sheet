@@ -172,6 +172,7 @@ export interface Item {
   weight: string;
   traits: Trait[];
   weapon: boolean;
+  description: string;
 }
 
 export interface Weapon extends Item {

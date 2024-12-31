@@ -1,7 +1,7 @@
 <template>
   <span class="clickable-trait">
     {{ trait.name
-    }}<q-popup-proxy :class="popupClass + ' trait-popup'">
+    }}<q-popup-proxy :class="popupClass + ' clickable-popup'">
       {{ trait.name }}
       <span v-html="trait.description" />
     </q-popup-proxy>

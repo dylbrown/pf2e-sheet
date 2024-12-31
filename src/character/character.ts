@@ -13,7 +13,7 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { abilityMod, getProficiency, signed } from './util';
+import { abilityMod, getProficiency, parseDescription, signed } from './util';
 import vm from 'node:vm';
 
 export default class Character {
@@ -225,6 +225,7 @@ export default class Character {
         hands: entry.item.hands,
         traits: Trait.map(entry.item.traits),
         weapon: true,
+        description: entry.item.description,
       };
       attack.range = entry.item.meta_data.range;
       attack.reload = entry.item.meta_data.reload;
@@ -254,6 +255,7 @@ export default class Character {
           weight: entry.item.bulk ?? '',
           traits: Trait.map(entry.item.traits),
           weapon: false,
+          description: parseDescription(entry.item.description),
         };
       }
       if (item.weapon) {
@@ -400,6 +402,7 @@ export default class Character {
           hands: '0',
           traits: [],
           weapon: true,
+          description: '',
         };
         attackMap.set(attack.name, attack);
         this.combat.attacks.push(attack);
@@ -422,6 +425,7 @@ export default class Character {
             weight: entry.bulk > 0 ? entry.bulk : 0,
             traits: [],
             weapon: false,
+            description: parseDescription(entry.description),
           };
         }
         if (item.weapon) {

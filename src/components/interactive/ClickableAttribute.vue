@@ -1,6 +1,9 @@
 <template>
-  <span ref="name" class="clickable-trait">{{ name }}</span>
-  <q-popup-proxy :class="popupClass + ' trait-popup'" :target="$refs.name">
+  <span ref="clickableName" class="clickable-trait">{{ name }}</span>
+  <q-popup-proxy
+    :class="popupClass + ' clickable-popup'"
+    :target="$refs.clickableName as Element"
+  >
     {{ abilityMod }}
     {{ scoreName }}, {{ profBonus }} Proficiency<template v-if="item"
       >, {{ item }} Item.</template
