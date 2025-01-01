@@ -1,0 +1,57 @@
+<template>
+  <q-expansion-item
+    :group="list.name + '_spells'"
+    :label="level.toString()"
+    header-class="sectionLabel"
+    dense
+    dense-toggle
+    expand-separator
+    :default-opened="opened"
+  >
+    <q-table
+      flat
+      bordered
+      dense
+      :rows="spells"
+      :columns="COLUMNS"
+      row-key="name"
+      class="no-scroll"
+      hide-header
+      hide-title
+      hide-bottom
+      :rows-per-page-options="[0]"
+    >
+      <template v-slot:header="props">
+        <q-tr :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.label }}
+          </q-th>
+        </q-tr>
+      </template>
+      <template v-slot:body="props">
+        <q-tr :props="props" ref="row">
+          <q-td key="name" :props="props">
+            <ClickableSpell :spell="props.row" />
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
+  </q-expansion-item>
+</template>
+
+<script setup lang="ts">
+import { QTableColumn } from 'quasar';
+import { Spell, SpellList } from 'src/character/model';
+import ClickableSpell from './ClickableSpell.vue';
+
+const COLUMNS: QTableColumn[] = [
+  { name: 'name', label: 'Name', field: 'name', align: 'left' },
+];
+
+defineProps<{
+  spells: Spell[];
+  opened: boolean;
+  level: number;
+  list: SpellList;
+}>();
+</script>

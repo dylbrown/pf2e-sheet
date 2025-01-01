@@ -83,6 +83,7 @@
             :spell="spell"
             ref="spells"
             :data-list="list.name"
+            :interactive="false"
           />
         </template>
       </template>
@@ -121,6 +122,7 @@
             :spell="spell"
             ref="focusSpells"
             :data-focus="list.name"
+            :interactive="false"
           />
         </template>
       </template>

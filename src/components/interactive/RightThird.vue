@@ -14,18 +14,19 @@
         align="justify"
         narrow-indicator
         style="flex-grow: 0"
+        ref="tabButtons"
         v-if="character.items.length > 0 || character.spells.lists.length > 0"
       >
-        <q-tab
-          name="items"
-          icon="fa-solid fa-suitcase"
-          v-if="character.items.length > 0"
-        />
         <q-tab name="skills" icon="ra-circle-of-circles" />
         <q-tab
           name="spells"
           icon="ra-incense"
           v-if="character.spells.lists.length > 0"
+        />
+        <q-tab
+          name="items"
+          icon="fa-solid fa-suitcase"
+          v-if="character.items.length > 0"
         />
       </q-tabs>
       <q-scroll-area
@@ -33,7 +34,7 @@
         horizontal-bar-style="opacity: 0"
         :horizontal-thumb-style="{ opacity: '0' }"
       >
-        <span id="rightTabHolder">
+        <span id="rightTabHolder" ref="rightTabHolder">
           <q-resize-observer @resize="tabsResize" />
           <q-tab-panels
             v-model="currentRightTab"
@@ -65,19 +66,34 @@ import type Character from 'src/character/character';
 import InteractiveSkills from 'src/components/interactive/InteractiveSkills.vue';
 import InteractiveItems from 'src/components/interactive/InteractiveItems.vue';
 import InteractiveSpells from 'src/components/interactive/InteractiveSpells.vue';
+import { QTabs } from 'quasar';
 defineProps<{
   character: Character;
 }>();
 
 const currentRightTab = ref('skills');
+let expectedTab = 'skills';
 
 const rightThird = ref<HTMLDivElement | null>(null);
-let newTabWidth = -1;
+
+const tabButtons = ref<QTabs | null>(null);
+const rightTabHolder = ref<HTMLSpanElement | null>(null);
 const tabsResize = (size: { height: number; width: number }) => {
-  newTabWidth = size.width;
+  if (expectedTab != currentRightTab.value) {
+    expectedTab = currentRightTab.value;
+    return;
+  }
+  if (!rightThird.value || !tabButtons.value) return;
+  rightThird.value.style.width =
+    Math.max(size.width, tabButtons.value.$el.getBoundingClientRect().width) +
+    'px';
 };
 const afterTransition = () => {
-  if (!rightThird.value || newTabWidth == 0) return;
-  rightThird.value.style.width = newTabWidth + 'px';
+  if (!rightThird.value || !rightTabHolder.value || !tabButtons.value) return;
+  rightThird.value.style.width =
+    Math.max(
+      rightTabHolder.value.offsetWidth,
+      tabButtons.value.$el.getBoundingClientRect().width,
+    ) + 'px';
 };
 </script>

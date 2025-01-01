@@ -1,6 +1,6 @@
 <template>
   <div class="column tab items" style="justify-content: stretch">
-    <q-list bordered>
+    <q-list>
       <template
         v-for="(list, index) in character.spells.lists"
         :key="list.name"
@@ -28,19 +28,33 @@
               {{ list.dc }}
             </div>
           </div>
-          <template
-            v-if="
-              list.type == SpellListType.Spontaneous ||
-              list.type == SpellListType.Prepared
-            "
-          >
+          <template v-if="list.type == SpellListType.Spontaneous">
+            <div class="pip-counters">
+              <template
+                v-for="(slots, index) in list.slots.toReversed()"
+                :key="index"
+              >
+                <PipCounter
+                  :start="slots"
+                  :max="slots"
+                  :label="(10 - index).toString()"
+                  :interactive="true"
+                  v-if="slots > 0 && 10 - index != 0"
+                />
+              </template>
+            </div>
             <template
-              v-for="(slots, index) in list.slots.toReversed()"
+              v-for="(spells, index) in list.known.toReversed()"
               :key="index"
             >
-              <template v-if="slots > 0"
-                >{{ 10 - index + ': ' + slots }}<br
-              /></template>
+              <template v-if="list.slots[10 - index] ?? 0 > 0">
+                <SpellsTable
+                  :spells="spells"
+                  :level="10 - index"
+                  :opened="false"
+                  :list="list"
+                />
+              </template>
             </template>
           </template>
         </q-expansion-item>
@@ -53,6 +67,8 @@
 import * as Util from 'src/character/util';
 import { SpellListType } from 'src/character/model';
 import type Character from 'src/character/character';
+import SpellsTable from './SpellsTable.vue';
+import PipCounter from '../PipCounter.vue';
 
 defineProps<{
   character: Character;

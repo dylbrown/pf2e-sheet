@@ -12,15 +12,16 @@
       hide-title
       hide-bottom
       :rows-per-page-options="[0]"
-      ><template v-slot:body="props">
+    >
+      <template v-slot:body="props">
         <q-tr :props="props" ref="row">
           <q-td key="name" :props="props">
             <ClickableItem :item="props.row" />
           </q-td>
           <q-td key="count" :props="props">{{ props.row.count }}</q-td>
         </q-tr>
-      </template></q-table
-    >
+      </template>
+    </q-table>
   </div>
 </template>
 

@@ -337,6 +337,31 @@ div {
   text-align: center;
   width: 4em;
 }
+.pip-counters {
+  display: flex;
+  justify-content: space-between;
+}
+.line.pip-line {
+  justify-content: stretch;
+  flex-grow: 0;
+  & .labello {
+    align-self: normal;
+    padding: 0;
+    text-align: center;
+    font-size: 0.8em;
+  }
+}
+.pip-counter {
+  display: inline-block;
+  position: relative;
+  border: 2px solid gray;
+  border-width: 0 2px 0 2px;
+  border-radius: 5px;
+  & > .prof-box {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+}
 .prof-box {
   border: 2px solid black;
   width: calc(0.9em - 4px);
@@ -743,6 +768,7 @@ div.action-label {
   }
   .interactive & {
     background-color: white;
+    max-width: 25vw;
   }
   padding: 6px 3px;
   border: 1px dashed grey;
@@ -1200,8 +1226,10 @@ div.spell-cost-optional > span {
   }
 
   #rightTabHolder {
-    max-width: fit-content;
+    width: fit-content;
     flex-grow: 1;
     display: flex;
+    position: absolute;
+    right: 0;
   }
 }

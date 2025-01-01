@@ -58,10 +58,21 @@
         :content="spell.castsPerDay ? spell.castsPerDay.toString() : ''"
       />
       <LinePart label="Source" :content="spell.source" />
-      <LinePart
-        label="Traits"
-        :content="spell.traits.map((t) => t.name).join(', ')"
-      />
+      <div class="line" v-if="spell.traits.length > 0">
+        <div class="underlined" style="flex-direction: row"><span v-if="interactive">
+          <template
+            v-for="(trait, index) in spell.traits"
+            :key="trait.name"
+          >
+            <template v-if="index > 0">, </template>
+              <ClickableTrait :trait="trait" />
+            </template>
+          </span>
+          <template v-else>{{
+            spell.traits.map((t) => t.name).join(', ')
+          }}</template></div>
+        <div class="labello">Traits</div>
+      </div>
       <LinePart label="Requirements" :content="spell.requirements" />
       <LinePart label="Range" :content="spell.range" />
       <LinePart label="Area" :content="spell.area" />
@@ -69,18 +80,20 @@
       <LinePart label="Duration" :content="spell.duration" />
       <LinePart label="Save" :content="spell.save" />
     </div>
-    <div class="ability-description" ref="description" />
+    <div class="ability-description" ref="description" v-html="interactive ? spell.description : ''" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Spell } from 'src/character/model';
 import LinePart from './LinePart.vue';
+import ClickableTrait from './interactive/ClickableTrait.vue';
 import { ref } from 'vue';
 import * as Positioning from './paper/positioning';
 
 const props = defineProps<{
   spell: Spell;
+  interactive: boolean;
 }>();
 const box = ref<HTMLDivElement | null>(null);
 const description = ref<HTMLDivElement | null>(null);
