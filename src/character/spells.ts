@@ -75,6 +75,11 @@ export default class Spells {
       const slots = list.slots[entry.rank];
       if (slots === undefined) continue;
       list.slots[entry.rank] = slots + 1;
+      if (entry.spell) {
+        const spell = this.makeSpell(entry.spell, context, list.name);
+        if (!list.known[entry.rank]?.some((s) => s.name == spell.name))
+          list.known[entry.rank]?.push(spell);
+      }
     }
     for (const entry of content.focus_spells) {
       const list = this.getOrCreateSpellsList(

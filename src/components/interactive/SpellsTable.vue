@@ -1,5 +1,6 @@
 <template>
-  <q-expansion-item
+  <component
+    :is="preparing ? 'span' : 'q-expansion-item'"
     :group="list.name + '_spells'"
     :label="level.toString()"
     header-class="sectionLabel"
@@ -26,6 +27,7 @@
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
             {{ col.label }}
           </q-th>
+          <q-th v-if="preparing" auto-width></q-th>
         </q-tr>
       </template>
       <template v-slot:body="props">
@@ -33,10 +35,17 @@
           <q-td key="name" :props="props">
             <ClickableSpell :spell="props.row" />
           </q-td>
+          <q-td v-if="preparing" auto-width>
+            <q-btn
+              icon="fa-solid fa-book-bookmark"
+              text-color="grey"
+              @click="$emit('select', props.row)"
+            />
+          </q-td>
         </q-tr>
       </template>
     </q-table>
-  </q-expansion-item>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -50,8 +59,11 @@ const COLUMNS: QTableColumn[] = [
 
 defineProps<{
   spells: Spell[];
-  opened: boolean;
+  opened?: boolean;
   level: number;
   list: SpellList;
+  preparing?: boolean;
 }>();
+
+defineEmits(['select']);
 </script>

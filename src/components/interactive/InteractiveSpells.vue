@@ -28,6 +28,24 @@
               {{ list.dc }}
             </div>
           </div>
+          <template v-if="list.type == SpellListType.Prepared">
+            <div>
+              <template
+                v-for="(slots, index) in list.slots.toReversed()"
+                :key="index"
+              >
+                <div
+                  class="level-slots"
+                  v-if="slots > 0"
+                  :style="getColumns(slots)"
+                >
+                  <template v-for="i in slots" :key="i">
+                    <SpellSlot :list="list" :level="10 - index" />
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
           <template v-if="list.type == SpellListType.Spontaneous">
             <div class="pip-counters">
               <template
@@ -69,8 +87,14 @@ import { SpellListType } from 'src/character/model';
 import type Character from 'src/character/character';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';
+import SpellSlot from './SpellSlot.vue';
 
 defineProps<{
   character: Character;
 }>();
+
+const getColumns = (slots: number) => {
+  const columns = Math.ceil(slots / (1 + Math.floor(slots / 4.0)));
+  return `grid-template-columns: repeat(${columns}, 1fr)`;
+};
 </script>

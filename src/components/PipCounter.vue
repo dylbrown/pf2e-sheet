@@ -1,11 +1,16 @@
 <template>
   <div class="line pip-line">
     <div class="pip-counter" :style="`width: ${SIZE}em; height: ${SIZE}em`">
-      <q-popup-proxy self="top middle" anchor="bottom middle"
-        ><q-btn-group>
+      <q-popup-proxy
+        self="top middle"
+        anchor="bottom middle"
+        v-if="interactive"
+      >
+        <q-btn-group>
           <q-btn label="-" @click="remove" />
-          <q-btn label="+" @click="add" /> </q-btn-group
-      ></q-popup-proxy>
+          <q-btn label="+" @click="add" />
+        </q-btn-group>
+      </q-popup-proxy>
       <template v-for="i in max" :key="i">
         <div
           class="prof-box rounded"
