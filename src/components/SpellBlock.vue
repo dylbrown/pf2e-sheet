@@ -1,7 +1,9 @@
 <template>
   <div class="spell-box" ref="box">
     <div class="spell-attrs">
-      <div class="spell-title">{{ spell.name }}</div>
+      <div class="spell-title">
+        {{ spell.name }}
+      </div>
       <div class="spell-cost" v-if="spell.cost && !spell.maxCost">
         <div
           :class="Number(spell.cost) >= 1 ? 'spell-cost-yes' : 'spell-cost-no'"
@@ -59,18 +61,17 @@
       />
       <LinePart label="Source" :content="spell.source" />
       <div class="line" v-if="spell.traits.length > 0">
-        <div class="underlined" style="flex-direction: row"><span v-if="interactive">
-          <template
-            v-for="(trait, index) in spell.traits"
-            :key="trait.name"
-          >
-            <template v-if="index > 0">, </template>
+        <div class="underlined" style="flex-direction: row">
+          <span v-if="interactive">
+            <template v-for="(trait, index) in spell.traits" :key="trait.name">
+              <template v-if="index > 0">, </template>
               <ClickableTrait :trait="trait" />
             </template>
           </span>
           <template v-else>{{
             spell.traits.map((t) => t.name).join(', ')
-          }}</template></div>
+          }}</template>
+        </div>
         <div class="labello">Traits</div>
       </div>
       <LinePart label="Requirements" :content="spell.requirements" />
@@ -80,7 +81,11 @@
       <LinePart label="Duration" :content="spell.duration" />
       <LinePart label="Save" :content="spell.save" />
     </div>
-    <div class="ability-description" ref="description" v-html="interactive ? spell.description : ''" />
+    <div
+      class="ability-description"
+      ref="description"
+      v-html="interactive ? spell.description : ''"
+    />
   </div>
 </template>
 

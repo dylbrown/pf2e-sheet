@@ -237,11 +237,18 @@ export class Spell {
   save = '';
   innate = false;
   castsPerDay?: number;
+  heightening = new Heightening();
 
   constructor(name: string, id: number) {
     this.name = name;
     this.id = id;
   }
+}
+
+export class Heightening {
+  intervals = Array<number>();
+  fixed = Array<number>();
+  constructor() {}
 }
 
 export type SpellList = {
@@ -254,6 +261,7 @@ export type SpellList = {
   tradition: string;
   score: Score;
   known: Array<Array<Spell>>;
+  heightenedKnown: Array<Array<Spell>>;
   slots: Array<number>;
   focus: Array<Spell>;
 };

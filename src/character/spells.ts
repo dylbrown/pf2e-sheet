@@ -3,6 +3,7 @@ import {
   Action,
   Attribute,
   getSource,
+  Heightening,
   Spell,
   SpellListType,
   Trait,
@@ -29,6 +30,7 @@ export default class Spells {
         dc: 10,
         type: SpellListType.None,
         known: [[], [], [], [], [], [], [], [], [], [], []],
+        heightenedKnown: [[], [], [], [], [], [], [], [], [], [], []],
         slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         focus: [],
         tradition: '',
@@ -53,7 +55,7 @@ export default class Spells {
       );
       if (!list) continue;
       const spell = this.makeSpell(entry, context, list.name);
-      list.known[spell.level]?.push(spell);
+      this.addSpell(list, spell);
     }
     for (const entry of content.spell_sources) {
       const list = this.getOrCreateSpellsList(entry.source.name || className);
@@ -78,7 +80,7 @@ export default class Spells {
       if (entry.spell) {
         const spell = this.makeSpell(entry.spell, context, list.name);
         if (!list.known[entry.rank]?.some((s) => s.name == spell.name))
-          list.known[entry.rank]?.push(spell);
+          this.addSpell(list, spell);
       }
     }
     for (const entry of content.focus_spells) {
@@ -107,13 +109,26 @@ export default class Spells {
       const spell = this.makeSpell(entry.spell, context, list.name);
       spell.innate = true;
       spell.castsPerDay = entry.casts_max;
-      list.known[entry.rank]?.push(spell);
+      this.addSpell(list, spell);
     }
     const maxCount = (prev: number, curr: number, id: number) =>
       curr > 0 ? id : prev;
     this.lists.sort(
       (a, b) => b.slots.reduce(maxCount, 0) - a.slots.reduce(maxCount, 0),
     );
+  }
+  addSpell(list: SpellList, spell: Spell) {
+    list.known[spell.level]?.push(spell);
+    if (spell.level == 0) return;
+    list.heightenedKnown[spell.level]?.push(spell);
+    for (const level of spell.heightening.fixed) {
+      list.heightenedKnown[level]?.push(spell);
+    }
+    for (const interval of spell.heightening.intervals) {
+      for (let i = spell.level + interval; i <= 10; i += interval) {
+        list.heightenedKnown[i]?.push(spell);
+      }
+    }
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -127,11 +142,23 @@ export default class Spells {
     } else {
       cost = Util.getActions(entry.cast);
     }
+    let description = Util.parseDescription(entry.description, context);
+    const h = new Heightening();
+    for (const heightening of entry.heightened.text || []) {
+      const heightenText = `<b>${heightening.amount}</b> ${heightening.text}`;
+      description += Util.parseDescription(heightenText);
+      const amount = heightening.amount.replaceAll(/[A-z()]/gi, '');
+      if (amount.startsWith('+')) {
+        h.intervals.push(parseInt(amount));
+      } else {
+        h.fixed.push(parseInt(amount));
+      }
+    }
     return {
       name: entry.name.replaceAll(' (legacy)', 'ᴸ'),
       id: entry.id,
       level: entry.rank ?? 1,
-      description: Util.parseDescription(entry.description, context) ?? '',
+      description: description,
       source: getSource(entry.content_source_id),
       traits: Trait.map(entry.traits).filter(
         (t) => t.id != 1856 && t.name != listName,
@@ -146,6 +173,7 @@ export default class Spells {
       duration: entry.duration ?? '',
       save: entry.defense ?? '',
       innate: false,
+      heightening: h,
     };
   }
 
@@ -160,7 +188,7 @@ export default class Spells {
         if (!list) continue;
         const spell = new Spell(entry._spellName, entry.spellID);
         promises.push(Wanderer.loadSpell(spell));
-        list.known[entry.spellLevel]?.push(spell);
+        this.addSpell(list, spell);
       }
     }
     function setTradition(list: SpellList, value: string) {
@@ -228,7 +256,7 @@ export default class Spells {
           innateList.score = Util.getScore(bits[4]);
           promises.push(
             Wanderer.loadSpell(spell).then(() => {
-              innateList.known[spell.level]?.push(spell);
+              this.addSpell(innateList, spell);
             }),
           );
         }
