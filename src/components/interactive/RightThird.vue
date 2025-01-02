@@ -5,34 +5,35 @@
       style="justify-content: stretch; align-items: end"
       ref="rightThird"
     >
+      <q-tabs
+        v-model="currentRightTab"
+        dense
+        class="text-grey right-tabs"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        narrow-indicator
+        style="flex-grow: 0"
+        ref="tabButtons"
+        v-if="character.items.length > 0 || character.spells.lists.length > 0"
+      >
+        <q-tab name="skills" icon="ra-circle-of-circles" />
+        <q-tab
+          name="spells"
+          icon="ra-incense"
+          v-if="character.spells.lists.length > 0"
+        />
+        <q-tab
+          name="items"
+          icon="fa-solid fa-suitcase"
+          v-if="character.items.length > 0"
+        />
+      </q-tabs>
+
       <div
         class="column"
         style="justify-content: stretch; align-items: stretch; width: 100%"
       >
-        <q-tabs
-          v-model="currentRightTab"
-          dense
-          class="text-grey right-tabs"
-          active-color="primary"
-          indicator-color="primary"
-          align="justify"
-          narrow-indicator
-          style="flex-grow: 0"
-          ref="tabButtons"
-          v-if="character.items.length > 0 || character.spells.lists.length > 0"
-        >
-          <q-tab name="skills" icon="ra-circle-of-circles" />
-          <q-tab
-            name="spells"
-            icon="ra-incense"
-            v-if="character.spells.lists.length > 0"
-          />
-          <q-tab
-            name="items"
-            icon="fa-solid fa-suitcase"
-            v-if="character.items.length > 0"
-          />
-        </q-tabs>
         <q-scroll-area
           class="full-height full-width"
           horizontal-bar-style="opacity: 0"
