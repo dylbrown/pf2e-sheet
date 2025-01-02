@@ -8,8 +8,6 @@
       :columns="COLUMNS"
       row-key="name"
       class="no-scroll"
-      hide-header
-      hide-title
       hide-bottom
       :rows-per-page-options="[0]"
     >
@@ -31,8 +29,8 @@ import type Character from 'src/character/character';
 import ClickableItem from 'src/components/interactive/ClickableItem.vue';
 
 const COLUMNS: QTableColumn[] = [
-  { name: 'name', label: 'Name', field: 'name', align: 'left' },
-  { name: 'count', label: 'Count', field: 'count' },
+  { name: 'name', label: 'Name', field: 'name', align: 'left', sortable: true },
+  { name: 'count', label: 'Count', field: 'count', sortable: true },
 ];
 
 defineProps<{
