@@ -371,8 +371,26 @@
                         [],
                       ).filter((a) => !a.activity)
                     "
-                  /> </q-expansion-item
-              ></template>
+                  />
+                </q-expansion-item>
+              </template>
+              <template v-if="character.abilities.excluded.length > 0">
+                <div class="sectionDivider">
+                  <hr />
+                </div>
+                <q-expansion-item
+                  group="middle"
+                  label="Hidden Feats + Features"
+                  header-class="sectionLabel"
+                  default-opened
+                  dense
+                  dense-toggle
+                  expand-separator
+                  style="opacity: 0.4"
+                >
+                  <AbilitiesTable :abilities="character.abilities.excluded" />
+                </q-expansion-item>
+              </template>
             </q-list>
           </q-scroll-area>
           <div id="focus">

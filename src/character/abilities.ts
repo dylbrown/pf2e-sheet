@@ -37,6 +37,9 @@ export default class Abilities extends Array<Ability> {
     feats_features.classFeats.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.ClassFeat, context),
     );
+    feats_features.classFeatures.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.ClassFeature, context),
+    );
     this.sort((a, b) => b.level - a.level);
   }
 
@@ -65,10 +68,22 @@ export default class Abilities extends Array<Ability> {
     }
     // TODO: Conditionals
     let exclude = 0;
+    if (
+      feat.description.match(/You gain your \w+('|&#39;)s [\w ]+<\/p>$/gi) ||
+      feat.name.startsWith('Spell Repertoire') ||
+      feat.name.startsWith('Signature Spells')
+    )
+      exclude++;
     for (const entry of feature.operations ?? []) {
       if (
         ['ABILITY_BLOCK', 'SPELL'].includes(entry?.data?.optionType) ||
-        entry.type == 'giveAbilityBlock'
+        [
+          'giveAbilityBlock',
+          'giveSpellSlot',
+          'adjValue',
+          'addBonusToValue',
+          'giveSpell',
+        ].includes(entry.type)
       ) {
         exclude++;
       }
