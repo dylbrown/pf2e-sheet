@@ -393,7 +393,7 @@
                     <q-avatar icon="fa-solid fa-bed" />
                     <span class="q-ml-sm"
                       >Are you sure you would like to rest? This will reset your
-                      focus points and spells, as well as granting {{}} Hit
+                      focus points and spells cast, as well as granting {{}} Hit
                       Points.
                     </span>
                   </q-card-section>

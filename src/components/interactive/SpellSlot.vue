@@ -2,7 +2,12 @@
   <div class="prep-slot" :class="cast ? 'cast' : ''">
     <div class="level-label" v-if="!contents">{{ level }}</div>
     <span v-if="contents != null"> {{ contents.name }}</span>
-    <q-popup-proxy self="top middle" anchor="bottom middle" ref="buttonPopup">
+    <q-popup-proxy
+      self="top middle"
+      anchor="bottom middle"
+      ref="buttonPopup"
+      v-if="(contents && level > 0) || spells.length > 0"
+    >
       <q-btn-group>
         <q-btn
           icon="fa-solid fa-wand-magic-sparkles"
@@ -16,6 +21,7 @@
             selecting = true;
             if ($refs.buttonPopup) ($refs.buttonPopup as QPopupProxy).hide();
           "
+          v-if="spells.length > 0"
         />
       </q-btn-group>
     </q-popup-proxy>
@@ -23,7 +29,7 @@
   <q-dialog v-model="selecting">
     <q-card>
       <SpellsTable
-        :spells="list.known[level] ?? []"
+        :spells="spells"
         :preparing="true"
         :level="level"
         :list="list"
@@ -54,6 +60,8 @@ const props = defineProps<{
   notifier: number;
 }>();
 
+const spells = props.list.known[props.level] ?? [];
+
 let initialSpell = null;
 const initialSpellName = LS.load(props.charName, props.saveKey);
 if (initialSpellName != null) {
@@ -75,4 +83,10 @@ watch(contents, (spell) => {
 watch(cast, (isCast) => {
   LS.save(props.charName, CAST_KEY, isCast);
 });
+watch(
+  () => props.notifier,
+  () => {
+    cast.value = false;
+  },
+);
 </script>
