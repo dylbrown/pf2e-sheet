@@ -268,7 +268,6 @@
                 <hr />
               </div>
               <q-expansion-item
-                group="middle"
                 label="Strikes"
                 header-class="sectionLabel"
                 default-opened
@@ -487,8 +486,8 @@ watch(focus, (value) => {
 });
 
 onMounted(() => {
-  if (expInfo.value) {
-    expInfo.value.show();
+  if (expAct.value) {
+    expAct.value.show();
   }
   const boundedCheck = () => {
     if (!root.value) return;
