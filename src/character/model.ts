@@ -173,6 +173,7 @@ export interface Item {
   traits: Trait[];
   weapon: boolean;
   description: string;
+  source: string;
 }
 
 export interface Weapon extends Item {

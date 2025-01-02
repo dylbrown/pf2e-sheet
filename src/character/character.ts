@@ -10,6 +10,7 @@ import {
   weaponsAndArmor,
   Trait,
   sfSkills,
+  getSource,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
@@ -226,6 +227,7 @@ export default class Character {
         traits: Trait.map(entry.item.traits),
         weapon: true,
         description: entry.item.description,
+        source: getSource(entry.item.content_source_id),
       };
       attack.range = entry.item.meta_data.range;
       attack.reload = entry.item.meta_data.reload;
@@ -256,6 +258,7 @@ export default class Character {
           traits: Trait.map(entry.item.traits),
           weapon: false,
           description: parseDescription(entry.item.description),
+          source: getSource(entry.item.content_source_id),
         };
       }
       if (item.weapon) {
@@ -403,6 +406,7 @@ export default class Character {
           traits: [],
           weapon: true,
           description: '',
+          source: '',
         };
         attackMap.set(attack.name, attack);
         this.combat.attacks.push(attack);
@@ -426,6 +430,7 @@ export default class Character {
             traits: [],
             weapon: false,
             description: parseDescription(entry.description),
+            source: '',
           };
         }
         if (item.weapon) {

@@ -4,17 +4,13 @@
     :class="popupClass + ' clickable-popup'"
     :target="$refs.clickableName as Element"
   >
-    <template v-for="(trait, index) in item.traits" :key="trait.name">
-      <template v-if="index > 0">, </template>
-      <ClickableTrait :trait="trait" />
-    </template>
-    <span v-html="item.description" />
+    <ItemBlock :item="item" interactive />
   </q-popup-proxy>
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
 import { Item } from 'src/character/model';
-import ClickableTrait from './ClickableTrait.vue';
+import ItemBlock from '../ItemBlock.vue';
 
 defineProps<{
   item: Item;
