@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="preparing ? 'span' : 'q-expansion-item'"
+    :is="preparing || focus ? 'span' : 'q-expansion-item'"
     :group="list.name + '_spells'"
     :label="level.toString()"
     header-class="sectionLabel"
@@ -63,6 +63,7 @@ defineProps<{
   level: number;
   list: SpellList;
   preparing?: boolean;
+  focus?: boolean;
 }>();
 
 defineEmits(['select']);

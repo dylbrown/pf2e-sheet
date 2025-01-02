@@ -82,9 +82,16 @@ export default class Spells {
       }
     }
     for (const entry of content.focus_spells) {
-      const list = this.getOrCreateSpellsList(
-        entry.casting_source || className,
-      );
+      let listName = entry.casting_source;
+      if (!listName) {
+        for (const trait of Trait.map(entry.traits)) {
+          if (trait.description.endsWith('class.</p>')) {
+            listName = trait.name;
+            break;
+          }
+        }
+      }
+      const list = this.getOrCreateSpellsList(listName);
       if (!list) continue;
       const spell = this.makeSpell(entry, context, list.name);
       list.focus.push(spell);

@@ -28,7 +28,12 @@
               {{ list.dc }}
             </div>
           </div>
+          <template v-if="list.focus.length > 0">
+            <div class="spells-header">Focus Points</div>
+            <SpellsTable :spells="list.focus" :level="0" :list="list" />
+          </template>
           <template v-if="list.type == SpellListType.Prepared">
+            <div class="spells-header">Prepared Spells</div>
             <div>
               <template
                 v-for="(slots, index) in list.slots.toReversed()"
@@ -47,6 +52,7 @@
             </div>
           </template>
           <template v-if="list.type == SpellListType.Spontaneous">
+            <div class="spells-header">Spontaneous Spells</div>
             <div class="pip-counters">
               <template
                 v-for="(slots, index) in list.slots.toReversed()"

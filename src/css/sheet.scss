@@ -9,6 +9,38 @@ body,
   top: 0;
   left: 0;
 }
+:root {
+  --scrollbar-width-height: 10px;
+  --scrollbar-track: #eeeeee;
+  --scrollbar-thumb: rgb(209, 209, 209);
+  --scrollbar-thumb-hover: rgb(205, 205, 205);
+  --scrollbar-track-dark: #eeeeee;
+  --scrollbar-thumb-dark: rgb(193, 193, 193);
+  --scrollbar-thumb-hover-dark: rgb(178, 178, 178);
+}
+::-webkit-scrollbar {
+  width: var(--scrollbar-width-height);
+  height: var(--scrollbar-width-height);
+}
+// the track (progress bar) of the scrollbar
+::-webkit-scrollbar-track {
+  // border-top: var(--markdown-border)
+  background: var(--scrollbar-track-dark);
+  box-shadow: inset 0 0 4px var(--scrollbar-track-dark);
+}
+// the bottom corner of the scrollbar, where both horizontal and vertical scrollbars meet
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track-dark);
+}
+// the draggable scrolling handle
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-dark);
+  border-radius: 5px;
+
+  &:hover {
+    background: var(--scrollbar-thumb-hover-dark);
+  }
+}
 .height_measure {
   height: 100vh;
 }
@@ -730,10 +762,15 @@ div.action-label {
   right: 4px;
   bottom: 4px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   font-size: 1.2em;
   background-color: white;
   border-radius: 10%;
+  &.paper {
+    grid-template-columns: 1fr 1fr;
+  }
+  &.interactive {
+    grid-template-columns: 1fr;
+  }
 }
 #skills-grid {
   display: grid;
@@ -1231,6 +1268,17 @@ div.spell-cost-optional > span {
     display: flex;
     position: absolute;
     right: 0;
+  }
+
+  .spells-header {
+    border: 1px solid grey;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: grey;
+    color: white;
+    font-size: 13px;
   }
 
   .level-slots {

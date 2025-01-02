@@ -369,30 +369,12 @@
             </q-list>
           </q-scroll-area>
           <div id="focus" v-if="character.spells.focusPoints > 0">
-            <div class="line">
-              <div class="numBox rounded">
-                <q-input
-                  v-model.number="focus"
-                  type="number"
-                  :max="character.spells.focusPoints"
-                  min="0"
-                  input-class="text-right"
-                  style="font-size: 1em"
-                />
-              </div>
-              <div
-                class="labello"
-                style="align-self: center; text-align: center"
-              >
-                Focus
-              </div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
-                {{ character.spells.focusPoints }}
-              </div>
-              <div class="labello">Max Focus</div>
-            </div>
+            <PipCounter
+              label="Focus"
+              :max="character.spells.focusPoints"
+              :start="character.spells.focusPoints"
+              :interactive="true"
+            />
           </div>
         </div>
       </div>
@@ -414,6 +396,7 @@ import { onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
 import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
+import PipCounter from 'src/components/PipCounter.vue';
 
 document.documentElement.classList.add('interactive');
 
