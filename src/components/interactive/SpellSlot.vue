@@ -1,7 +1,9 @@
 <template>
   <div class="prep-slot" :class="cast ? 'cast' : ''">
-    <div class="level-label" v-if="!contents">{{ level }}</div>
-    <span v-if="contents != null"> {{ contents.name }}</span>
+    <div class="level-label">{{ level }}</div>
+    <span v-if="contents != null">
+      {{ contents.name }}<template v-if="contents.level < level">ᴴ</template>
+    </span>
     <q-popup-proxy
       self="top middle"
       anchor="bottom middle"

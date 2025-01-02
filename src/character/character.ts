@@ -58,7 +58,9 @@ export default class Character {
     };
   };
   items = Array<Item>();
-
+  totalBulk = 0;
+  bulkLimitBonus = 0;
+  money = 0;
   spells = new Spells();
 
   constructor() {
@@ -207,6 +209,7 @@ export default class Character {
       }
     }
 
+    // Weapons
     const attackMap = new Map<string, Weapon>();
     for (const entry of data?.content?.weapons ?? []) {
       const damage =
@@ -238,6 +241,8 @@ export default class Character {
       attackMap.set(attack.name, attack);
       this.combat.attacks.push(attack);
     }
+
+    // Inventory
     for (const entry of data?.content?.inventory_flat ?? []) {
       if (
         entry.item.name.includes('Improvised') ||
@@ -267,6 +272,16 @@ export default class Character {
       }
       this.items.push(item);
     }
+
+    // Bulk
+    this.totalBulk = data.content.total_bulk;
+    this.bulkLimitBonus =
+      data.content.raw_data_dump.variables.BULK_LIMIT_BONUS?.value ?? 0;
+
+    // Money
+    const coins = data.character.inventory.coins;
+    this.money = coins.pp * 100 + coins.gp * 10 + coins.sp + coins.cp / 10.0;
+
     for (const [key, e] of Object.entries(
       data.content.raw_data_dump.variables,
     )) {

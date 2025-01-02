@@ -65,43 +65,51 @@
           <div class="sectionLabel">Health</div>
           <div class="row-between">
             <div class="line">
-              <div class="numBox rounded">{{ character.hp }}</div>
-              <div class="labello">Max</div>
-            </div>
-            <div class="line">
-              <div class="numBox rounded">
+              <div class="numBox rounded" style="position: relative">
                 <q-linear-progress
-                  :value="currHP / character.hp"
-                  color="blue-2"
+                  :value="(currHP - character.hp) / character.hp"
+                  color="yellow-4"
                   track-color="white"
                   class="rounded"
+                  style="
+                    position: absolute;
+                    z-index: 10;
+                    width: 100%;
+                    height: 100%;
+                  "
                 >
                   <div
                     class="absolute-full flex flex-center"
                     style="color: black; font-size: calc(1rem + 0.5px)"
                   >
-                    {{ currHP }}
+                    {{ currHP }} / {{ character.hp }}
                   </div>
                   <q-popup-proxy
                     @show="workingHP = currHP"
                     @hide="currHP = workingHP"
                   >
                     <q-linear-progress
-                      :value="workingHP / character.hp"
-                      color="blue-2"
+                      :value="(workingHP - character.hp) / character.hp"
+                      color="yellow-4"
                       track-color="white"
-                      style="height: 28px"
+                      style="height: 28px; position: absolute; z-index: 10"
                     >
                       <div
                         class="absolute-full flex flex-center"
                         style="color: black; font-size: 14px"
                       >
                         {{ workingHP }}
-                        <span style="color: gray"
-                          >&nbsp;({{ Util.signed(workingHP - currHP) }})</span
-                        >
-                      </div></q-linear-progress
-                    >
+                        <span style="color: gray">
+                          &nbsp;({{ Util.signed(workingHP - currHP) }})
+                        </span>
+                      </div>
+                    </q-linear-progress>
+                    <q-linear-progress
+                      :value="workingHP / character.hp"
+                      color="blue-2"
+                      track-color="white"
+                      style="height: 28px"
+                    />
                     <q-btn-group>
                       <q-btn label="-10" @click="workingHP -= 10" />
                       <q-btn label="-5" @click="workingHP -= 5" />
@@ -112,6 +120,12 @@
                     </q-btn-group>
                   </q-popup-proxy>
                 </q-linear-progress>
+                <q-linear-progress
+                  :value="currHP / character.hp"
+                  color="blue-2"
+                  track-color="white"
+                  class="rounded"
+                />
               </div>
               <div class="labello">Current</div>
             </div>

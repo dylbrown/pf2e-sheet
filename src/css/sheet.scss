@@ -285,7 +285,8 @@ div {
   justify-self: stretch;
 }
 .column.tab {
-  height: 100%;
+  min-height: 100%;
+  height: fit-content;
 }
 .column:not(.compact) {
   flex-flow: column nowrap;
@@ -1272,7 +1273,12 @@ div.spell-cost-optional > span {
     display: flex;
     position: absolute;
     right: 0;
-    height: 100%;
+    min-height: 100%;
+    height: fit-content;
+  }
+
+  .money-button {
+    max-width: 2.5em;
   }
 
   .spells-header {
