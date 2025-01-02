@@ -33,12 +33,15 @@
             @click="$emit('select', props.row)"
           />
         </q-td>
-        <q-td v-if="innate" auto-width>
+        <q-td v-if="innate && charName && notifier != undefined" auto-width>
           <PipCounter
             :max="props.row.castsPerDay"
             :start="props.row.castsPerDay"
             v-if="props.row.level > 0"
             interactive
+            :save-key="`${list.name.replaceAll(' ', '-')}_innate_${props.row.name.replaceAll(' ', '-')}`"
+            :char-name="charName"
+            :notifier="notifier"
           />
         </q-td>
       </q-tr>
@@ -62,6 +65,8 @@ defineProps<{
   list: SpellList;
   preparing?: boolean;
   innate?: boolean;
+  charName?: string;
+  notifier?: number;
 }>();
 
 defineEmits(['select']);

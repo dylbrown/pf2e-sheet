@@ -24,7 +24,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import * as LS from 'src/pages/localStorage';
+import { onMounted, ref, watch } from 'vue';
 
 const SIZE = 2.5;
 
@@ -32,10 +33,28 @@ const props = defineProps<{
   label?: string;
   max: number;
   start: number;
-  interactive: boolean;
+  interactive?: boolean;
+  charName?: string;
+  saveKey?: string;
+  notifier?: number;
 }>();
-
-const current = ref<number>(Math.max(0, Math.min(props.max, props.start)));
+const current = ref<number>(
+  LS.loadOrDefault(
+    props.charName,
+    props.saveKey,
+    Math.max(0, Math.min(props.max, props.start)),
+  ),
+);
+watch(current, (val) => {
+  if (!props.charName || !props.saveKey) return;
+  LS.save(props.charName, props.saveKey, val);
+});
+watch(
+  () => props.notifier,
+  () => {
+    current.value = props.max;
+  },
+);
 
 const pips = ref<HTMLDivElement[] | null>(null);
 

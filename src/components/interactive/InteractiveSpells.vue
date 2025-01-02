@@ -49,7 +49,13 @@
                   :style="getColumns(slots)"
                 >
                   <template v-for="i in slots" :key="i">
-                    <SpellSlot :list="list" :level="10 - index" />
+                    <SpellSlot
+                      :list="list"
+                      :level="10 - index"
+                      :char-name="character.name"
+                      :save-key="`${list.name.replaceAll(' ', '-')}_${character.level}_slot_${i}_${10 - index}`"
+                      :notifier="notifier"
+                    />
                   </template>
                 </div>
               </template>
@@ -66,7 +72,10 @@
                   :start="slots"
                   :max="slots"
                   :label="(10 - index).toString()"
-                  :interactive="true"
+                  interactive
+                  :save-key="`${list.name.replaceAll(' ', '-')}_${character.level}_slots_${10 - index}`"
+                  :char-name="character.name"
+                  :notifier="notifier"
                   v-if="slots > 0 && 10 - index != 0"
                 />
               </template>
@@ -96,6 +105,8 @@
               :spells="list.known.toReversed().flat()"
               :list="list"
               :innate="true"
+              :char-name="character.name"
+              :notifier="notifier"
             />
           </template>
         </q-expansion-item>
@@ -114,6 +125,7 @@ import SpellSlot from './SpellSlot.vue';
 
 defineProps<{
   character: Character;
+  notifier: number;
 }>();
 
 const getColumns = (slots: number) => {

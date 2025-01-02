@@ -53,7 +53,7 @@
               <InteractiveSkills :character="character" />
             </q-tab-panel>
             <q-tab-panel name="spells" style="padding: 0">
-              <InteractiveSpells :character="character" />
+              <InteractiveSpells :character="character" :notifier="notifier" />
             </q-tab-panel>
           </q-tab-panels>
         </span>
@@ -70,6 +70,7 @@ import InteractiveSpells from 'src/components/interactive/InteractiveSpells.vue'
 import { QTabs } from 'quasar';
 defineProps<{
   character: Character;
+  notifier: number;
 }>();
 
 const currentRightTab = ref('skills');

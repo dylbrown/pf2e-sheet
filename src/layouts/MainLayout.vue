@@ -40,10 +40,15 @@
 import Character from 'src/character/character';
 import InteractiveSheet from 'src/pages/InteractiveSheet.vue';
 import PaperSheet from 'src/pages/PaperSheet.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import * as LS from 'src/pages/localStorage';
 const file = ref<File | null>(null);
 const ready = ref(false);
-const interactiveMode = ref(false);
+const interactiveMode = ref(LS.loadGlobalOrDefault('interactive', false));
+watch(interactiveMode, (val) => {
+  LS.saveGlobal('interactive', val);
+});
+
 const progress = ref(0);
 const character = new Character();
 

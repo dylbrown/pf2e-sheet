@@ -41,13 +41,38 @@
 
 <script setup lang="ts">
 import { Spell, SpellList } from 'src/character/model';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import SpellsTable from './SpellsTable.vue';
+import * as LS from 'src/pages/localStorage';
 import { QPopupProxy } from 'quasar';
 
-const contents = ref<Spell | null>(null);
-const cast = ref<boolean>(false);
+const props = defineProps<{
+  list: SpellList;
+  level: number;
+  charName: string;
+  saveKey: string;
+  notifier: number;
+}>();
+
+let initialSpell = null;
+const initialSpellName = LS.load(props.charName, props.saveKey);
+if (initialSpellName != null) {
+  for (const spell of props.list.known[props.level] ?? []) {
+    if (spell.name == initialSpellName) {
+      initialSpell = spell;
+      break;
+    }
+  }
+}
+const contents = ref<Spell | null>(initialSpell);
+const CAST_KEY = props.saveKey + '_cast';
+const cast = ref<boolean>(LS.loadOrDefault(props.charName, CAST_KEY, false));
 const selecting = ref<boolean>(false);
 
-defineProps<{ list: SpellList; level: number }>();
+watch(contents, (spell) => {
+  LS.save(props.charName, props.saveKey, spell?.name);
+});
+watch(cast, (isCast) => {
+  LS.save(props.charName, CAST_KEY, isCast);
+});
 </script>

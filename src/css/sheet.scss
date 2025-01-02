@@ -201,7 +201,7 @@ div {
 .no-grow {
   width: fit-content;
 }
-
+/* TODO: Dunno why this was here
 .row {
   flex-flow: row nowrap;
   justify-content: flex-start;
@@ -209,7 +209,7 @@ div {
   .paper & {
     margin: 0 -5px;
   }
-}
+}*/
 .row-wrap {
   flex-flow: row wrap;
   justify-content: flex-start;
@@ -763,14 +763,12 @@ div.action-label {
   right: 4px;
   bottom: 4px;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   font-size: 1.2em;
   background-color: white;
   border-radius: 10%;
-  &.paper {
-    grid-template-columns: 1fr 1fr;
-  }
-  &.interactive {
-    grid-template-columns: 1fr;
+  & :first-child:last-child {
+    grid-column: 2;
   }
 }
 #skills-grid {

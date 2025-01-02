@@ -368,17 +368,52 @@
               ></template>
             </q-list>
           </q-scroll-area>
-          <div id="focus" v-if="character.spells.focusPoints > 0">
+          <div id="focus">
             <PipCounter
               label="Focus"
               :max="character.spells.focusPoints"
               :start="character.spells.focusPoints"
-              :interactive="true"
+              interactive
+              save-key="focus"
+              :char-name="character.name"
+              :notifier="restNotifier"
+              v-if="character.spells.focusPoints > 0"
             />
+            <div class="line pip-line" style="margin-right: 5px">
+              <q-btn
+                icon="fa-solid fa-bed"
+                dense
+                style="width: 2.5em; height: 2.5em"
+                @click="restConfirm = true"
+              />
+              <div class="labello">Rest</div>
+              <q-dialog v-model="restConfirm">
+                <q-card>
+                  <q-card-section class="row items-center">
+                    <q-avatar icon="fa-solid fa-bed" />
+                    <span class="q-ml-sm"
+                      >Are you sure you would like to rest? This will reset your
+                      focus points and spells, as well as granting {{}} Hit
+                      Points.
+                    </span>
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn
+                      flat
+                      label="Confirm"
+                      color="primary"
+                      v-close-popup
+                      @click="rest"
+                    />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+            </div>
           </div>
         </div>
       </div>
-      <RightThird :character="character" />
+      <RightThird :character="character" :notifier="restNotifier" />
     </div>
   </div>
 </template>
@@ -419,6 +454,22 @@ const workingHP = ref<number>(
 const focus = ref<number>(
   LS.load(props.character.name, 'focus') ?? props.character.spells.focusPoints,
 );
+const restConfirm = ref<boolean>(false);
+const rest = () => {
+  if (currHP.value) {
+    currHP.value = Math.min(
+      currHP.value +
+        props.character.level *
+          Math.max(
+            1,
+            Util.abilityMod(props.character.scores[Score.Constitution]),
+          ),
+      props.character.hp,
+    );
+  }
+  restNotifier.value += 1;
+};
+const restNotifier = ref<number>(0);
 
 watch(currHP, (value) => {
   LS.save(props.character.name, 'hp', value);

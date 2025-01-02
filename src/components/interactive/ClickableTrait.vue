@@ -3,7 +3,9 @@
     {{ trait.name
     }}<q-popup-proxy :class="popupClass + ' clickable-popup'">
       {{ trait.name }}
-      <span v-html="trait.description" />
+      <div style="max-width: 25vw">
+        <span v-html="trait.description" />
+      </div>
     </q-popup-proxy>
   </span>
 </template>
