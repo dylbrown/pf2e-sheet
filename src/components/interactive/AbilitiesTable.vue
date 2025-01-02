@@ -2,6 +2,7 @@
   <q-table
     flat
     bordered
+    dense
     :rows="abilities"
     :rows-per-page-options="[0]"
     :columns="ABILITY_COLUMNS"
@@ -54,17 +55,15 @@
 import AbilityBlock from 'src/components/AbilityBlock.vue';
 import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import type { QTableColumn } from 'quasar';
-import type Character from 'src/character/character';
 import type { Ability } from 'src/character/model';
 import { ref } from 'vue';
 
-const props = defineProps<{
-  character: Character;
+defineProps<{
   abilities: Ability[];
 }>();
 
 const showAbility = ref<boolean>(false);
-const currentAbility = props.character.abilities[0];
+const currentAbility = ref<Ability | undefined>(undefined);
 
 const ABILITY_COLUMNS: QTableColumn[] = [
   { name: 'name', label: 'Name', field: 'name', align: 'left' },

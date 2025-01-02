@@ -513,7 +513,6 @@ div {
   font-size: 0.4em;
 }
 div.weapon-label {
-  font-size: 0.8em;
   display: flex;
   align-items: center;
   justify-items: flex-start;
@@ -521,6 +520,14 @@ div.weapon-label {
   text-transform: uppercase;
   max-width: 25%;
   align-self: center;
+
+  .paper & {
+    font-size: 0.8em;
+  }
+  .interactive & {
+    font-size: 1.2em;
+    padding-left: 5px;
+  }
 }
 .weapon .underlined {
   text-align: center;
@@ -535,11 +542,17 @@ div.weapon-label {
     margin: 0 -2px;
   }
 }
-.weapon-info {
-  font-size: 0.8em;
-}
+.weapon-info,
 .weapon-traits {
-  font-size: 0.8em;
+  .paper & {
+    font-size: 0.8em;
+  }
+  .interactive & {
+    font-size: 1.2em;
+  }
+}
+.interactive .weapon-traits {
+  font-style: italic;
 }
 
 .clickable-trait {
@@ -779,6 +792,7 @@ div.action-label {
   }
   .interactive & {
     grid-template-columns: 2fr 1.3fr 1fr;
+    margin-left: 5px;
   }
   column-gap: 3px;
   row-gap: 3px;
@@ -1256,12 +1270,18 @@ div.spell-cost-optional > span {
     height: 100%;
   }
 
+  .weapon-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .right-tabs .q-tab {
     padding-left: 4px;
     padding-right: 4px;
   }
 
-  .q-table tbody td.table-traits {
+  .q-table tbody td.table-traits,
+  .table-traits {
     font-size: 9.75px;
     text-wrap: wrap;
     font-style: italic;

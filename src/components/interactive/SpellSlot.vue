@@ -74,7 +74,10 @@ const props = defineProps<{
   notifier: number;
 }>();
 
-const spells = props.list.heightenedKnown[props.level] ?? [];
+const spells =
+  (props.level > 0
+    ? props.list.heightenedKnown[props.level]
+    : props.list.known[0]) ?? [];
 
 let initialSpell = null;
 const initialSpellName = LS.load(props.charName, props.saveKey);

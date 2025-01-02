@@ -277,11 +277,9 @@
                 expand-separator
                 ref="expStrike"
               >
-                <WeaponBlock
-                  v-for="attack in character.combat.attacks"
-                  :key="attack.name"
-                  :weapon="attack"
-                  :interactive="true"
+                <WeaponsList
+                  :character="character"
+                  :weapons="character.combat.attacks"
                 />
               </q-expansion-item>
               <div class="sectionDivider">
@@ -298,7 +296,6 @@
                 ref="expAct"
               >
                 <AbilitiesTable
-                  :character="character"
                   :abilities="character.abilities.filter((a) => a.activity)"
                 />
               </q-expansion-item>
@@ -315,7 +312,6 @@
                 expand-separator
               >
                 <AbilitiesTable
-                  :character="character"
                   :abilities="
                     Util.types(
                       character.abilities,
@@ -338,7 +334,6 @@
                 expand-separator
               >
                 <AbilitiesTable
-                  :character="character"
                   :abilities="
                     Util.types(
                       character.abilities,
@@ -370,7 +365,6 @@
                   expand-separator
                 >
                   <AbilitiesTable
-                    :character="character"
                     :abilities="
                       Util.types(
                         character.abilities,
@@ -440,12 +434,12 @@ import RightThird from 'src/components/interactive/RightThird.vue';
 import { AbilityType, Attribute, Score } from 'src/character/model';
 import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
-import WeaponBlock from 'src/components/WeaponBlock.vue';
 import { onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
 import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
 import PipCounter from 'src/components/PipCounter.vue';
+import WeaponsList from 'src/components/interactive/WeaponsList.vue';
 
 document.documentElement.classList.add('interactive');
 

@@ -310,10 +310,21 @@ export class Trait {
   public static getFromDB(id: number) {
     if (this.trait_map[id]) return this.trait_map[id];
     if (!this.trait_map[id] && this.db[id]) {
+      const name = this.db[id].name.replaceAll(/d ?(\d{1,2})/gi, 'd$1');
+      let description = this.db[id].description;
+      if (description == '' && name.match(/d\d{1,2}( \(Playtest\))?$/gi)) {
+        const searchName = name.replaceAll(/ d\d{1,2}/gi, '');
+        for (const entry of Object.values(this.db)) {
+          if (entry.name == searchName && entry.description != '') {
+            description = entry.description;
+            break;
+          }
+        }
+      }
       this.trait_map[id] = new Trait(
-        this.db[id].name.replaceAll(' (Playtest)', 'ᴾ'),
+        name.replaceAll(' (Playtest)', 'ᴾ'),
         id,
-        this.db[id].description,
+        description,
       );
       return this.trait_map[id];
     }
