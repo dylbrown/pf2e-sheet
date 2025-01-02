@@ -44,6 +44,7 @@
             transition-next="slide-right"
             transition-prev="slide-left"
             @transition="afterTransition"
+            @vue:mounted="afterTransition"
           >
             <q-tab-panel name="items" style="padding: 0">
               <InteractiveItems :character="character" />
@@ -83,17 +84,19 @@ const tabsResize = (size: { height: number; width: number }) => {
     expectedTab = currentRightTab.value;
     return;
   }
-  if (!rightThird.value || !tabButtons.value) return;
+  if (!rightThird.value) return;
   rightThird.value.style.width =
-    Math.max(size.width, tabButtons.value.$el.getBoundingClientRect().width) +
-    'px';
+    Math.max(
+      size.width,
+      tabButtons.value?.$el.getBoundingClientRect().width ?? 0,
+    ) + 'px';
 };
 const afterTransition = () => {
-  if (!rightThird.value || !rightTabHolder.value || !tabButtons.value) return;
+  if (!rightThird.value || !rightTabHolder.value) return;
   rightThird.value.style.width =
     Math.max(
       rightTabHolder.value.offsetWidth,
-      tabButtons.value.$el.getBoundingClientRect().width,
+      tabButtons.value?.$el.getBoundingClientRect().width ?? 0,
     ) + 'px';
 };
 </script>

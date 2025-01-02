@@ -20,7 +20,7 @@
         ></div>
       </template>
     </div>
-    <div class="labello">{{ label }}</div>
+    <div class="labello" v-if="label">{{ label }}</div>
   </div>
 </template>
 <script setup lang="ts">
@@ -29,7 +29,7 @@ import { onMounted, ref } from 'vue';
 const SIZE = 2.5;
 
 const props = defineProps<{
-  label: string;
+  label?: string;
   max: number;
   start: number;
   interactive: boolean;

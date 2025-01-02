@@ -29,8 +29,12 @@
             </div>
           </div>
           <template v-if="list.focus.length > 0">
-            <div class="spells-header">Focus Points</div>
-            <SpellsTable :spells="list.focus" :level="0" :list="list" />
+            <div class="spells-header">Focus Spells</div>
+            <SpellsTable
+              :spells="list.focus"
+              :list="list"
+              :no-expander="true"
+            />
           </template>
           <template v-if="list.type == SpellListType.Prepared">
             <div class="spells-header">Prepared Spells</div>
@@ -72,14 +76,27 @@
               :key="index"
             >
               <template v-if="list.slots[10 - index] ?? 0 > 0">
-                <SpellsTable
-                  :spells="spells"
-                  :level="10 - index"
-                  :opened="false"
-                  :list="list"
-                />
+                <q-expansion-item
+                  :group="list.name + '_spells'"
+                  :label="(10 - index).toString()"
+                  header-class="sectionLabel"
+                  dense
+                  dense-toggle
+                  expand-separator
+                  :default-opened="false"
+                >
+                  <SpellsTable :spells="spells" :list="list" />
+                </q-expansion-item>
               </template>
             </template>
+          </template>
+          <template v-if="list.type == 'Innate'">
+            <div class="spells-header">Innate Spells</div>
+            <SpellsTable
+              :spells="list.known.toReversed().flat()"
+              :list="list"
+              :innate="true"
+            />
           </template>
         </q-expansion-item>
       </template>
