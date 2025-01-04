@@ -4,11 +4,37 @@
       <div id="leftThird">
         <div class="column" style="justify-content: stretch">
           <div>PATHFINDER CHARACTER SHEET</div>
-          <div
-            class="underlined wrap"
-            style="font-size: 0.75em; border: none; font-style: italic"
-          >
-            {{ character.name }}
+          <div class="underlined wrap character-name">
+            <span>{{ character.name }}</span>
+            <q-btn
+              dense
+              icon="ra-burning-meteor"
+              style="font-size: 0.8em"
+              @click="resetConfirm = true"
+            />
+            <q-dialog v-model="resetConfirm">
+              <q-card style="background-color: #f33">
+                <q-card-section class="row items-center">
+                  <q-avatar icon="ra-burning-meteor" />
+                  <span class="q-ml-sm"
+                    >Are you sure you would like to reset all cached character
+                    data? This won't affect the file, but all selections made on
+                    this site will be deleted and the page reloaded.
+                  </span>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn flat label="Cancel" v-close-popup />
+                  <q-btn
+                    push
+                    label="Confirm"
+                    v-close-popup
+                    @click="reset"
+                    color="black"
+                    text-color="red"
+                  />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
           <div class="sectionDivider">
             <hr />
@@ -549,6 +575,12 @@ onMounted(() => {
   }
   boundedCheck();
 });
+
+const resetConfirm = ref<boolean>(false);
+const reset = () => {
+  LS.reset(props.character.name);
+  location.reload();
+};
 </script>
 
 <style>

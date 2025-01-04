@@ -221,7 +221,8 @@ export default class Character {
         entry.stats.damage.damageType; // TODO: Support extra types
       const attack: Weapon = {
         name: entry.item.name,
-        id: -1,
+        id: entry.item.id,
+        instanceID: entry.id,
         count: -1,
         weight: '',
         attack: signed(entry.stats.attack_bonus.total[0]),
@@ -258,6 +259,7 @@ export default class Character {
         item = {
           name: entry.item.name,
           id: entry.item.id,
+          instanceID: entry.id,
           count: Number(entry.item.meta_data.quantity),
           weight: entry.item.bulk ?? '',
           traits: Trait.map(entry.item.traits),
@@ -413,6 +415,7 @@ export default class Character {
         const attack: Weapon = {
           name: entry.Name,
           id: -1,
+          instanceID: '',
           count: -1,
           weight: '',
           attack: entry.Bonus,
@@ -440,6 +443,7 @@ export default class Character {
           item = {
             name: entry.name,
             id: entry.itemID,
+            instanceID: '',
             count: Number(entry.quantity),
             weight: entry.bulk > 0 ? entry.bulk : 0,
             traits: [],

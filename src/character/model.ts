@@ -168,6 +168,7 @@ export const weaponsAndArmor: { [s: string]: Attribute } = {
 export interface Item {
   name: string;
   id: number;
+  instanceID: string;
   count: number;
   weight: string;
   traits: Trait[];

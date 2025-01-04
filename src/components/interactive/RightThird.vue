@@ -52,7 +52,7 @@
               @vue:mounted="afterTransition"
             >
               <q-tab-panel name="items" style="padding: 0">
-                <InteractiveItems :character="character" />
+                <InteractiveItems :character="character" ref="itemsPane" />
               </q-tab-panel>
               <q-tab-panel name="skills" style="padding: 0">
                 <InteractiveSkills :character="character" />
@@ -84,7 +84,10 @@
               border-radius: 4px;
             "
           >
-            <InteractiveItemsFooter :character="character" />
+            <InteractiveItemsFooter
+              :character="character"
+              :items-pane="$refs.itemsPane"
+            />
           </q-tab-panel>
         </q-tab-panels>
       </div>

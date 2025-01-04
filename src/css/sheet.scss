@@ -445,6 +445,15 @@ div {
 .labello.invisible {
   color: white;
 }
+.underlined.character-name {
+  font-size: 0.75em;
+  border: none;
+  font-style: italic;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: end;
+  width: 100%;
+}
 .box-label {
   font-size: 0.5em;
   color: #333;

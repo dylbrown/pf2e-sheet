@@ -95,8 +95,12 @@ import { ref, watch } from 'vue';
 import { signed, abilityMod } from 'src/character/util';
 import { Score } from 'src/character/model';
 import * as TS from 'src/pages/localStorage';
+import InteractiveItems from './InteractiveItems.vue';
 
-const props = defineProps<{ character: Character }>();
+const props = defineProps<{
+  character: Character;
+  itemsPane?: InstanceType<typeof InteractiveItems> | null;
+}>();
 
 const extraMoney = ref<number>(
   TS.loadOrDefault(props.character.name, 0, 'money'),

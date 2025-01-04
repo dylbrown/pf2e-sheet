@@ -54,3 +54,6 @@ export function loadGlobalOrDefault<T>(
 ): T | null {
   return loadOrDefault(GLOBAL, defaultT, ...key);
 }
+export function reset(characterName: string) {
+  localStorage.removeItem('2e-sheet:' + characterName);
+}
