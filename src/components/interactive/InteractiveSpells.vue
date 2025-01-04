@@ -53,7 +53,13 @@
                       :list="list"
                       :level="10 - index"
                       :char-name="character.name"
-                      :save-key="`${list.name.replaceAll(' ', '-')}_${character.level}_slot_${i}_${10 - index}`"
+                      :save-key="[
+                        'slots',
+                        list.name.replaceAll(' ', '-'),
+                        character.level.toString(),
+                        (10 - index).toString(), // Slot Level
+                        i.toString(), // Slot Index
+                      ]"
                       :notifier="notifier"
                     />
                   </template>
@@ -73,7 +79,12 @@
                   :max="slots"
                   :label="(10 - index).toString()"
                   interactive
-                  :save-key="`${list.name.replaceAll(' ', '-')}_${character.level}_slots_${10 - index}`"
+                  :save-key="[
+                    'slots',
+                    list.name.replaceAll(' ', '-'),
+                    character.level.toString(),
+                    (10 - index).toString(), // Slot Level
+                  ]"
                   :char-name="character.name"
                   :notifier="notifier"
                   v-if="slots > 0 && 10 - index != 0"

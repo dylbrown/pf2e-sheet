@@ -399,7 +399,7 @@
               :max="character.spells.focusPoints"
               :start="character.spells.focusPoints"
               interactive
-              save-key="focus"
+              :save-key="['focus']"
               :char-name="character.name"
               :notifier="restNotifier"
               v-if="character.spells.focusPoints > 0"
@@ -497,10 +497,10 @@ const rest = () => {
 const restNotifier = ref<number>(0);
 
 watch(currHP, (value) => {
-  LS.save(props.character.name, 'hp', value);
+  LS.save(props.character.name, value, 'hp');
 });
 watch(focus, (value) => {
-  LS.save(props.character.name, 'focus', value);
+  LS.save(props.character.name, value, 'focus');
 });
 
 onMounted(() => {

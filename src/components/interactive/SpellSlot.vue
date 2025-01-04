@@ -70,7 +70,7 @@ const props = defineProps<{
   list: SpellList;
   level: number;
   charName: string;
-  saveKey: string;
+  saveKey: string[];
   notifier: number;
 }>();
 
@@ -80,9 +80,9 @@ const spells =
     : props.list.known[0]) ?? [];
 
 let initialSpell = null;
-const initialSpellName = LS.load(props.charName, props.saveKey);
+const initialSpellName = LS.load(props.charName, ...props.saveKey);
 if (initialSpellName != null) {
-  for (const spell of props.list.known[props.level] ?? []) {
+  for (const spell of spells) {
     if (spell.name == initialSpellName) {
       initialSpell = spell;
       break;
@@ -90,16 +90,16 @@ if (initialSpellName != null) {
   }
 }
 const contents = ref<Spell | null>(initialSpell);
-const CAST_KEY = props.saveKey + '_cast';
-const cast = ref<boolean>(LS.loadOrDefault(props.charName, CAST_KEY, false));
+const CAST_KEY = ['cast', ...props.saveKey];
+const cast = ref<boolean>(LS.loadOrDefault(props.charName, false, ...CAST_KEY));
 const selecting = ref<boolean>(false);
 const viewing = ref<boolean>(false);
 
 watch(contents, (spell) => {
-  LS.save(props.charName, props.saveKey, spell?.name);
+  LS.save(props.charName, spell?.name, ...props.saveKey);
 });
 watch(cast, (isCast) => {
-  LS.save(props.charName, CAST_KEY, isCast);
+  LS.save(props.charName, isCast, ...CAST_KEY);
 });
 watch(
   () => props.notifier,

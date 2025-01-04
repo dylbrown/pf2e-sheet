@@ -63,7 +63,11 @@
             :start="props.row.castsPerDay"
             v-if="props.row.level > 0"
             interactive
-            :save-key="`${list.name.replaceAll(' ', '-')}_innate_${props.row.name.replaceAll(' ', '-')}`"
+            :save-key="[
+              'innate',
+              list.name.replaceAll(' ', '-'),
+              props.row.name.replaceAll(' ', '-'),
+            ]"
             :char-name="charName"
             :notifier="notifier"
           />

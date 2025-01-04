@@ -99,10 +99,10 @@ import * as TS from 'src/pages/localStorage';
 const props = defineProps<{ character: Character }>();
 
 const extraMoney = ref<number>(
-  TS.loadOrDefault(props.character.name, 'money', 0),
+  TS.loadOrDefault(props.character.name, 0, 'money'),
 );
 watch(extraMoney, (money) => {
-  TS.save(props.character.name, 'money', money);
+  TS.save(props.character.name, money, 'money');
 });
 
 const workingMoney = ref<number>(0);

@@ -44,9 +44,9 @@ import { ref, watch } from 'vue';
 import * as LS from 'src/pages/localStorage';
 const file = ref<File | null>(null);
 const ready = ref(false);
-const interactiveMode = ref(LS.loadGlobalOrDefault('interactive', false));
+const interactiveMode = ref(LS.loadGlobalOrDefault(false, 'interactive'));
 watch(interactiveMode, (val) => {
-  LS.saveGlobal('interactive', val);
+  LS.saveGlobal(val, 'interactive');
 });
 
 const progress = ref(0);
