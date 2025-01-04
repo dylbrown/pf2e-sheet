@@ -16,6 +16,7 @@
       </div>
       <div class="labello">Traits</div>
     </div>
+    <line-part label="Bulk" :content="item.weight" />
     <div
       class="ability-description"
       ref="description"
