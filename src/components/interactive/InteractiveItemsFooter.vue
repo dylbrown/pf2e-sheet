@@ -12,22 +12,30 @@
           class="flex flex-center"
           style="color: black; font-size: 14px; padding: 5px"
         >
-          <template v-if="workingMoney < 10">
+          <template v-if="Math.abs(workingMoney) < 10">
             {{ signed(workingMoney) }} cp
           </template>
-          <template v-if="workingMoney >= 10 && workingMoney % 100 != 0">
+          <template
+            v-if="
+              Math.abs(workingMoney) >= 10 && Math.abs(workingMoney) % 100 != 0
+            "
+          >
             {{ signed(workingMoney / 10) }} sp
           </template>
           <template
             v-if="
-              workingMoney >= 10 &&
-              workingMoney % 100 == 0 &&
-              workingMoney % 1000 != 0
+              Math.abs(workingMoney) >= 10 &&
+              Math.abs(workingMoney) % 100 == 0 &&
+              Math.abs(workingMoney) % 1000 != 0
             "
           >
             {{ signed(workingMoney / 100) }} gp
           </template>
-          <template v-if="workingMoney >= 10 && workingMoney % 1000 == 0">
+          <template
+            v-if="
+              Math.abs(workingMoney) >= 10 && Math.abs(workingMoney) % 1000 == 0
+            "
+          >
             {{ signed(workingMoney / 1000) }} pp
           </template>
         </div>
