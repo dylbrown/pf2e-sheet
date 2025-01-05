@@ -13,7 +13,7 @@
       </q-popup-proxy>
       <template v-for="i in max" :key="i">
         <div
-          class="prof-box rounded"
+          class="prof-box"
           :class="i <= current ? 'filled' : ''"
           ref="pips"
           :style="`width: ${SIZE / Math.PI}em; height: ${SIZE / Math.PI}em`"

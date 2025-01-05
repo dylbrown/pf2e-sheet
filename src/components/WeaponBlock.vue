@@ -3,7 +3,7 @@
     <div class="weapon-label bounded-line" data-max="2.4">
       {{ weapon.name }}
     </div>
-    <div class="column">
+    <div class="flex-column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
           <div class="underlined weapon-info">{{ weapon.attack }}</div>
@@ -38,7 +38,7 @@
         <div class="line">
           <div
             class="underlined weapon-traits bounded-line second-pass"
-            data-max="1.5"
+            :data-max="interactive ? 0.8 : 1.5"
           >
             <span v-if="interactive">
               <template

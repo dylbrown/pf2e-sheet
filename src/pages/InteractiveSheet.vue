@@ -2,7 +2,7 @@
   <div ref="root">
     <div class="page first-page">
       <div id="leftThird">
-        <div class="column" style="justify-content: stretch">
+        <div class="flex-column" style="justify-content: stretch">
           <div>PATHFINDER CHARACTER SHEET</div>
           <div class="underlined wrap character-name">
             <span>{{ character.name }}</span>
@@ -118,11 +118,16 @@
                       :value="(workingHP - character.hp) / character.hp"
                       color="yellow-4"
                       track-color="white"
-                      style="height: 28px; position: absolute; z-index: 10"
+                      style="
+                        height: 2rem;
+                        width: 20rem;
+                        position: absolute;
+                        z-index: 10;
+                      "
                     >
                       <div
                         class="absolute-full flex flex-center"
-                        style="color: black; font-size: 14px"
+                        style="color: black; font-size: 1rem"
                       >
                         {{ workingHP }}
                         <span style="color: gray">
@@ -134,9 +139,9 @@
                       :value="workingHP / character.hp"
                       color="blue-2"
                       track-color="white"
-                      style="height: 28px"
+                      style="height: 2rem"
                     />
-                    <q-btn-group>
+                    <q-btn-group style="width: 20rem" spread stretch>
                       <q-btn label="-10" @click="workingHP -= 10" />
                       <q-btn label="-5" @click="workingHP -= 5" />
                       <q-btn label="-1" @click="workingHP -= 1" />
@@ -205,7 +210,7 @@
         </div>
       </div>
       <div id="middleThird">
-        <div class="column" style="justify-content: flex-start">
+        <div class="flex-column" style="justify-content: flex-start">
           <q-scroll-area ref="middleScroll">
             <q-list bordered>
               <div class="sectionDivider">

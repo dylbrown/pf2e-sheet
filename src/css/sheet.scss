@@ -35,7 +35,7 @@ body,
 // the draggable scrolling handle
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb-dark);
-  border-radius: 5px;
+  border-radius: 0.36rem;
 
   &:hover {
     background: var(--scrollbar-thumb-hover-dark);
@@ -79,7 +79,7 @@ body {
     left: 50vw;
     top: 50vh;
     transform: translate(-50%, -50%);
-    width: calc(min(1000px, 100vw - 10px));
+    width: calc(min(max(1000px, 100vh * 23 / 16), 100vw - 10px));
     height: calc(100vh - 10px);
     font-size: calc(2.5vh - 3.5px);
     overflow: hidden;
@@ -104,6 +104,9 @@ html {
     }
   }
 }
+body {
+  font-size: calc(2.5vh - 4px);
+}
 @media (max-height: 600px) {
   #page1 {
     font-size: calc(2.5vh - 4px);
@@ -114,7 +117,7 @@ html {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 5px;
+  padding: 0.36rem;
   width: calc(50vw - 60vh);
   text-wrap: wrap;
   background: repeating-linear-gradient(
@@ -163,7 +166,7 @@ html {
 #middleThird {
   overflow: hidden;
   .paper & {
-    padding: 0 5px;
+    padding: 0 0.36rem;
     position: absolute;
     left: 30%;
     top: 0;
@@ -271,7 +274,7 @@ div {
   .row-stretch > div,
   .row-between > div,
   .row-center > div {
-    margin: 0 5px;
+    margin: 0 0.36rem;
   }
 }
 
@@ -284,11 +287,11 @@ div {
   align-self: stretch;
   justify-self: stretch;
 }
-.column.tab {
+.flex-column.tab {
   min-height: 100%;
   height: fit-content;
 }
-.column:not(.compact) {
+.flex-column:not(.compact) {
   flex-flow: column nowrap;
   flex-grow: 1;
   display: flex;
@@ -364,7 +367,7 @@ div {
   min-height: 1.8em;
 }
 .numBox > input {
-  border-radius: 5px;
+  border-radius: 0.36rem;
   border: none;
   height: 100%;
   text-align: center;
@@ -389,7 +392,7 @@ div {
   position: relative;
   border: 2px solid gray;
   border-width: 0 2px 0 2px;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   & > .prof-box {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -397,8 +400,9 @@ div {
 }
 .prof-box {
   border: 2px solid black;
-  width: calc(1.1em - 4px);
-  height: calc(1.1em - 4px);
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 100%;
 }
 .hero-box {
   border: 2px solid black;
@@ -424,7 +428,7 @@ div {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 .rounded {
-  border-radius: 7px;
+  border-radius: 0.4em;
 }
 .filled {
   background-color: black;
@@ -534,7 +538,7 @@ div.weapon-label {
     font-size: 0.8em;
   }
   .interactive & {
-    font-size: 1.2em;
+    font-size: 1em;
     padding-left: 5px;
   }
 }
@@ -557,7 +561,7 @@ div.weapon-label {
     font-size: 0.8em;
   }
   .interactive & {
-    font-size: 1.2em;
+    font-size: 1em;
   }
 }
 .interactive .weapon-traits {
@@ -568,7 +572,7 @@ div.weapon-label {
   display: inline;
 }
 .clickable-popup {
-  padding: 2px;
+  padding: 0.14rem;
   p,
   .underlined {
     font-size: 0.75em;
@@ -626,7 +630,7 @@ div.action-label {
   height: 100%;
 }
 
-.column.compact {
+.flex-column.compact {
   display: grid;
   grid-template-columns: 1fr 1fr;
   justify-content: stretch;
@@ -689,7 +693,7 @@ div.action-label {
   background-color: black;
   border: 1px solid black;
   color: white;
-  padding: 3px;
+  padding: 0.21rem;
   font-weight: bold;
   text-align: center;
   display: flex;
@@ -700,9 +704,9 @@ div.action-label {
   background-color: black;
   border: 1px solid black;
   color: white;
-  padding: 6px;
+  padding: 0.4em;
   font-weight: bold;
-  border-radius: 7px;
+  border-radius: 0.4em;
   text-transform: uppercase;
 }
 
@@ -793,6 +797,9 @@ div.action-label {
   & :first-child:last-child {
     grid-column: 2;
   }
+  & .q-btn {
+    font-size: 0.8em;
+  }
 }
 #skills-grid {
   display: grid;
@@ -800,8 +807,12 @@ div.action-label {
     grid-template-columns: 2fr 1.3fr 0.7fr 1fr 1fr;
   }
   .interactive & {
-    grid-template-columns: 2fr 1.3fr 1fr;
+    grid-template-columns: 2fr 0.8fr 1fr;
     margin-left: 5px;
+    max-width: fit-content;
+    & > * {
+      max-width: fit-content;
+    }
   }
   column-gap: 3px;
   row-gap: 3px;
@@ -831,7 +842,7 @@ div.action-label {
     background-color: white;
     max-width: 50vw;
   }
-  padding: 6px 3px;
+  padding: 0.43rem 0.21rem;
   border: 1px dashed grey;
   margin: 0;
   display: flex;
@@ -847,7 +858,7 @@ div.ability-section {
   align-items: center;
   justify-content: center;
   background-color: black;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   color: white;
   font-weight: bold;
   text-transform: uppercase;
@@ -877,7 +888,7 @@ div.ability-section {
 .spell-title {
   background-color: black;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   color: white;
   font-weight: bolder;
   text-transform: uppercase;
@@ -886,7 +897,7 @@ div.ability-section {
   justify-content: center;
   align-items: center;
   flex-grow: 0;
-  padding: 0 5px;
+  padding: 0 0.36rem;
 }
 .ability-description,
 .description-chunk {
@@ -897,7 +908,7 @@ div.ability-section {
 .description-chunk:not(.first-chunk) {
   position: absolute;
   width: calc(100% + 2px);
-  padding: 0px 3px 6px;
+  padding: 0 0.21rem 0.43rem;
   border: 1px dashed grey;
   border-top: none;
 }
@@ -931,7 +942,7 @@ ol + br {
 .description-header {
   background-color: black;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   color: white;
   font-weight: bolder;
   text-transform: uppercase;
@@ -975,13 +986,13 @@ div.col-section-title {
   text-align: center;
   border: 1px solid black;
   background-color: black;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   color: white;
   font-weight: bolder;
   text-transform: uppercase;
-  padding: 2px;
-  margin-bottom: 1px;
-  margin-top: 2px;
+  padding: 0.14rem;
+  margin-bottom: 0.07rem;
+  margin-top: 0.14rem;
   align-items: center;
   justify-content: center;
   display: flex;
@@ -1052,7 +1063,7 @@ div.col-section-label {
 .header-chunk:not(.first-chunk) {
   position: absolute;
   width: calc(100% + 2px);
-  padding: 0px 3px 6px;
+  padding: 0 0.21rem 0.43rem;
   border: 1px dashed grey;
   border-top: none;
 }
@@ -1140,8 +1151,8 @@ div.col-section-label {
   background-color: black;
   border: 1px solid black;
   color: white;
-  padding: 2px 5px;
-  border-radius: 5px;
+  padding: 0.21rem 0.36rem;
+  border-radius: 0.36rem;
   flex-grow: 0;
   min-width: 2em;
   text-align: center;
@@ -1188,7 +1199,7 @@ div.col-center {
 }
 .spells-spontaneous-grid div.spells-name {
   flex-grow: 0;
-  padding: 2px;
+  padding: 0.14rem;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -1207,7 +1218,7 @@ div.spells-name.right {
   justify-content: space-between;
 }
 .spell-title {
-  padding: 5px;
+  padding: 0.36rem;
   min-width: 30%;
 }
 .spell-cost {
@@ -1222,7 +1233,7 @@ div.spells-name.right {
   height: 1.8em;
   width: 1.8em;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 0.36rem;
   flex-grow: 0;
   border: 1px solid black;
 }
@@ -1268,7 +1279,7 @@ div.spell-cost-optional > span {
   #rightThird {
     width: fit-content;
     flex-grow: 0;
-    & > div.column {
+    & > div.flex-column {
       height: 100%;
       width: fit-content;
       overflow: hidden;
@@ -1291,7 +1302,7 @@ div.spell-cost-optional > span {
 
   .q-table tbody td.table-traits,
   .table-traits {
-    font-size: 9.75px;
+    font-size: 0.75em;
     text-wrap: wrap;
     font-style: italic;
   }
@@ -1312,13 +1323,13 @@ div.spell-cost-optional > span {
 
   .spells-header {
     border: 1px solid grey;
-    border-radius: 5px;
+    border-radius: 0.36rem;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: grey;
     color: white;
-    font-size: 13px;
+    font-size: 1em;
   }
 
   .level-slots {
@@ -1331,7 +1342,7 @@ div.spell-cost-optional > span {
   }
   .prep-slot {
     border: 2px solid black;
-    border-radius: 5px;
+    border-radius: 0.36rem;
     height: 3em;
     min-width: 10em;
     padding-left: 1px;
@@ -1363,5 +1374,43 @@ div.spell-cost-optional > span {
       );
       border-color: grey;
     }
+  }
+
+  // Quasar Overrides
+  .q-tab__content {
+    height: 2.55rem;
+    padding: 0.3rem 0;
+    min-width: 2.8rem;
+    font-size: 1.7rem;
+  }
+
+  .q-tab__icon {
+    width: 1.7rem;
+    height: 1.7rem;
+    font-size: 1.7rem;
+  }
+
+  .q-table tbody td {
+    font-size: 1em;
+  }
+  .q-table th {
+    font-size: 0.8em;
+  }
+
+  .q-table--dense .q-table th,
+  .q-table--dense .q-table td {
+    padding: 0.3em 0.6em;
+  }
+
+  .q-linear-progress {
+    font-size: 1em;
+  }
+
+  .q-item__section--side > .q-icon {
+    font-size: 1.3em;
+  }
+
+  .q-btn {
+    font-size: 1em;
   }
 }

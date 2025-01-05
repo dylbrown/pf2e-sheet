@@ -1,6 +1,6 @@
 <template>
   <div
-    class="column tab"
+    class="flex-column tab"
     style="justify-content: stretch; max-width: fit-content"
   >
     <div id="skills-grid">

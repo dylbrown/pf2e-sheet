@@ -1,1 +1,36 @@
 // app global css in SCSS form
+
+.q-toggle__inner {
+  font-size: 3em;
+}
+
+.q-field,
+.q-field__label {
+  font-size: 1em;
+}
+
+.q-field__label {
+  top: 1.29rem;
+}
+
+.q-field__input {
+  min-height: 1.7rem;
+  line-height: 1.7rem;
+}
+
+.q-field__control {
+  height: 4rem;
+  min-height: 4rem;
+}
+
+.q-field--auto-height.q-field--labeled .q-field__control-container {
+  padding-top: 1.7rem;
+}
+
+.q-field--labeled .q-field__native,
+.q-field--labeled .q-field__prefix,
+.q-field--labeled .q-field__suffix {
+  line-height: 1.7rem;
+  padding-top: 1.7rem;
+  padding-bottom: 0.57rem;
+}

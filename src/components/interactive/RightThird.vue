@@ -1,7 +1,7 @@
 <template>
   <div id="rightThird">
     <div
-      class="column"
+      class="flex-column"
       style="justify-content: stretch; align-items: end"
       ref="rightThird"
     >
@@ -31,7 +31,7 @@
       </q-tabs>
 
       <div
-        class="column"
+        class="flex-column"
         style="justify-content: stretch; align-items: stretch; width: 100%"
       >
         <q-scroll-area

@@ -21,7 +21,7 @@
     <div class="page first-page">
       <div class="printBorder"></div>
       <div id="leftThird">
-        <div class="column" style="justify-content: stretch">
+        <div class="flex-column" style="justify-content: stretch">
           <div>PATHFINDER CHARACTER SHEET</div>
           <div class="sectionDivider">
             <hr />
@@ -323,7 +323,7 @@
         </div>
       </div>
       <div id="middleThird" ref="middleThird">
-        <div class="column" style="justify-content: flex-start">
+        <div class="flex-column" style="justify-content: flex-start">
           <div class="sectionDivider">
             <hr />
           </div>
@@ -401,7 +401,11 @@
             <hr />
           </div>
           <div class="sectionLabel">Actions and Activities</div>
-          <div class="column abilities" ref="abilities" style="flex-grow: 0">
+          <div
+            class="flex-column abilities"
+            ref="abilities"
+            style="flex-grow: 0"
+          >
             <template
               v-for="[index, ability] in Array.from(
                 character.abilities.entries(),
@@ -432,7 +436,7 @@
         </div>
       </div>
       <div id="rightThird">
-        <div class="column" style="justify-content: stretch">
+        <div class="flex-column" style="justify-content: stretch">
           <div class="sectionDivider">
             <hr />
           </div>

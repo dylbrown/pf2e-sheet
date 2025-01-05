@@ -10,7 +10,7 @@
       >
         <div
           class="flex flex-center"
-          style="color: black; font-size: 14px; padding: 5px"
+          style="color: black; font-size: 1rem; padding: 0.36rem"
         >
           <template v-if="Math.abs(workingMoney) < 10">
             {{ signed(workingMoney) }} cp

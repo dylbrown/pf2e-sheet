@@ -12,7 +12,7 @@
       label="Pick one file"
       accept=".guidechar,.json"
       filled
-      style="max-width: 300px; align-self: flex-start"
+      style="max-width: 20em; align-self: flex-start"
       :item-aligned="true"
       @update:model-value="(_$event) => load()"
     />

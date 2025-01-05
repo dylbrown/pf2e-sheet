@@ -1,5 +1,5 @@
 <template>
-  <div class="column tab items" style="justify-content: stretch">
+  <div class="flex-column tab items" style="justify-content: stretch">
     <q-list>
       <template
         v-for="(list, index) in character.spells.lists"
