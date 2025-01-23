@@ -96,7 +96,11 @@ export default class Spells {
       const spell = this.makeSpell(entry, context, list.name);
       list.focus.push(spell);
     }
-    this.focusPoints = Math.min(content.focus_spells.length, 3);
+    this.focusPoints = Math.min(
+      content.focus_spells.length +
+        (content.raw_data_dump.variables.FOCUS_POINT_BONUS?.value ?? 0),
+      3,
+    );
 
     for (const entry of content.innate_spells) {
       const list = this.getOrCreateSpellsList('Innate');
