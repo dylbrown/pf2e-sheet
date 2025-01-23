@@ -29,6 +29,7 @@ export default class Spells {
         attack: 0,
         dc: 10,
         type: SpellListType.None,
+        fullTradition: false,
         known: [[], [], [], [], [], [], [], [], [], [], []],
         heightenedKnown: [[], [], [], [], [], [], [], [], [], [], []],
         slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -68,6 +69,8 @@ export default class Spells {
         (capitalize(
           entry.source.type.split('-')[0].toLowerCase(),
         ) as SpellListType) ?? SpellListType.None;
+      list.fullTradition =
+        entry.source.type.split('-')[1].toLowerCase() == 'tradition';
       list.tradition = capitalize(entry.source.tradition.toLowerCase());
       list.score = Util.getScore(entry.source.attribute.split('_')[1]);
     }
@@ -77,11 +80,6 @@ export default class Spells {
       const slots = list.slots[entry.rank];
       if (slots === undefined) continue;
       list.slots[entry.rank] = slots + 1;
-      if (entry.spell) {
-        const spell = this.makeSpell(entry.spell, context, list.name);
-        if (!list.known[entry.rank]?.some((s) => s.name == spell.name))
-          this.addSpell(list, spell);
-      }
     }
     for (const entry of content.focus_spells) {
       let listName = entry.casting_source;
@@ -111,6 +109,20 @@ export default class Spells {
       spell.castsPerDay = entry.casts_max;
       this.addSpell(list, spell);
     }
+
+    if (this.lists.some((l) => l.fullTradition)) {
+      const allSpells: Array<Spell> = Object.values(content.all_spells).map(
+        (s: any) => this.makeSpell(s, context, ''),
+      );
+      for (const list of this.lists) {
+        if (list.fullTradition) {
+          allSpells
+            .filter((s) => s.traditions.includes(list.tradition.toLowerCase()))
+            .forEach((s) => this.addSpell(list, s));
+        }
+      }
+    }
+
     const maxCount = (prev: number, curr: number, id: number) =>
       curr > 0 ? id : prev;
     this.lists.sort(
@@ -135,12 +147,12 @@ export default class Spells {
   private makeSpell(entry: any, context: vm.Context, listName: string): Spell {
     let cost = Action.None;
     let maxCost = Action.None;
-    if (entry.cast.includes('TO')) {
+    if (entry.cast && entry.cast.includes('TO')) {
       const actions = entry.cast.split(/[_-]TO[_-]/gi);
       cost = actions[0] == 'ONE' ? Action.One : Action.Two;
       maxCost = Util.getActions(actions[1]);
     } else {
-      cost = Util.getActions(entry.cast);
+      cost = entry.cast != null ? Util.getActions(entry.cast) : Action.None;
     }
     let description = Util.parseDescription(entry.description, context);
     const h = new Heightening();
@@ -165,7 +177,7 @@ export default class Spells {
         .filter((t) => t.id != 1856 && t.name != listName), // "Focus" filter
       cost: cost,
       maxCost: maxCost,
-      castTime: entry.cast.replaceAll('_', ' '),
+      castTime: entry.cast?.replaceAll('_', ' ') ?? '',
       requirements: entry.requirements ?? '',
       range: entry.range ?? '',
       area: entry.area ?? '',
@@ -174,6 +186,7 @@ export default class Spells {
       save: entry.defense ?? '',
       innate: false,
       heightening: h,
+      traditions: entry.traditions,
     };
   }
 

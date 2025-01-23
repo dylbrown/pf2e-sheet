@@ -2,6 +2,7 @@
 
 .q-toggle__inner {
   font-size: 3em;
+  flex-grow: 0;
 }
 
 .q-field,
@@ -33,4 +34,19 @@
   line-height: 1.7rem;
   padding-top: 1.7rem;
   padding-bottom: 0.57rem;
+}
+
+.spells-table {
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    background-color: white;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
 }

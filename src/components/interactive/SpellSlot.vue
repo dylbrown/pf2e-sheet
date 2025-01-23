@@ -43,7 +43,6 @@
         :preparing="true"
         :list="list"
         :is-heightened="(s) => (s.level < level ? level : 0)"
-        style="max-width: 80vw; max-height: 80vh"
         @select="
           (spell: Spell) => {
             contents = spell;

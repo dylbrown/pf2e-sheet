@@ -239,6 +239,7 @@ export class Spell {
   innate = false;
   castsPerDay?: number;
   heightening = new Heightening();
+  traditions = new Array<string>();
 
   constructor(name: string, id: number) {
     this.name = name;
@@ -259,6 +260,7 @@ export type SpellList = {
   attack: number;
   dc: number;
   type: SpellListType;
+  fullTradition: boolean;
   tradition: string;
   score: Score;
   known: Array<Array<Spell>>;

@@ -6,7 +6,7 @@
     :rows="spells"
     :columns="COLUMNS"
     row-key="name"
-    class="no-scroll"
+    class="no-scroll spells-table"
     :hide-header="!preparing"
     hide-bottom
     :rows-per-page-options="[0]"
@@ -30,11 +30,28 @@
             <q-menu self="top right" anchor="bottom right">
               <q-list>
                 <q-item>
-                  <q-toggle
-                    v-model="showHeightened"
-                    label="Show Heightened"
-                    v-close-popup
-                  />
+                  <q-item-section>
+                    <q-toggle
+                      v-model="showHeightened"
+                      label="Show Heightened"
+                    />
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-toggle v-model="showLegacy" label="Show Legacy" />
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-select
+                      outlined
+                      v-model="targets"
+                      :options="Object.keys(TARGET_OPTIONS)"
+                      multiple
+                      label="Targets"
+                    />
+                  </q-item-section>
                 </q-item>
               </q-list>
             </q-menu> </q-btn
@@ -94,6 +111,13 @@ const COLUMNS: QTableColumn[] = [
   },
 ];
 
+const TARGET_OPTIONS: { [key: string]: string } = {
+  Fortitude: 'Fortitude',
+  Reflex: 'Reflex',
+  Will: 'Will',
+  AC: 'Make a spell attack',
+};
+
 const props = defineProps<{
   spells: Spell[];
   isHeightened?: (s: Spell) => number;
@@ -108,12 +132,26 @@ const props = defineProps<{
 defineEmits(['select']);
 
 const showHeightened = ref<boolean>(true);
+const showLegacy = ref<boolean>(false);
+const targets = ref<string[]>([]);
 
 const filterMethod = (spells: readonly Spell[]) => {
-  if (!props.isHeightened) return spells;
-  return spells.filter(
-    (s) =>
-      !(props.isHeightened && props.isHeightened(s) && !showHeightened.value),
-  );
+  return spells.filter((s) => {
+    if (!showHeightened.value && props.isHeightened && props.isHeightened(s))
+      return false;
+    if (!showLegacy.value && s.name.includes('ᴸ')) return false;
+    if (targets.value.length > 0) {
+      if (
+        s.description.search(
+          new RegExp(
+            '(' + targets.value.map((k) => TARGET_OPTIONS[k]).join('|') + ')',
+            'gi',
+          ),
+        ) == -1
+      )
+        return false;
+    }
+    return true;
+  });
 };
 </script>
