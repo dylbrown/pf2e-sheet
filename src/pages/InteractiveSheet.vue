@@ -435,7 +435,10 @@
               :notifier="restNotifier"
               v-if="character.spells.focusPoints > 0"
             />
-            <div class="line pip-line" style="margin-right: 5px">
+            <div
+              class="line pip-line"
+              style="margin-right: 5px; align-self: end"
+            >
               <q-btn
                 icon="fa-solid fa-bed"
                 dense

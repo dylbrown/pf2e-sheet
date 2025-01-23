@@ -810,14 +810,15 @@ div.action-label {
   bottom: 4px;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 5px;
   font-size: 1.2em;
   background-color: white;
   border-radius: 10%;
   & :first-child:last-child {
     grid-column: span 2;
   }
-  & .q-btn {
-    font-size: 0.8em;
+  & .labello {
+    font-size: 0.7rem;
   }
 }
 #skills-grid {
