@@ -11,7 +11,7 @@
         ></template>
         <q-expansion-item
           group="magic"
-          :label="list.name"
+          :label="list.name.replaceAll('_', ' ')"
           header-class="sectionLabel"
           dense
           dense-toggle
@@ -105,7 +105,11 @@
                   expand-separator
                   :default-opened="false"
                 >
-                  <SpellsTable :spells="spells" :list="list" />
+                  <SpellsTable
+                    :spells="spells"
+                    :list="list"
+                    style="flex-grow: 1"
+                  />
                 </q-expansion-item>
               </template>
             </template>
@@ -118,6 +122,7 @@
               :innate="true"
               :char-name="character.name"
               :notifier="notifier"
+              style="flex-grow: 1"
             />
           </template>
         </q-expansion-item>

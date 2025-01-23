@@ -29,6 +29,8 @@ export enum Score {
 export enum Action {
   One = '1',
   Two = '2',
+  OnePlus = '1+',
+  TwoPlus = '2+',
   Three = '3',
   Free = '◇',
   Reaction = '↩',

@@ -201,8 +201,8 @@ body {
 .interactive {
   .flex-column > div,
   .numBox,
-  .labello,
-  .q-scrollarea {
+  .q-scrollarea,
+  .underlined {
     flex-grow: 1;
   }
 }
@@ -384,7 +384,9 @@ body {
 }
 .pip-counters {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 1em;
+  padding: 0 5px;
 }
 .line.pip-line {
   justify-content: stretch;
@@ -618,15 +620,22 @@ div.action-label {
   color: white;
   background-color: black;
   border: 1px solid black;
-  border-radius: 2em;
-  height: 1em;
-  min-width: 1em;
+  border-radius: 0.6em;
+  height: 1.2em;
+  min-width: 1.2em;
   flex-grow: 0;
   text-align: center;
   margin: 0;
 
   &.inline {
     display: inline-flex;
+  }
+  .ability-box & {
+    height: 2em;
+    min-width: 2em;
+    padding: 0.18rem;
+    border-radius: 1.25em;
+    font-size: 1.15em;
   }
 }
 .action-details .underlined {
@@ -1431,7 +1440,7 @@ div.spell-cost-optional > span {
   }
 }
 
-.spells-table {
+.popup-spells-table {
   min-width: 30vw;
   min-height: 30vh;
   max-width: 80vw;

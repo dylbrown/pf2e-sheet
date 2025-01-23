@@ -7,6 +7,7 @@
     :columns="COLUMNS"
     row-key="name"
     class="no-scroll spells-table"
+    :class="extraClass"
     :hide-header="!preparing"
     hide-bottom
     :rows-per-page-options="[0]"
@@ -31,6 +32,18 @@
               <q-list>
                 <q-item>
                   <q-item-section>
+                    <q-select
+                      clearable
+                      outlined
+                      v-model="targets"
+                      :options="Object.keys(TARGET_OPTIONS)"
+                      multiple
+                      label="Targets"
+                    />
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
                     <q-toggle
                       v-model="showHeightened"
                       label="Show Heightened"
@@ -40,17 +53,6 @@
                 <q-item>
                   <q-item-section>
                     <q-toggle v-model="showLegacy" label="Show Legacy" />
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-select
-                      outlined
-                      v-model="targets"
-                      :options="Object.keys(TARGET_OPTIONS)"
-                      multiple
-                      label="Targets"
-                    />
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -127,20 +129,21 @@ const props = defineProps<{
   innate?: boolean;
   charName?: string;
   notifier?: number;
+  extraClass?: string;
 }>();
 
 defineEmits(['select']);
 
 const showHeightened = ref<boolean>(true);
 const showLegacy = ref<boolean>(false);
-const targets = ref<string[]>([]);
+const targets = ref<string[] | null>([]);
 
 const filterMethod = (spells: readonly Spell[]) => {
   return spells.filter((s) => {
     if (!showHeightened.value && props.isHeightened && props.isHeightened(s))
       return false;
     if (!showLegacy.value && s.name.includes('ᴸ')) return false;
-    if (targets.value.length > 0) {
+    if (targets.value != null && targets.value.length > 0) {
       if (
         s.description.search(
           new RegExp(

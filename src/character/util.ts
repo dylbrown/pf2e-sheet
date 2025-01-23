@@ -143,6 +143,9 @@ export function getActions(s: string) {
     case 'FREE':
     case 'FREEACTION':
       return Action.Free;
+    case 'ONETOTWOACTIONS':
+    case 'ONETOTHREEACTIONS':
+      return Action.OnePlus;
   }
   return Action.None;
 }
