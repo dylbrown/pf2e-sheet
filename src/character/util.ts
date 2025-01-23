@@ -146,6 +146,8 @@ export function getActions(s: string) {
     case 'ONETOTWOACTIONS':
     case 'ONETOTHREEACTIONS':
       return Action.OnePlus;
+    case 'TWOTOTHREEACTIONS':
+      return Action.TwoPlus;
   }
   return Action.None;
 }
@@ -154,7 +156,7 @@ export function makeSource(s: string) {
   const i = s.indexOf('(');
   if (i != -1) s = s.substring(0, i - 1);
   const parts = s.split(/[ -]/gi);
-  if (parts.length == 1) return s;
+  if (parts.length == 1) return s.substring(0, 2);
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
