@@ -37,7 +37,7 @@
             </template>
           </span>
         </q-td>
-        <q-td key="source" :props="props">{{ props.row.source }}</q-td>
+        <q-td key="source" :props="props">{{ props.row.source.name }}</q-td>
         <q-td key="level" :props="props">{{ props.row.level }}</q-td>
       </q-tr>
     </template>

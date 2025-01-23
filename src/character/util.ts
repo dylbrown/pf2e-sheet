@@ -148,7 +148,9 @@ export function getActions(s: string) {
 }
 
 export function makeSource(s: string) {
-  const parts = s.split('-');
+  const i = s.indexOf('(');
+  if (i != -1) s = s.substring(0, i - 1);
+  const parts = s.split(/[ -]/gi);
   if (parts.length == 1) return s;
   return parts.reduce((acc, value) => acc + value[0], '');
 }

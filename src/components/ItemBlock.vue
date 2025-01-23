@@ -1,7 +1,7 @@
 <template>
   <div class="item-box" ref="box">
     <div class="ability-title">{{ item.name }}</div>
-    <line-part label="Source" :content="item.source" />
+    <line-part label="Source" :content="item.source.name" />
     <div class="line" v-if="item.traits.length > 0">
       <div class="underlined" style="flex-direction: row">
         <span v-if="interactive">

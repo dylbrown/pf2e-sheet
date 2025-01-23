@@ -1,5 +1,5 @@
 import type { Ability } from './model';
-import { AbilityType, Action, getSource, Trait } from './model';
+import { AbilityType, Action, Source, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
@@ -49,10 +49,10 @@ export default class Abilities extends Array<Ability> {
       id: feature.id ?? -1,
       level: feature.level ?? -1,
       type: type,
-      source: getSource(feature.content_source_id),
+      source: Source.bank.get(feature.content_source_id),
       description: Util.parseDescription(feature.description, context),
       activity: feature.actions != null,
-      traits: Trait.map(feature.traits),
+      traits: Trait.bank.map(feature.traits),
     };
     if (
       type == AbilityType.GeneralFeat &&
@@ -147,7 +147,7 @@ export default class Abilities extends Array<Ability> {
             id: feature.id ?? -1,
             level: feature.level ?? -1,
             type: AbilityType.ClassFeature,
-            source: Util.makeSource(feature.contentSrc),
+            source: Source.bank.dummy(Util.makeSource(feature.contentSrc)),
             description: Util.parseDescription(feature.description),
             activity: false,
             traits: [],
@@ -182,7 +182,7 @@ export default class Abilities extends Array<Ability> {
           id: entry.value?.id ?? -1,
           level: entry.sourceLevel ?? -1,
           type: type,
-          source: '',
+          source: Source.None,
           description: Util.parseDescription(entry.value?.description),
           activity: cost != Action.None,
           traits: [],

@@ -10,7 +10,7 @@ import {
   weaponsAndArmor,
   Trait,
   sfSkills,
-  getSource,
+  Source,
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
@@ -103,7 +103,8 @@ export default class Character {
     };
     this.remaster = true;
     this.starfinder = data.character.content_sources.enabled.includes(276);
-    Trait.setDB(data.content.all_traits);
+    Source.bank.build(data.content.all_sources);
+    Trait.bank.build(data.content.all_traits);
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
     contextRaw.level = this.level;
@@ -124,7 +125,7 @@ export default class Character {
     this.class = data.character?.details?.class?.name ?? '';
     this.size = data.content?.size ?? '';
     this.traits = (data.content?.character_traits ?? []).map(
-      (e: { id: number }) => Trait.getFromDB(e.id),
+      (e: { id: number }) => Trait.bank.get(e.id),
     );
 
     // Ability Scores
@@ -228,10 +229,10 @@ export default class Character {
         attack: signed(entry.stats.attack_bonus.total[0]),
         damage: damage,
         hands: entry.item.hands,
-        traits: Trait.map(entry.item.traits),
+        traits: Trait.bank.map(entry.item.traits),
         weapon: true,
         description: entry.item.description,
-        source: getSource(entry.item.content_source_id),
+        source: Source.bank.get(entry.item.content_source_id),
       };
       attack.range = entry.item.meta_data.range;
       attack.reload = entry.item.meta_data.reload;
@@ -262,10 +263,10 @@ export default class Character {
           instanceID: entry.id,
           count: Number(entry.item.meta_data.quantity),
           weight: entry.item.bulk ?? '',
-          traits: Trait.map(entry.item.traits),
+          traits: Trait.bank.map(entry.item.traits),
           weapon: false,
           description: parseDescription(entry.item.description),
-          source: getSource(entry.item.content_source_id),
+          source: Source.bank.get(entry.item.content_source_id),
         };
       }
       if (item.weapon) {
@@ -340,7 +341,7 @@ export default class Character {
     this.size = info?.size ?? '';
     const traits = info?.traits;
     if (traits instanceof Array)
-      this.traits = traits.map((trait) => Trait.dummy(trait));
+      this.traits = traits.map((trait) => Trait.bank.dummy(trait));
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',
@@ -424,7 +425,7 @@ export default class Character {
           traits: [],
           weapon: true,
           description: '',
-          source: '',
+          source: Source.None,
         };
         attackMap.set(attack.name, attack);
         this.combat.attacks.push(attack);
@@ -449,7 +450,7 @@ export default class Character {
             traits: [],
             weapon: false,
             description: parseDescription(entry.description),
-            source: '',
+            source: Source.None,
           };
         }
         if (item.weapon) {

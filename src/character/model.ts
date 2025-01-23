@@ -1,4 +1,4 @@
-import { parseDescription } from './util';
+import { makeSource, parseDescription } from './util';
 
 export enum AbilityType {
   ClassFeat,
@@ -174,7 +174,7 @@ export interface Item {
   traits: Trait[];
   weapon: boolean;
   description: string;
-  source: string;
+  source: Source;
 }
 
 export interface Weapon extends Item {
@@ -192,7 +192,7 @@ export class Ability {
   id: number;
   level: number;
   type: AbilityType;
-  source = '';
+  source = Source.None;
   description: string;
   activity: boolean;
   traits: Array<Trait> = [];
@@ -228,7 +228,7 @@ export class Spell {
   maxCost?: Action;
   castTime = '';
   components?: Array<string> = [];
-  source = '';
+  source = Source.None;
   traits: Array<Trait> = [];
   requirements = '';
   range = '';
@@ -280,14 +280,13 @@ interface DataEntry {
   name: string;
   description: string;
 }
-export class Trait {
-  name: string;
-  description: string;
-  id: number;
 
-  private static trait_map: { [id: number]: Trait } = {};
+abstract class AbstractDataEntry implements DataEntry {
+  readonly name: string;
+  readonly description: string;
+  readonly id: number;
 
-  private constructor(name: string, id: number, description: string) {
+  protected constructor(name: string, id: number, description: string) {
     this.name = name
       .replace(' (legacy)', 'ᴸ')
       .replace(' - Item', 'ᴵ')
@@ -295,96 +294,54 @@ export class Trait {
     this.id = id;
     this.description = description ? parseDescription(description) : '';
   }
+}
+
+class StaticBank<T extends DataEntry> {
+  private bank: { [id: number]: T } = {};
+  private ctor: (e: DataEntry) => T;
+
+  public constructor(ctor: (e: DataEntry) => T) {
+    this.ctor = ctor;
+  }
 
   // DB
-  private static db: { [id: number]: DataEntry } = {};
-  public static setDB(db: Array<DataEntry>) {
+  public build(db: Array<DataEntry>) {
     for (const entry of db) {
-      this.db[entry.id] = entry;
+      this.bank[entry.id] = this.ctor(entry);
     }
   }
 
   // DB Access
-  static map(traits: Array<number>): Trait[] {
-    return traits.map((id: number) => Trait.getFromDB(id));
+  public map(ts: Array<number>): T[] {
+    return ts.map((id: number) => this.get(id));
   }
-  public static getFromDB(id: number) {
-    if (this.trait_map[id]) return this.trait_map[id];
-    if (!this.trait_map[id] && this.db[id]) {
-      const name = this.db[id].name.replaceAll(/d ?(\d{1,2})/gi, 'd$1');
-      let description = this.db[id].description;
-      if (description == '' && name.match(/d\d{1,2}( \(Playtest\))?$/gi)) {
-        const searchName = name.replaceAll(/ d\d{1,2}/gi, '');
-        for (const entry of Object.values(this.db)) {
-          if (entry.name == searchName && entry.description != '') {
-            description = entry.description;
-            break;
-          }
-        }
-      }
-      this.trait_map[id] = new Trait(
-        name.replaceAll(' (Playtest)', 'ᴾ'),
-        id,
-        description,
-      );
-      return this.trait_map[id];
-    }
-    return new Trait(id.toString(), id, '');
+  public get(id: number) {
+    if (this.bank[id]) return this.bank[id];
+    return this.ctor({ name: id.toString(), id: id, description: '' });
   }
 
   // === Legacy stuff ===
-  public static createIfAbsent(
-    name: string,
-    id: number,
-    description = '',
-  ): Trait {
-    if (this.trait_map[id]) return this.trait_map[id];
-    const trait = new Trait(name, id, description);
-    this.trait_map[id] = trait;
+  public createIfAbsent(name: string, id: number, description = ''): Trait {
+    if (this.bank[id]) return this.bank[id];
+    const trait = this.ctor({ name, id, description });
+    this.bank[id] = trait;
     return trait;
   }
 
   // === Legacy stuff ===
-  public static dummy(name: string) {
-    return new Trait(name, -1, '');
+  public dummy(name: string) {
+    return this.ctor({ name, id: -1, description: '' });
   }
 }
+export class Trait extends AbstractDataEntry {
+  public static readonly bank = new StaticBank<Trait>(
+    (e) => new Trait(e.name, e.id, e.description),
+  );
+}
+export class Source extends AbstractDataEntry {
+  public static readonly bank = new StaticBank<Source>(
+    (e) => new Source(makeSource(e.name), e.id, e.description),
+  );
 
-const sources: { [id: number]: string } = {
-  1: 'PC1',
-  7: 'GMC',
-  8: 'MC',
-  11: 'CRB',
-  12: 'DA',
-  13: 'SoM',
-  14: 'APG',
-  15: 'RoE',
-  16: 'TV',
-  17: 'G&G',
-  18: 'AG',
-  19: 'CG',
-  20: 'Abs',
-  21: 'Fbs',
-  23: 'GB',
-  24: 'IL',
-  25: 'KoL',
-  28: 'ME',
-  29: 'PFS',
-  31: 'WG',
-  34: 'P#147',
-  35: 'P#183',
-  41: 'P#176',
-  42: 'P#172',
-  51: 'BotD',
-  146: 'Hh',
-  185: 'HotW',
-  256: 'PC2',
-  276: 'SF2',
-  318: 'TXCG',
-  400: 'WoI',
-};
-
-export function getSource(id: number) {
-  if (!sources[id]) console.log('Missing Source Name: ' + id);
-  return sources[id] ?? id.toString();
+  public static readonly None = new Source('', -1, '');
 }

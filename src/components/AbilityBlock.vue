@@ -4,7 +4,7 @@
       {{ ability.cost }}
     </div>
     <div class="ability-title">{{ ability.name }}</div>
-    <line-part label="Source" :content="ability.source" />
+    <line-part label="Source" :content="ability.source.name" />
     <div class="line" v-if="ability.traits.length > 0">
       <div class="underlined" style="flex-direction: row">
         <span v-if="interactive">

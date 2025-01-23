@@ -59,7 +59,7 @@
         label="Per Day"
         :content="spell.castsPerDay ? spell.castsPerDay.toString() : ''"
       />
-      <LinePart label="Source" :content="spell.source" />
+      <LinePart label="Source" :content="spell.source.name" />
       <div class="line" v-if="spell.traits.length > 0">
         <div class="underlined" style="flex-direction: row">
           <span v-if="interactive">

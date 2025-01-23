@@ -2,8 +2,8 @@ import type { Score, SpellList } from './model';
 import {
   Action,
   Attribute,
-  getSource,
   Heightening,
+  Source,
   Spell,
   SpellListType,
   Trait,
@@ -86,7 +86,7 @@ export default class Spells {
     for (const entry of content.focus_spells) {
       let listName = entry.casting_source;
       if (!listName) {
-        for (const trait of Trait.map(entry.traits)) {
+        for (const trait of Trait.bank.map(entry.traits)) {
           if (trait.description.endsWith('class.</p>')) {
             listName = trait.name;
             break;
@@ -159,10 +159,10 @@ export default class Spells {
       id: entry.id,
       level: entry.rank ?? 1,
       description: description,
-      source: getSource(entry.content_source_id),
-      traits: Trait.map(entry.traits).filter(
-        (t) => t.id != 1856 && t.name != listName,
-      ), // "Focus" filter
+      source: Source.bank.get(entry.content_source_id),
+      traits: Trait.bank
+        .map(entry.traits)
+        .filter((t) => t.id != 1856 && t.name != listName), // "Focus" filter
       cost: cost,
       maxCost: maxCost,
       castTime: entry.cast.replaceAll('_', ' '),
