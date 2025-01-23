@@ -306,7 +306,7 @@ class StaticBank<T extends DataEntry> {
 
   // DB
   public build(db: Array<DataEntry>) {
-    for (const entry of db) {
+    for (const entry of db ?? []) {
       this.bank[entry.id] = this.ctor(entry);
     }
   }
