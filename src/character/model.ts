@@ -1,4 +1,5 @@
 import { makeSource, parseDescription } from './util';
+import type vm from 'node:vm';
 
 export enum AbilityType {
   ClassFeat,
@@ -196,6 +197,7 @@ export class Ability {
   type: AbilityType;
   source = Source.None;
   description: string;
+  rawDescription: string;
   activity: boolean;
   traits: Array<Trait> = [];
   cost?: Action;
@@ -210,14 +212,20 @@ export class Ability {
     level: number,
     type: AbilityType,
     activity: boolean,
+    source: Source,
+    traits: Trait[],
     description: string,
+    context?: vm.Context,
   ) {
     this.name = name;
     this.id = id;
     this.level = level;
     this.type = type;
     this.activity = activity;
-    this.description = parseDescription(description);
+    this.source = source;
+    this.traits = traits;
+    this.description = parseDescription(description, context);
+    this.rawDescription = description;
   }
 }
 
@@ -255,21 +263,29 @@ export class Heightening {
   constructor() {}
 }
 
-export type SpellList = {
+export interface SpellList {
   name: string;
   attack_attr: Attribute;
   dc_attr: Attribute;
   attack: number;
   dc: number;
   type: SpellListType;
-  fullTradition: boolean;
+  subtype: SpellListSubType;
   tradition: string;
   score: Score;
   known: Array<Array<Spell>>;
   heightenedKnown: Array<Array<Spell>>;
   slots: Array<number>;
   focus: Array<Spell>;
-};
+}
+
+export interface ApparitionList extends SpellList {
+  apparitions: Map<string, Ability>;
+  vesselSpells: Map<Ability, string>;
+  apparitionSkills: Map<Ability, string[]>;
+  apparitionSpells: Map<Ability, string[]>;
+  currentApparitions: string[];
+}
 
 export enum SpellListType {
   None = '',
@@ -277,6 +293,13 @@ export enum SpellListType {
   Spontaneous = 'Spontaneous',
   Innate = 'Innate',
   FocusOnly = 'Focus Only',
+}
+
+export enum SpellListSubType {
+  None = '',
+  List = 'List',
+  Tradition = 'Tradition',
+  Apparition = 'Apparition',
 }
 
 interface DataEntry {

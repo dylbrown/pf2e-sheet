@@ -1439,6 +1439,10 @@ div.spell-cost-optional > span {
     flex-grow: 2;
     min-height: 2em;
   }
+
+  .apparitionChoices .q-field__native {
+    font-size: 0.5em;
+  }
 }
 
 .popup-spells-table {

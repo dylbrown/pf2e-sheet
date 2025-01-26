@@ -303,6 +303,7 @@ export default class Character {
       this.class,
       context,
       abilityMod(this.scores[Score.Charisma]),
+      this.abilities,
     );
 
     return [];

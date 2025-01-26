@@ -21,10 +21,7 @@
           :proficiency="character.attributes[skill].proficiency"
         />
       </template>
-      <template
-        v-for="[name, lore] of Object.entries(character.lore)"
-        :key="name"
-      >
+      <template v-for="[name, lore] of filteredLores" :key="name">
         <div class="skill-label lore-label">
           <ClickableAttribute :lore="name" :character="character" />
         </div>
@@ -47,9 +44,38 @@ import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vu
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import type Character from 'src/character/character';
 import * as Util from 'src/character/util';
-import { skills, sfSkills } from 'src/character/model';
+import {
+  skills,
+  sfSkills,
+  SpellListSubType,
+  ApparitionList,
+} from 'src/character/model';
+import { computed, reactive } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   character: Character;
 }>();
+const aList = props.character.spells.lists.find(
+  (l) => l.subtype == SpellListSubType.Apparition,
+) as ApparitionList | undefined;
+
+const curr = aList ? reactive(aList.currentApparitions) : undefined;
+const filteredLores = computed(() => {
+  const checkLore = (lore: string) => {
+    if (!aList || !aList.apparitions || !curr) return true;
+    if (
+      aList.apparitions.values().some((a) => {
+        return (
+          !curr.includes(a.name) &&
+          aList.apparitionSkills.get(a)?.includes(lore.toLowerCase())
+        );
+      })
+    )
+      return false;
+    return true;
+  };
+  return Object.entries(props.character.lore).filter(([lore]) =>
+    checkLore(lore),
+  );
+});
 </script>

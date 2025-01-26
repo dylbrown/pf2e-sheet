@@ -11,7 +11,7 @@
     :hide-header="!preparing"
     hide-bottom
     :rows-per-page-options="[0]"
-    :filter="[showHeightened]"
+    :filter="[showHeightened, filter]"
     :filter-method="filterMethod"
     binary-state-sort
     :pagination="{ sortBy: 'name' }"
@@ -130,6 +130,7 @@ const props = defineProps<{
   charName?: string;
   notifier?: number;
   extraClass?: string;
+  filter?: (spell: Spell) => boolean;
 }>();
 
 defineEmits(['select']);
@@ -142,6 +143,7 @@ const filterMethod = (spells: readonly Spell[]) => {
   return spells.filter((s) => {
     if (!showHeightened.value && props.isHeightened && props.isHeightened(s))
       return false;
+    if (props.filter && props.filter(s) == false) return false;
     if (!showLegacy.value && s.name.includes('ᴸ')) return false;
     if (targets.value != null && targets.value.length > 0) {
       if (

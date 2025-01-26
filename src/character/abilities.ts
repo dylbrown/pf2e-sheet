@@ -1,4 +1,4 @@
-import type { Ability } from './model';
+import { Ability } from './model';
 import { AbilityType, Action, Source, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
@@ -44,16 +44,17 @@ export default class Abilities extends Array<Ability> {
   }
 
   loadFeat(feature: any, type: AbilityType, context: vm.Context) {
-    const feat: Ability = {
-      name: feature.name ?? '',
-      id: feature.id ?? -1,
-      level: feature.level ?? -1,
-      type: type,
-      source: Source.bank.get(feature.content_source_id),
-      description: Util.parseDescription(feature.description, context),
-      activity: feature.actions != null,
-      traits: Trait.bank.map(feature.traits),
-    };
+    const feat = new Ability(
+      feature.name ?? '',
+      feature.id ?? -1,
+      feature.level ?? -1,
+      type,
+      feature.actions != null,
+      Source.bank.get(feature.content_source_id),
+      Trait.bank.map(feature.traits),
+      feature.description,
+      context,
+    );
     if (
       type == AbilityType.GeneralFeat &&
       feature.traits &&
@@ -142,17 +143,17 @@ export default class Abilities extends Array<Ability> {
           )
             continue;
 
-          const feat: Ability = {
-            name: feature.name ?? '',
-            id: feature.id ?? -1,
-            level: feature.level ?? -1,
-            type: AbilityType.ClassFeature,
-            source: Source.bank.dummy(Util.makeSource(feature.contentSrc)),
-            description: Util.parseDescription(feature.description),
-            activity: false,
-            traits: [],
-            code: feature.code ?? '',
-          };
+          const feat = new Ability(
+            feature.name ?? '',
+            feature.id ?? -1,
+            feature.level ?? -1,
+            AbilityType.ClassFeature,
+            false,
+            Source.bank.dummy(Util.makeSource(feature.contentSrc)),
+            [],
+            feature.description,
+          );
+          feat.code = feature.code ?? '';
           if (feat.code) this.checkConditionals(feat.code);
           this.push(feat);
         }
@@ -177,21 +178,21 @@ export default class Abilities extends Array<Ability> {
               break;
           }
         }
-        const feat: Ability = {
-          name: entry.value?.name ?? '',
-          id: entry.value?.id ?? -1,
-          level: entry.sourceLevel ?? -1,
-          type: type,
-          source: Source.None,
-          description: Util.parseDescription(entry.value?.description),
-          activity: cost != Action.None,
-          traits: [],
-          cost: cost,
-          frequency: entry.value?.frequency,
-          requirements: entry.value?.requirements,
-          trigger: entry.value?.trigger,
-          code: entry.value?.code ?? '',
-        };
+        const feat = new Ability(
+          entry.value?.name ?? '',
+          entry.value?.id ?? -1,
+          entry.sourceLevel ?? -1,
+          type,
+          cost != Action.None,
+          Source.None,
+          [],
+          entry.value?.description,
+        );
+        feat.cost = cost;
+        feat.frequency = entry.value?.frequency;
+        feat.requirements = entry.value?.requirements;
+        feat.trigger = entry.value?.trigger;
+        feat.code = entry.value?.code ?? '';
         promises.push(Wanderer.loadFeat(feat));
         if (feat.code) this.checkConditionals(feat.code);
         this.push(feat);

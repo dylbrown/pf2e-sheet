@@ -28,7 +28,12 @@
               {{ list.dc }}
             </div>
           </div>
-          <template v-if="list.focus.length > 0">
+          <template
+            v-if="
+              list.focus.length > 0 &&
+              list.subtype != SpellListSubType.Apparition
+            "
+          >
             <div class="spells-header">Focus Spells</div>
             <SpellsTable
               :spells="list.focus"
@@ -67,7 +72,21 @@
               </template>
             </div>
           </template>
-          <template v-if="list.type == SpellListType.Spontaneous">
+          <ApparitionSpells
+            v-if="
+              list.type == SpellListType.Spontaneous &&
+              list.subtype == SpellListSubType.Apparition
+            "
+            :character="character"
+            :list="list as ApparitionList"
+            :notifier="notifier"
+          />
+          <template
+            v-if="
+              list.type == SpellListType.Spontaneous &&
+              list.subtype != SpellListSubType.Apparition
+            "
+          >
             <div class="spells-header">Spontaneous Spells</div>
             <div class="pip-counters">
               <template
@@ -133,8 +152,13 @@
 
 <script setup lang="ts">
 import * as Util from 'src/character/util';
-import { SpellListType } from 'src/character/model';
+import {
+  ApparitionList,
+  SpellListSubType,
+  SpellListType,
+} from 'src/character/model';
 import type Character from 'src/character/character';
+import ApparitionSpells from './ApparitionSpells.vue';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';
 import SpellSlot from './SpellSlot.vue';

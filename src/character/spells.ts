@@ -1,10 +1,11 @@
-import type { Score, SpellList } from './model';
+import type { Ability, ApparitionList, Score, SpellList } from './model';
 import {
   Action,
   Attribute,
   Heightening,
   Source,
   Spell,
+  SpellListSubType,
   SpellListType,
   Trait,
 } from './model';
@@ -12,6 +13,7 @@ import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
 import type vm from 'node:vm';
+import Abilities from './abilities';
 
 export default class Spells {
   focusPoints = 0;
@@ -29,7 +31,7 @@ export default class Spells {
         attack: 0,
         dc: 10,
         type: SpellListType.None,
-        fullTradition: false,
+        subtype: SpellListSubType.None,
         known: [[], [], [], [], [], [], [], [], [], [], []],
         heightenedKnown: [[], [], [], [], [], [], [], [], [], [], []],
         slots: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -49,6 +51,7 @@ export default class Spells {
     className: string,
     context: vm.Context,
     chaMod: number,
+    abilities: Abilities,
   ) {
     for (const entry of content.spells.all) {
       const list = this.getOrCreateSpellsList(
@@ -69,8 +72,13 @@ export default class Spells {
         (capitalize(
           entry.source.type.split('-')[0].toLowerCase(),
         ) as SpellListType) ?? SpellListType.None;
-      list.fullTradition =
-        entry.source.type.split('-')[1].toLowerCase() == 'tradition';
+      if (entry.source.type.split('-')[1].toLowerCase() == 'tradition') {
+        list.subtype = SpellListSubType.Tradition;
+      } else if (list.type == SpellListType.Prepared) {
+        list.subtype = SpellListSubType.List;
+      } else if (list.name.toLowerCase().endsWith('apparition')) {
+        list.subtype = SpellListSubType.Apparition;
+      }
       list.tradition = capitalize(entry.source.tradition.toLowerCase());
       list.score = Util.getScore(entry.source.attribute.split('_')[1]);
     }
@@ -114,15 +122,100 @@ export default class Spells {
       this.addSpell(list, spell);
     }
 
-    if (this.lists.some((l) => l.fullTradition)) {
-      const allSpells: Array<Spell> = Object.values(content.all_spells).map(
-        (s: any) => this.makeSpell(s, context, ''),
-      );
+    if (
+      this.lists.some((l) =>
+        [SpellListSubType.Tradition, SpellListSubType.Apparition].includes(
+          l.subtype,
+        ),
+      )
+    ) {
+      const allSpells = new Map<string, Spell>();
+      Object.values(content.all_spells).forEach((s: any) => {
+        const spell = this.makeSpell(s, context, '');
+        allSpells.set(spell.name.toLowerCase(), spell);
+      });
       for (const list of this.lists) {
-        if (list.fullTradition) {
+        if (list.subtype == SpellListSubType.Tradition) {
           allSpells
+            .values()
             .filter((s) => s.traditions.includes(list.tradition.toLowerCase()))
             .forEach((s) => this.addSpell(list, s));
+        } else if (list.subtype == SpellListSubType.Apparition) {
+          const apparitionList = list as ApparitionList;
+          apparitionList.apparitions = new Map<string, Ability>();
+          apparitionList.currentApparitions = new Array<string>();
+          abilities.forEach((a) => {
+            if (a.traits.some((t) => t.id == 4092))
+              apparitionList.apparitions.set(a.name, a);
+          });
+          abilities.excluded.forEach((a) => {
+            if (a.traits.some((t) => t.id == 4092))
+              apparitionList.apparitions.set(a.name, a);
+          });
+          apparitionList.apparitionSkills = new Map<Ability, string[]>();
+          apparitionList.apparitionSpells = new Map<Ability, string[]>();
+          apparitionList.vesselSpells = new Map<Ability, string>();
+          for (const apparition of apparitionList.apparitions.values()) {
+            const apparitionSkills = new Array<string>();
+            const apparitionSpells = new Array<string>();
+            apparitionList.apparitionSkills.set(apparition, apparitionSkills);
+            apparitionList.apparitionSpells.set(apparition, apparitionSpells);
+            const desc = apparition.rawDescription;
+            const APPARITION_SKILLS = 'Apparition Skill';
+            const APPARITION_SPELL = 'Apparition Spells';
+            const VESSEL_SPELL = 'Vessel Spell';
+            const skillIndex =
+              desc.indexOf(APPARITION_SKILLS) + APPARITION_SKILLS.length;
+            const apparitionIndex =
+              desc.indexOf(APPARITION_SPELL, skillIndex) +
+              APPARITION_SPELL.length;
+            const vesselIndex =
+              desc.indexOf(VESSEL_SPELL, apparitionIndex) + VESSEL_SPELL.length;
+            for (
+              let nextSkill = desc.indexOf(' ', skillIndex);
+              nextSkill != -1 &&
+              nextSkill < apparitionIndex - APPARITION_SPELL.length;
+              nextSkill = desc.indexOf(
+                ' ',
+                desc.indexOf(' ', desc.indexOf('Lore', nextSkill)),
+              )
+            ) {
+              const skill = desc.substring(
+                nextSkill + 1,
+                desc.indexOf('Lore', nextSkill + 1) + 4,
+              );
+              apparitionSkills.push(skill.toLowerCase().replaceAll('-', ' '));
+            }
+            for (
+              let nextSpell = desc.indexOf('[', apparitionIndex);
+              nextSpell != -1 && nextSpell < vesselIndex;
+              nextSpell = desc.indexOf('[', nextSpell + 1)
+            ) {
+              const spellName = desc.substring(
+                nextSpell + 1,
+                desc.indexOf(']', nextSpell),
+              );
+              apparitionSpells.push(
+                spellName.toLowerCase().replaceAll('’', "'"),
+              );
+            }
+            const open = desc.indexOf('[', vesselIndex);
+            const vesselSpellName = desc.substring(
+              open + 1,
+              desc.indexOf(']', open),
+            );
+            const vesselSpell = allSpells.get(
+              vesselSpellName.toLowerCase().replaceAll('’', "'"),
+            );
+            if (vesselSpell) {
+              apparitionList.vesselSpells.set(apparition, vesselSpell.name);
+              list.focus.push(vesselSpell);
+            } else {
+              console.log(
+                `Animist: Could not find vessel spell ${vesselSpellName} for apparition ${apparition.name}!`,
+              );
+            }
+          }
         }
       }
     }
