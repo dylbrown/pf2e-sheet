@@ -213,13 +213,26 @@ export default class Character {
     // Weapons
     const attackMap = new Map<string, Weapon>();
     for (const entry of data?.content?.weapons ?? []) {
-      const damage =
+      let damage =
         entry.stats.damage.dice.toString() +
         entry.stats.damage.die +
         '+' +
         entry.stats.damage.bonus.total +
         ' ' +
         entry.stats.damage.damageType; // TODO: Support extra types
+      for (const otherDamage of entry.stats.damage.other ?? []) {
+        damage += ' + ';
+        let dice = false;
+        if (otherDamage.dice > 0 && otherDamage.die != null) {
+          damage += otherDamage.dice + otherDamage.die;
+          dice = true;
+        }
+        if (otherDamage.bonus > 0) {
+          if (dice) damage += '+';
+          damage += otherDamage.bonus;
+        }
+        damage += ' ' + otherDamage.damageType.replaceAll('persistent ', 'p.');
+      }
       const attack: Weapon = {
         name: entry.item.name,
         id: entry.item.id,
