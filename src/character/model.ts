@@ -168,26 +168,104 @@ export const weaponsAndArmor: { [s: string]: Attribute } = {
   HEAVY_ARMOR: Attribute.HeavyArmor,
 };
 
-export interface Item {
-  name: string;
-  id: number;
-  instanceID: string;
-  count: number;
-  weight: string;
-  traits: Trait[];
-  weapon: boolean;
-  description: string;
-  source: Source;
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
+
+export type Verifier<T> = (t: Partial<Mutable<T>>) => t is Mutable<T>;
+
+export interface Builder<T> {
+  partial: Partial<Mutable<T>>;
+  build(): T;
+}
+abstract class ABuilder<T> {
+  partial: Partial<Mutable<T>>;
+  private ctor: (t: Mutable<T>) => T;
+
+  protected constructor(
+    ctor: (t: Mutable<T>) => T,
+    partial: Partial<Mutable<T>> = {},
+  ) {
+    this.ctor = ctor;
+    this.partial = partial;
+  }
+
+  private verify<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends { [P in K]?: any },
+    K extends PropertyKey,
+  >(obj: T, ...keys: K[]): obj is T & { [P in K]-?: Exclude<T[P], undefined> } {
+    return keys.every((k) => obj[k] !== undefined);
+  }
+
+  build(): T {
+    if (!this.verify(this.partial))
+      throw Error('Failed to verify: ' + this.partial);
+    return this.partial;
+  }
 }
 
-export interface Weapon extends Item {
-  attack: string;
-  damage: string;
-  hands: string;
-  range?: number;
-  reload?: string;
-  capacity?: number;
-  usage?: number;
+export class Item {
+  readonly name: string;
+  readonly id: number;
+  readonly instanceID: string;
+  readonly count: number;
+  readonly weight: string;
+  readonly traits: Trait[];
+  readonly weapon: boolean;
+  readonly description: string;
+  readonly source: Source;
+
+  protected constructor(i: Mutable<Item>) {
+    this.name = i.name;
+    this.id = i.id;
+    this.instanceID = i.instanceID;
+    this.count = i.count;
+    this.weight = i.weight;
+    this.traits = i.traits;
+    this.weapon = i.weapon;
+    this.description = i.description;
+    this.source = i.source;
+  }
+  private static verify(t: Partial<Mutable<Item>>): t is Mutable<Item> {
+    throw new Error('Method not implemented.');
+  }
+
+  static Builder = class extends ABuilder<Item> {
+    constructor() {
+      super((t: Mutable<Item>) => new Item(t));
+    }
+  };
+}
+
+export class Weapon extends Item {
+  readonly attack: string;
+  readonly damage: string;
+  readonly hands: string;
+  readonly range?: number;
+  readonly reload?: string;
+  readonly capacity?: number;
+  readonly usage?: number;
+
+  protected constructor(w: Mutable<Weapon>) {
+    super(w);
+    this.attack = w.attack;
+    this.damage = w.damage;
+    this.hands = w.hands;
+    if (w.range) this.range = w.range;
+    if (w.reload) this.reload = w.reload;
+    if (w.capacity) this.capacity = w.capacity;
+    if (w.usage) this.usage = w.usage;
+  }
+
+  static WBuilder = class extends ABuilder<Weapon> {
+    constructor(b?: Builder<Item>) {
+      super((t: Mutable<Weapon>) => new Weapon(t), b?.partial);
+      if (b) {
+        b.partial = {};
+      }
+    }
+  };
 }
 
 export class Ability {

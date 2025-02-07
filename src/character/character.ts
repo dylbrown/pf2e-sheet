@@ -1,6 +1,6 @@
 import { capitalize } from 'vue';
 import Abilities from './abilities';
-import type { Weapon, Item } from './model';
+import { Weapon, Item, Builder } from './model';
 import {
   Proficiency,
   Attribute,
@@ -233,7 +233,8 @@ export default class Character {
         }
         damage += ' ' + otherDamage.damageType.replaceAll('persistent ', 'p.');
       }
-      const attack: Weapon = {
+      const b = new Weapon.WBuilder();
+      b.partial = {
         name: entry.item.name,
         id: entry.item.id,
         instanceID: entry.id,
@@ -246,12 +247,18 @@ export default class Character {
         weapon: true,
         description: entry.item.description,
         source: Source.bank.get(entry.item.content_source_id),
+        range: entry.item.meta_data.range,
+        reload: entry.item.meta_data.reload,
       };
-      attack.range = entry.item.meta_data.range;
-      attack.reload = entry.item.meta_data.reload;
       if (entry.item.meta_data.starfinder) {
-        attack.capacity = entry.item.meta_data.starfinder.capacity;
-        attack.usage = entry.item.meta_data.starfinder.usage;
+        b.partial.capacity = entry.item.meta_data.starfinder.capacity;
+        b.partial.usage = entry.item.meta_data.starfinder.usage;
+      }
+      const attack = b.build();
+      if (!attack) {
+        console.log(b.partial.name + ' failed to build!');
+        console.log(entry);
+        continue;
       }
       attackMap.set(attack.name, attack);
       this.combat.attacks.push(attack);
@@ -266,11 +273,19 @@ export default class Character {
         continue;
       let item: Item | undefined = attackMap.get(entry.name);
       if (item) {
-        item.id = entry.item.id;
-        item.count = Number(entry.item.meta_data.quantity);
-        item.weight = entry.item.bulk ?? '';
+        const b = new Weapon.WBuilder();
+        Object.assign(b.partial, item);
+        b.partial.id = entry.item.id;
+        b.partial.count = Number(entry.item.meta_data.quantity);
+        b.partial.weight = entry.item.bulk ?? '';
+        const w = b.build();
+        if (w) {
+          item = w;
+          attackMap.set(w.name, w);
+        }
       } else {
-        item = {
+        const b = new Item.Builder();
+        b.partial = {
           name: entry.item.name,
           id: entry.item.id,
           instanceID: entry.id,
@@ -281,12 +296,11 @@ export default class Character {
           description: parseDescription(entry.item.description),
           source: Source.bank.get(entry.item.content_source_id),
         };
+        item = b.build();
       }
-      if (item.weapon) {
-        // const weapon = item as Weapon;
-        // TODO: Rune check
-      }
-      this.items.push(item);
+      if (item) this.items.push(item);
+      else
+        console.log((entry?.item?.name ?? 'unknown item ') + 'failed to load');
     }
 
     // Bulk
@@ -420,14 +434,17 @@ export default class Character {
         proficiency -
         Math.floor((this.scores[this.attributes[attr].score] - 10) / 2);
     }
-    const attackMap = new Map<string, Weapon>();
+    const attackMap = new Map<string, Builder<Weapon>>();
+    const itemBuilders: Array<Builder<Item>> = [];
+    const itemPromises: Array<Promise<void>> = [];
 
     const attacks: any = JSON.parse(data.stats?.weapons);
     if (attacks instanceof Array) {
       for (const entry of attacks) {
         if (entry.Name.includes('Improvised') || attackMap.has(entry.Name))
           continue;
-        const attack: Weapon = {
+        const wb = new Weapon.WBuilder();
+        wb.partial = {
           name: entry.Name,
           id: -1,
           instanceID: '',
@@ -441,21 +458,23 @@ export default class Character {
           description: '',
           source: Source.None,
         };
-        attackMap.set(attack.name, attack);
-        this.combat.attacks.push(attack);
+        if (wb.partial.name) attackMap.set(wb.partial.name, wb);
+        itemBuilders.push(wb);
       }
     }
     if (data.invItems instanceof Array) {
       for (const entry of data.invItems) {
         if (entry.name.includes('Improvised') || entry.name.includes('Fist'))
           continue;
-        let item: Item | undefined = attackMap.get(entry.name);
-        if (item) {
-          item.id = entry.itemID;
-          item.count = Number(entry.quantity);
-          item.weight = entry.bulk > 0 ? entry.bulk : 0;
+        const wb = attackMap.get(entry.name);
+        let b: Builder<Item> | undefined = wb;
+        if (b) {
+          b.partial.id = entry.itemID;
+          b.partial.count = Number(entry.quantity);
+          b.partial.weight = entry.bulk > 0 ? entry.bulk : 0;
         } else {
-          item = {
+          b = new Item.Builder();
+          b.partial = {
             name: entry.name,
             id: entry.itemID,
             instanceID: '',
@@ -467,20 +486,25 @@ export default class Character {
             source: Source.None,
           };
         }
-        if (item.weapon) {
-          const weapon = item as Weapon;
+        if (wb) {
           // Rune Check
           for (let i = 1; i <= 4; i++) {
             const key = 'propRune' + i + 'ID';
             if (entry[key]) {
-              promises.push(Wanderer.loadRune(weapon, entry[key]));
+              itemPromises.push(Wanderer.loadRune(wb, entry[key]));
             }
           }
         }
-        this.items.push(item);
-        promises.push(Wanderer.loadItem(item));
+        itemPromises.push(Wanderer.loadItem(b));
       }
     }
+    promises.push(...itemPromises);
+    promises.push(
+      Promise.all(itemPromises).then(() => {
+        this.items.push(...itemBuilders.map((b) => b.build()));
+        this.combat.attacks.push(...attackMap.values().map((wb) => wb.build()));
+      }),
+    );
     const metaData = {
       spells: new Array<any>(),
       class_features: new Array<any>(),

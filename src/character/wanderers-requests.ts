@@ -1,5 +1,5 @@
 import { LocalStorage } from 'quasar';
-import type { Ability, Item, Spell, Weapon } from './model';
+import { Ability, Builder, Item, Spell, Weapon } from './model';
 import { Action, Source, Trait } from './model';
 import * as Util from './util';
 import runeLookupJSON from './examples/rune_lookup.json';
@@ -72,23 +72,24 @@ export async function loadFeat(feat: Ability) {
   );
 }
 
-export async function loadItem(item: Item) {
+export async function loadItem(b: Builder<Item>) {
+  if (!b.partial.id) return;
   const data = await load(
     '/.netlify/functions/wanderers-request?type=item&id=',
     'item',
-    item.id,
+    b.partial.id,
   );
   const entry = data.item;
-  item.traits = data.traits.map(
+  b.partial.traits = data.traits.map(
     (o: { name: string; description: string; id: number }) =>
       Trait.bank.createIfAbsent(o.name, o.id, o.description),
   );
-  if (item.weapon) {
-    const weapon = item as Weapon;
-    weapon.hands = entry.hands == 'TWO' ? '2' : '1';
+  if (b.partial.weapon) {
+    const wb = b as Builder<Weapon>;
+    wb.partial.hands = entry.hands == 'TWO' ? '2' : '1';
     if (entry.weapons?.isRanged) {
-      weapon.range = entry.weapons?.rangedRange;
-      weapon.reload = entry.weapons?.rangedReload;
+      wb.partial.range = entry.weapons?.rangedRange;
+      wb.partial.reload = entry.weapons?.rangedReload;
     }
   }
 }
@@ -167,7 +168,7 @@ export async function loadSpell(spell: Spell) {
           .join(' ')
       : '';
 }
-export async function loadRune(weapon: Weapon, key: string) {
+export async function loadRune(wb: Builder<Weapon>, key: string) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=item&id=',
     'item',
@@ -183,7 +184,7 @@ export async function loadRune(weapon: Weapon, key: string) {
 
     switch (key) {
       case 'DEFAULT-ON-HIT-DAMAGE': {
-        weapon.damage += value;
+        wb.partial.damage += value;
       }
     }
   }
