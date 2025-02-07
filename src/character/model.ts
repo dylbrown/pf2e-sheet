@@ -246,6 +246,7 @@ export class Weapon extends Item {
   readonly reload?: string;
   readonly capacity?: number;
   readonly usage?: number;
+  readonly runes: Rune[];
 
   protected constructor(w: Mutable<Weapon>) {
     super(w);
@@ -256,6 +257,7 @@ export class Weapon extends Item {
     if (w.reload) this.reload = w.reload;
     if (w.capacity) this.capacity = w.capacity;
     if (w.usage) this.usage = w.usage;
+    this.runes = w.runes ?? [];
   }
 
   static WBuilder = class extends ABuilder<Weapon> {
@@ -266,6 +268,56 @@ export class Weapon extends Item {
       }
     }
   };
+}
+
+export class DamageType {
+  private _shortName: string;
+  readonly name: string;
+  get shortName(): string {
+    return this._shortName;
+  }
+  private constructor(name: string, shortName: string) {
+    this.name = name;
+    this._shortName = shortName;
+  }
+
+  private static damageTypes: { [name: string]: DamageType } = {};
+  private static nameKeys: { [name: string]: string | null } = {};
+  static get(name: string): DamageType {
+    let dt = this.damageTypes[name.toLowerCase()];
+    if (dt) return dt;
+    const lastSpace = name.lastIndexOf(' ');
+    let key = name.substring(0, lastSpace + 1);
+    for (let i = 1; i <= name.length; i++) {
+      const letter = name.substring(lastSpace + i, lastSpace + i + 1);
+      key += i == 1 ? letter.toUpperCase() : letter.toLowerCase();
+      const nameKey = this.nameKeys[key];
+      if (nameKey === null) continue;
+      else if (nameKey) {
+        const conflict = this.damageTypes[nameKey.toLowerCase()];
+        if (!conflict) break;
+        conflict._shortName += conflict.name[conflict._shortName.length];
+        delete this.nameKeys[key];
+        this.nameKeys[conflict._shortName] = nameKey;
+      } else break;
+    }
+    dt = new DamageType(name, key);
+    this.damageTypes[name.toLowerCase()] = dt;
+    this.nameKeys[key] = name;
+    return dt;
+  }
+}
+DamageType.get('Slashing');
+DamageType.get('Bludgeoning');
+DamageType.get('Piercing');
+
+export interface Rune {
+  bonus: number;
+  damageType: DamageType;
+  dice: number;
+  die: string;
+  name: string;
+  description: string;
 }
 
 export class Ability {
@@ -439,9 +491,11 @@ class StaticBank<T extends DataEntry> {
   }
 }
 export class Trait extends AbstractDataEntry {
-  public static readonly bank = new StaticBank<Trait>(
-    (e) => new Trait(e.name, e.id, e.description),
-  );
+  public static readonly bank = new StaticBank<Trait>((e) => {
+    if (e.description.includes(`deal ${e.name.toLowerCase()} damage`))
+      DamageType.get(e.name);
+    return new Trait(e.name, e.id, e.description);
+  });
 }
 export class Source extends AbstractDataEntry {
   public static readonly bank = new StaticBank<Source>(

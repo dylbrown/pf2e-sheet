@@ -11,7 +11,28 @@
         </div>
         <div class="line">
           <div class="underlined weapon-info bounded-line" data-max="1.8">
-            {{ weapon.damage }}
+            <span class="list-flow"
+              >{{ weapon.damage
+              }}<template v-for="rune of weapon.runes ?? []" :key="rune.name">
+                <ClickableRune :rune="rune" v-if="interactive">
+                  &nbsp;+ {{ rune.dice }}{{ rune.die
+                  }}<template v-if="rune.bonus > 0">
+                    + {{ rune.bonus }}</template
+                  >
+                  {{
+                    rune.damageType.shortName.replaceAll('persistent ', 'p.')
+                  }}</ClickableRune
+                ><template v-else>
+                  &nbsp;+ {{ rune.dice }}{{ rune.die
+                  }}<template v-if="rune.bonus > 0">
+                    + {{ rune.bonus }}</template
+                  >
+                  {{
+                    rune.damageType.name.replaceAll('persistent ', 'p.')
+                  }}</template
+                >
+              </template></span
+            >
           </div>
           <div class="labello compact">Damage</div>
         </div>
@@ -35,12 +56,31 @@
           <div class="underlined weapon-info">{{ weapon.usage }}</div>
           <div class="labello compact">Usage</div>
         </div>
+        <div class="line" v-if="weapon.runes.length > 0">
+          <div
+            class="underlined weapon-traits bounded-line"
+            :data-pass="3"
+            :data-max="1.5"
+          >
+            <span v-if="interactive" class="list-flow">
+              <template v-for="(rune, index) in weapon.runes" :key="rune.name">
+                <template v-if="index > 0">, </template>
+                <ClickableRune :rune="rune">{{ rune.name }}</ClickableRune>
+              </template>
+            </span>
+            <template v-else>{{
+              weapon.runes.map((r) => r.name).join(', ')
+            }}</template>
+          </div>
+          <div class="labello compact">Runes</div>
+        </div>
         <div class="line">
           <div
-            class="underlined weapon-traits bounded-line second-pass"
-            :data-max="interactive ? 0.8 : 1.5"
+            class="underlined weapon-traits bounded-line"
+            :data-pass="2"
+            :data-max="1.5"
           >
-            <span v-if="interactive">
+            <span v-if="interactive" class="list-flow">
               <template
                 v-for="(trait, index) in weapon.traits"
                 :key="trait.name"
@@ -62,6 +102,7 @@
 
 <script setup lang="ts">
 import type { Weapon } from 'src/character/model';
+import ClickableRune from './interactive/ClickableRune.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
 
 defineProps<{

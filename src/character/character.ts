@@ -1,6 +1,6 @@
 import { capitalize } from 'vue';
 import Abilities from './abilities';
-import { Weapon, Item, Builder } from './model';
+import { Weapon, Item, Builder, Rune, DamageType } from './model';
 import {
   Proficiency,
   Attribute,
@@ -211,28 +211,8 @@ export default class Character {
     }
 
     // Weapons
-    const attackMap = new Map<string, Weapon>();
+    const attackMap = new Map<string, Builder<Weapon>>();
     for (const entry of data?.content?.weapons ?? []) {
-      let damage =
-        entry.stats.damage.dice.toString() +
-        entry.stats.damage.die +
-        '+' +
-        entry.stats.damage.bonus.total +
-        ' ' +
-        entry.stats.damage.damageType; // TODO: Support extra types
-      for (const otherDamage of entry.stats.damage.other ?? []) {
-        damage += ' + ';
-        let dice = false;
-        if (otherDamage.dice > 0 && otherDamage.die != null) {
-          damage += otherDamage.dice + otherDamage.die;
-          dice = true;
-        }
-        if (otherDamage.bonus > 0) {
-          if (dice) damage += '+';
-          damage += otherDamage.bonus;
-        }
-        damage += ' ' + otherDamage.damageType.replaceAll('persistent ', 'p.');
-      }
       const b = new Weapon.WBuilder();
       b.partial = {
         name: entry.item.name,
@@ -241,7 +221,6 @@ export default class Character {
         count: -1,
         weight: '',
         attack: signed(entry.stats.attack_bonus.total[0]),
-        damage: damage,
         hands: entry.item.hands,
         traits: Trait.bank.map(entry.item.traits),
         weapon: true,
@@ -250,6 +229,30 @@ export default class Character {
         range: entry.item.meta_data.range,
         reload: entry.item.meta_data.reload,
       };
+      b.partial.damage =
+        entry.stats.damage.dice.toString() +
+        entry.stats.damage.die +
+        '+' +
+        entry.stats.damage.bonus.total +
+        ' ' +
+        entry.stats.damage.damageType;
+      const runes: Array<Rune> = [];
+      for (const otherDamage of entry.stats.damage.other ?? []) {
+        runes.push({
+          bonus: otherDamage.bonus,
+          damageType: DamageType.get(otherDamage.damageType),
+          dice: otherDamage.dice,
+          die: otherDamage.die,
+          name: otherDamage.source.substring(
+            otherDamage.source.indexOf('<') + 1,
+            otherDamage.source.indexOf('>'),
+          ),
+          description: parseDescription(
+            otherDamage.source.substring(otherDamage.source.indexOf('>') + 1),
+          ),
+        });
+      }
+      b.partial.runes = runes;
       if (entry.item.meta_data.starfinder) {
         b.partial.capacity = entry.item.meta_data.starfinder.capacity;
         b.partial.usage = entry.item.meta_data.starfinder.usage;
@@ -260,7 +263,7 @@ export default class Character {
         console.log(entry);
         continue;
       }
-      attackMap.set(attack.name, attack);
+      attackMap.set(attack.name, b);
       this.combat.attacks.push(attack);
     }
 
@@ -271,18 +274,12 @@ export default class Character {
         entry.item.name.includes('Fist')
       )
         continue;
-      let item: Item | undefined = attackMap.get(entry.name);
-      if (item) {
-        const b = new Weapon.WBuilder();
-        Object.assign(b.partial, item);
-        b.partial.id = entry.item.id;
-        b.partial.count = Number(entry.item.meta_data.quantity);
-        b.partial.weight = entry.item.bulk ?? '';
-        const w = b.build();
-        if (w) {
-          item = w;
-          attackMap.set(w.name, w);
-        }
+      const wb: Builder<Weapon> | undefined = attackMap.get(entry.name);
+      if (wb) {
+        wb.partial.id = entry.item.id;
+        wb.partial.count = Number(entry.item.meta_data.quantity);
+        wb.partial.weight = entry.item.bulk ?? '';
+        this.items.push(wb.build());
       } else {
         const b = new Item.Builder();
         b.partial = {
@@ -296,11 +293,8 @@ export default class Character {
           description: parseDescription(entry.item.description),
           source: Source.bank.get(entry.item.content_source_id),
         };
-        item = b.build();
+        this.items.push(b.build());
       }
-      if (item) this.items.push(item);
-      else
-        console.log((entry?.item?.name ?? 'unknown item ') + 'failed to load');
     }
 
     // Bulk

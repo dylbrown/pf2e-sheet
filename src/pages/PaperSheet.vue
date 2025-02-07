@@ -537,7 +537,7 @@ onMounted(() => {
   const boundedCheck = () => {
     if (!root.value) return;
     root.value
-      .querySelectorAll('.bounded-line:not(.second-pass)')
+      .querySelectorAll('.bounded-line:not([data-pass])')
       .forEach((val) => {
         const value = val as HTMLElement;
         let size = parseFloat(getComputedStyle(value).fontSize);
@@ -549,22 +549,28 @@ onMounted(() => {
           value.style.fontSize = size.toString() + 'px';
         }
       });
-    root.value.querySelectorAll('.bounded-line.second-pass').forEach((val) => {
-      const value = val as HTMLElement;
-      let size = parseFloat(getComputedStyle(value).fontSize);
-      const bound =
-        parseFloat(val.getAttribute('data-max') ?? '2.1') *
-        parseFloat(getComputedStyle(value).lineHeight);
-      const row = value.parentElement?.parentElement;
-      if (!row) return;
-      const oldHeight = row.offsetHeight;
-      while (oldHeight >= row.offsetHeight && value.offsetHeight < bound) {
-        size += 0.25;
+    for (let pass = 2; pass < 5; pass++) {
+      const elements = root.value.querySelectorAll(
+        `.bounded-line[data-pass="${pass}"]`,
+      );
+      if (elements.length == 0) break;
+      elements.forEach((val) => {
+        const value = val as HTMLElement;
+        let size = parseFloat(getComputedStyle(value).fontSize);
+        const bound =
+          parseFloat(val.getAttribute('data-max') ?? '2.1') *
+          parseFloat(getComputedStyle(value).lineHeight);
+        const row = value.parentElement?.parentElement;
+        if (!row) return;
+        const oldHeight = row.offsetHeight;
+        while (oldHeight >= row.offsetHeight && value.offsetHeight < bound) {
+          size += 0.25;
+          value.style.fontSize = size.toString() + 'px';
+        }
+        size -= 0.25;
         value.style.fontSize = size.toString() + 'px';
-      }
-      size -= 0.25;
-      value.style.fontSize = size.toString() + 'px';
-    });
+      });
+    }
   };
   boundedCheck();
   if (middleThird.value && abilities.value) {

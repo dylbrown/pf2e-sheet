@@ -690,8 +690,12 @@ div.action-label {
 .compact.labello {
   font-size: 0.4em;
 }
-.second-pass {
+.bounded-line[data-pass] {
   font-size: 0.4em;
+}
+.list-flow {
+  display: flex;
+  flex-flow: row wrap;
 }
 
 .underText {
