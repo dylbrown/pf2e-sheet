@@ -158,8 +158,8 @@ export default class Character {
         const name = speed.name.replaceAll(/SPEED_?/gi, '');
         if (speed.value.value == 0) return '';
         return name.length == 0
-          ? speed.value.value
-          : name + ' ' + speed.value.value;
+          ? speed.value.total
+          : name + ' ' + speed.value.total;
       })
       .filter((s: string) => s.length > 0)
       .join(', ');
