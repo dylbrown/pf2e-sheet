@@ -12,15 +12,38 @@
     }}
     <br />
     {{ Util.signed(attrEntry?.level ?? 0) }} from level
-    <br />
-    <template v-if="item">{{ item }} from item bonuses</template>
+    <template
+      v-for="[type, bonus] of Object.entries(c.bonuses).filter(
+        ([type, bonus]) => bonus > 0 || c.penalties[type as StatModType] < 0,
+      )"
+      :key="type"
+    >
+      <br />
+      <span
+        :class="
+          type != StatModType.Item ||
+          bonus > item ||
+          c.penalties[type as StatModType] < 0
+            ? bonus + c.penalties[type as StatModType] > 0
+              ? 'buffed'
+              : 'debuffed'
+            : ''
+        "
+        >{{ Util.signed(bonus + c.penalties[type as StatModType]) }} {{ type }}
+        {{
+          bonus + c.penalties[type as StatModType] > 0 ? 'bonus' : 'penalty'
+        }}</span
+      >
+    </template>
   </q-popup-proxy>
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
 import type Character from 'src/character/character';
 import { Attribute, Proficiency, Score } from 'src/character/model';
+import { calculateMods, StatModType } from 'src/character/modifiers';
 import * as Util from 'src/character/util';
+import { computed } from 'vue';
 
 const props = defineProps<{
   attribute?: Attribute;
@@ -53,11 +76,18 @@ const attrEntry = isAt
     ? props.character.lore[props.lore]
     : undefined;
 
-const item = Util.nonzero(
-  props.attribute
-    ? props.character.attributes[props.attribute].itemBonus
-    : props.lore
-      ? (props.character.lore[props.lore]?.itemBonus ?? 0)
-      : 0,
-);
+const item = props.attribute
+  ? props.character.attributes[props.attribute].itemBonus
+  : props.lore
+    ? (props.character.lore[props.lore]?.itemBonus ?? 0)
+    : 0;
+
+const c = computed(() => {
+  const [, bonuses, penalties] = calculateMods(
+    props.character.modifiers,
+    props.character.attributes,
+    props.attribute || Attribute.LoreChecks,
+  );
+  return { bonuses, penalties };
+});
 </script>

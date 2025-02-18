@@ -12,8 +12,18 @@
           <ClickableAttribute :attribute="skill" :character="character" />
         </div>
         <div class="line">
-          <div class="underlined-roll">
-            {{ Util.signed(character.attributes[skill].total) }}
+          <div
+            class="underlined-roll"
+            :class="
+              (modifiedSkill(skill) < character.attributes[skill].total
+                ? 'de'
+                : '') +
+              (modifiedSkill(skill) != character.attributes[skill].total
+                ? 'buffed'
+                : '')
+            "
+          >
+            {{ Util.signed(modifiedSkill(skill)) }}
           </div>
         </div>
         <ProficiencyDisplay
@@ -49,12 +59,20 @@ import {
   sfSkills,
   SpellListSubType,
   ApparitionList,
+  Attribute,
 } from 'src/character/model';
+import { applyMods } from 'src/character/modifiers';
 import { computed, reactive } from 'vue';
 
 const props = defineProps<{
   character: Character;
 }>();
+const mods = props.character.modifiers;
+
+const modifiedSkill = (skill: Attribute) => {
+  return applyMods(mods, props.character.attributes, skill);
+};
+
 const aList = props.character.spells.lists.find(
   (l) => l.subtype == SpellListSubType.Apparition,
 ) as ApparitionList | undefined;

@@ -1,6 +1,15 @@
-import { capitalize } from 'vue';
+import { capitalize, Reactive, reactive } from 'vue';
 import Abilities from './abilities';
-import { Weapon, Item, Builder, Rune, DamageType, ModEffect } from './model';
+import {
+  Weapon,
+  Item,
+  Builder,
+  Rune,
+  DamageType,
+  Scores,
+  Attributes,
+  Lores,
+} from './model';
 import {
   Proficiency,
   Attribute,
@@ -14,8 +23,9 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { abilityMod, getProficiency, parseDescription, signed } from './util';
+import { abilityMod, getProficiency, parseDescription } from './util';
 import vm from 'node:vm';
+import { ModEffect } from './modifiers';
 
 export default class Character {
   remaster = false;
@@ -50,15 +60,13 @@ export default class Character {
   };
   abilities = new Abilities();
   attributes: Attributes;
-  lore = {} as {
-    [lore: string]: AttributeEntry;
-  };
+  lore: Lores = {};
   items = Array<Item>();
   totalBulk = 0;
   bulkLimitBonus = 0;
   money = 0;
   spells = new Spells();
-  modifiers = Array<ModEffect>();
+  modifiers: Reactive<ModEffect[]>;
 
   constructor() {
     this.scores = {} as Scores;
@@ -74,6 +82,7 @@ export default class Character {
         proficiency: Proficiency.Untrained,
       };
     });
+    this.modifiers = reactive([]);
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -220,7 +229,7 @@ export default class Character {
         instanceID: entry.id,
         count: -1,
         weight: '',
-        attack: signed(entry.stats.attack_bonus.total[0]),
+        attack: parseInt(entry.stats.attack_bonus.total[0]),
         hands: entry.item.hands,
         traits: Trait.bank.map(entry.item.traits),
         weapon: true,
@@ -453,7 +462,7 @@ export default class Character {
           instanceID: '',
           count: -1,
           weight: '',
-          attack: entry.Bonus,
+          attack: parseInt(entry.Bonus),
           damage: entry.Damage,
           hands: '0',
           traits: [],
@@ -563,19 +572,3 @@ function parseAndSet(
     }
   }
 }
-
-type Scores = {
-  [score in Score]: number;
-};
-
-type AttributeEntry = {
-  total: number;
-  score: Score;
-  itemBonus: number;
-  level: number;
-  proficiency: Proficiency;
-};
-
-type Attributes = {
-  [attribute in Attribute]: AttributeEntry;
-};

@@ -130,17 +130,11 @@
 
 <script setup lang="ts">
 import Character from 'src/character/character';
-import {
-  Attribute,
-  ModEffect,
-  sfSkills,
-  skills,
-  StatMod,
-  StatModType,
-} from 'src/character/model';
+import { Attribute, saves, sfSkills, skills } from 'src/character/model';
 import { signed } from 'src/character/util';
 import { reactive, ref, watch } from 'vue';
 import * as LS from 'src/pages/localStorage';
+import { ModEffect, StatMod, StatModType } from 'src/character/modifiers';
 
 const props = defineProps<{
   character: Character;
@@ -152,6 +146,7 @@ const options_temp = [
   Attribute.Saves,
   Attribute.SkillChecks,
 ];
+options_temp.push(...saves);
 options_temp.push(...(props.character.starfinder ? sfSkills : skills));
 const OPTIONS = options_temp.map((s) => s as Attribute);
 const AttrLabel = (a: Attribute) =>
@@ -164,13 +159,15 @@ const editingModEffect = ref<number | undefined>();
 const WIPmodEffect = ref<ModEffect>(new ModEffect());
 WIPmodEffect.value.statMods.push(new StatMod());
 
-const mods = reactive(
-  LS.loadOrDefault(
-    props.character.name,
-    props.character.modifiers,
-    'modifiers',
-  ),
-);
+const loadedMods = LS.load<ModEffect[]>(props.character.name, 'modifiers');
+if (loadedMods != null) {
+  for (const mod of loadedMods) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.character.modifiers.push(ModEffect.clone(mod));
+  }
+}
+const mods = props.character.modifiers;
+
 watch(mods, (val) => {
   LS.save(props.character.name, val, 'modifiers');
 });

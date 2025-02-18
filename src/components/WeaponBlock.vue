@@ -6,7 +6,15 @@
     <div class="flex-column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
-          <div class="underlined weapon-info">{{ weapon.attack }}</div>
+          <div
+            class="underlined weapon-info"
+            :class="
+              (modifiedAttack < weapon.attack ? 'de' : '') +
+              (modifiedAttack != weapon.attack ? 'buffed' : '')
+            "
+          >
+            {{ signed(modifiedAttack) }}
+          </div>
           <div class="labello compact">Attack</div>
         </div>
         <div class="line">
@@ -104,9 +112,20 @@
 import type { Weapon } from 'src/character/model';
 import ClickableRune from './interactive/ClickableRune.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
+import Character from 'src/character/character';
+import { applyAttackMods } from 'src/character/modifiers';
+import { signed } from 'src/character/util';
+import { computed } from 'vue';
 
-defineProps<{
+const { character, weapon, interactive } = defineProps<{
+  character: Character;
   weapon: Weapon;
   interactive: boolean;
 }>();
+
+const modifiedAttack = computed(() => {
+  return interactive
+    ? applyAttackMods(character.modifiers, weapon.attack)
+    : weapon.attack;
+});
 </script>

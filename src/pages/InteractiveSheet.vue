@@ -206,8 +206,18 @@
                 <ClickableAttribute :attribute="attr" :character="character" />
               </div>
               <div class="line">
-                <div class="underlined-roll">
-                  {{ Util.signed(character.attributes[attr].total) }}
+                <div
+                  class="underlined-roll"
+                  :class="
+                    (moddedAttr(attr) < character.attributes[attr].total
+                      ? 'de'
+                      : '') +
+                    (moddedAttr(attr) != character.attributes[attr].total
+                      ? 'buffed'
+                      : '')
+                  "
+                >
+                  {{ Util.signed(moddedAttr(attr)) }}
                 </div>
                 <div class="labello">Mod</div>
               </div>
@@ -502,12 +512,17 @@ import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
 import PipCounter from 'src/components/PipCounter.vue';
 import StatModsButton from 'src/components/interactive/StatModsButton.vue';
 import WeaponsList from 'src/components/interactive/WeaponsList.vue';
+import { applyMods } from 'src/character/modifiers';
 
 document.documentElement.classList.add('interactive');
 
 const props = defineProps<{
   character: Character;
 }>();
+
+const moddedAttr = (attr: Attribute) => {
+  return applyMods(props.character.modifiers, props.character.attributes, attr);
+};
 
 const root = ref<HTMLDivElement | null>(null);
 const abilityBlock = ref<HTMLDivElement | null>(null);
@@ -619,6 +634,6 @@ const reset = () => {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import '../css/sheet.scss';
 </style>

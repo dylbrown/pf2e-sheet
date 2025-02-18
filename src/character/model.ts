@@ -85,6 +85,8 @@ export enum Attribute {
   DamageRolls,
   Saves,
   SkillChecks,
+  AC,
+  LoreChecks,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -161,6 +163,22 @@ export const sfSkills = [
   Attribute.Thievery,
 ];
 
+export const attacks = [
+  Attribute.UnarmedAttacks,
+  Attribute.SimpleWeapons,
+  Attribute.MartialWeapons,
+  Attribute.AdvancedWeapons,
+];
+
+export const saves = [Attribute.Fortitude, Attribute.Reflex, Attribute.Will];
+
+export const ac = [
+  Attribute.UnarmoredDefense,
+  Attribute.LightArmor,
+  Attribute.MediumArmor,
+  Attribute.HeavyArmor,
+];
+
 export const weaponsAndArmor: { [s: string]: Attribute } = {
   UNARMED_ATTACKS: Attribute.UnarmedAttacks,
   SIMPLE_WEAPONS: Attribute.SimpleWeapons,
@@ -170,6 +188,26 @@ export const weaponsAndArmor: { [s: string]: Attribute } = {
   LIGHT_ARMOR: Attribute.LightArmor,
   MEDIUM_ARMOR: Attribute.MediumArmor,
   HEAVY_ARMOR: Attribute.HeavyArmor,
+};
+
+export type Scores = {
+  [score in Score]: number;
+};
+
+export type AttributeEntry = {
+  total: number;
+  score: Score;
+  itemBonus: number;
+  level: number;
+  proficiency: Proficiency;
+};
+
+export type Attributes = {
+  [attribute in Attribute]: AttributeEntry;
+};
+
+export type Lores = {
+  [lore: string]: AttributeEntry;
 };
 
 type Mutable<T> = {
@@ -243,7 +281,7 @@ export class Item {
 }
 
 export class Weapon extends Item {
-  readonly attack: string;
+  readonly attack: number;
   readonly damage: string;
   readonly hands: string;
   readonly range?: number;
@@ -507,43 +545,4 @@ export class Source extends AbstractDataEntry {
   );
 
   public static readonly None = new Source('', -1, '');
-}
-
-export enum StatModType {
-  None = '',
-  Item = 'Item',
-  Status = 'Status',
-  Circumstance = 'Circumstance',
-}
-export class StatMod {
-  type: StatModType;
-  attrs: Array<Attribute>;
-  amount: number;
-
-  constructor(
-    type = StatModType.None,
-    attrs: Array<Attribute> = [],
-    amount = 0,
-  ) {
-    this.type = type;
-    this.attrs = attrs;
-    this.amount = amount;
-  }
-
-  static clone(mod: StatMod): StatMod {
-    return new StatMod(mod.type, [...mod.attrs], mod.amount);
-  }
-}
-export class ModEffect {
-  name: string = '';
-  statMods: StatMod[] = [];
-  enabled = false;
-
-  static clone(mod: ModEffect): ModEffect {
-    const newMod = new ModEffect();
-    newMod.name = mod.name;
-    newMod.enabled = mod.enabled;
-    newMod.statMods = mod.statMods.map((sm) => StatMod.clone(sm));
-    return newMod;
-  }
 }

@@ -394,6 +394,7 @@
           <WeaponBlock
             v-for="attack in character.combat.attacks"
             :key="attack.name"
+            :character="character"
             :weapon="attack"
             :interactive="false"
           />
@@ -593,6 +594,6 @@ const makePDF = () => {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import '../css/sheet.scss';
 </style>
