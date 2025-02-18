@@ -43,7 +43,7 @@
             Ability Scores
           </div>
           <div id="ability-grid">
-            <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
+            <template v-for="score of [0, 1, 2, 3, 4, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
                   {{ Score[score]?.substring(0, 3).toUpperCase() }}
@@ -83,6 +83,16 @@
                 {{ character.classDC }}
               </div>
               <div class="labello">Class DC</div>
+            </div>
+          </div>
+          <div class="row-between">
+            <div class="line">
+              <StatModsButton :character="character" />
+              <div class="labello">Buffs/Debuffs</div>
+            </div>
+            <div class="line">
+              <div class="numBox rounded" style="min-height: 3.6em"></div>
+              <div class="labello">Conditions</div>
             </div>
           </div>
           <div class="sectionDivider">
@@ -490,6 +500,7 @@ import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
 import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
 import PipCounter from 'src/components/PipCounter.vue';
+import StatModsButton from 'src/components/interactive/StatModsButton.vue';
 import WeaponsList from 'src/components/interactive/WeaponsList.vue';
 
 document.documentElement.classList.add('interactive');

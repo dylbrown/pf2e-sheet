@@ -489,7 +489,7 @@ body {
   flex-grow: 0;
 }
 
-.sectionLabel {
+div.sectionLabel {
   font-size: 0.7em;
   color: #333;
   font-weight: bold;
@@ -504,6 +504,10 @@ body {
     display: flex;
     align-items: center;
     font-size: 1.2em;
+  }
+  .interactive & {
+    line-height: 1.2;
+    flex-grow: 0.5;
   }
 }
 .combined-label .sectionLabel {
@@ -737,13 +741,16 @@ div.action-label {
   display: grid;
   .paper & {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 5px;
+    row-gap: 5px;
+    grid-template-rows: 1fr 1fr 1fr;
   }
   .interactive & {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 1px;
+    row-gap: 1px;
+    grid-template-rows: 1fr 1fr;
   }
-  grid-template-rows: 1fr 1fr 1fr;
-  column-gap: 5px;
-  row-gap: 5px;
   align-items: start;
   justify-items: center;
 }
@@ -1446,6 +1453,20 @@ div.spell-cost-optional > span {
 
   .apparitionChoices .q-field__native {
     font-size: 0.5em;
+  }
+
+  .q-item.stat-mod-item {
+    padding: 8px;
+  }
+
+  .buff-button {
+    height: 100%;
+    padding: 0;
+  }
+
+  .buffs {
+    font-size: 0.6rem;
+    font-weight: normal;
   }
 }
 

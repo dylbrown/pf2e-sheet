@@ -20,6 +20,7 @@
     "jspdf": "^2.5.2",
     "marked": "^15.0.4",
     "netlify-cli": "^17.38.1",
+    "pinia": "^3.0.1",
     "quasar": "^2.17.5",
     "rpg-awesome": "patch:rpg-awesome@npm%3A0.2.0#~/.yarn/patches/rpg-awesome-npm-0.2.0-a2026686fd.patch",
     "vite": "^6.0.4",

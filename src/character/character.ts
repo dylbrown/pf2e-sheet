@@ -1,6 +1,6 @@
 import { capitalize } from 'vue';
 import Abilities from './abilities';
-import { Weapon, Item, Builder, Rune, DamageType } from './model';
+import { Weapon, Item, Builder, Rune, DamageType, ModEffect } from './model';
 import {
   Proficiency,
   Attribute,
@@ -62,6 +62,7 @@ export default class Character {
   bulkLimitBonus = 0;
   money = 0;
   spells = new Spells();
+  modifiers = Array<ModEffect>();
 
   constructor() {
     this.scores = {} as Scores;

@@ -81,6 +81,10 @@ export enum Attribute {
   PrimalSpellDCs,
   Computers,
   Piloting,
+  AttackRolls,
+  DamageRolls,
+  Saves,
+  SkillChecks,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -503,4 +507,31 @@ export class Source extends AbstractDataEntry {
   );
 
   public static readonly None = new Source('', -1, '');
+}
+
+export enum StatModType {
+  None = '',
+  Item = 'Item',
+  Status = 'Status',
+  Circumstance = 'Circumstance',
+}
+export class StatMod {
+  type: StatModType;
+  attrs: Array<Attribute>;
+  amount: number;
+
+  constructor(
+    type = StatModType.None,
+    attrs: Array<Attribute> = [],
+    amount = 0,
+  ) {
+    this.type = type;
+    this.attrs = attrs;
+    this.amount = amount;
+  }
+}
+export class ModEffect {
+  name: string = '';
+  statMods: StatMod[] = [];
+  enabled = false;
 }
