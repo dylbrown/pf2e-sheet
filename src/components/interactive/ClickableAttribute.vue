@@ -4,10 +4,16 @@
     :class="popupClass + ' clickable-popup'"
     :target="$refs.clickableName as Element"
   >
-    {{ abilityMod }}
-    {{ scoreName }}, {{ profBonus }} Proficiency<template v-if="item"
-      >, {{ item }} Item.</template
-    >
+    {{ abilityMod }} from {{ scoreName }}
+    <br />
+    {{ Util.signed(attrEntry?.proficiency ?? 0) }} from being
+    {{
+      attrEntry != undefined ? Proficiency[attrEntry.proficiency] : 'Untrained'
+    }}
+    <br />
+    {{ Util.signed(attrEntry?.level ?? 0) }} from level
+    <br />
+    <template v-if="item">{{ item }} from item bonuses</template>
   </q-popup-proxy>
 </template>
 <script setup lang="ts">
@@ -41,15 +47,11 @@ const scoreName = isAt
   ? Score[props.character.attributes[props.attribute].score]
   : 'Intelligence';
 
-const prof = isAt
-  ? props.character.attributes[props.attribute].proficiency
+const attrEntry = isAt
+  ? props.character.attributes[props.attribute]
   : props.lore
-    ? props.character.lore[props.lore]?.proficiency
-    : Proficiency.Untrained;
-
-const profBonus = Util.signed(
-  prof ?? 0 + (prof != Proficiency.Untrained ? props.character.level : 0),
-);
+    ? props.character.lore[props.lore]
+    : undefined;
 
 const item = Util.nonzero(
   props.attribute

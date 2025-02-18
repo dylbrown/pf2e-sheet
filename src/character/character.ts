@@ -51,11 +51,7 @@ export default class Character {
   abilities = new Abilities();
   attributes: Attributes;
   lore = {} as {
-    [lore: string]: {
-      proficiency: Proficiency;
-      total: number;
-      itemBonus: number;
-    };
+    [lore: string]: AttributeEntry;
   };
   items = Array<Item>();
   totalBulk = 0;
@@ -74,6 +70,7 @@ export default class Character {
         total: -1,
         score: attrScore[Attribute[a as Attribute]] as Score,
         itemBonus: 0,
+        level: 0,
         proficiency: Proficiency.Untrained,
       };
     });
@@ -207,6 +204,8 @@ export default class Character {
             proficiency: entry?.parts?.profValue as Proficiency,
             total: parseInt(entry?.total ?? '0'),
             itemBonus: entry.parts.breakdown.bonusValue ?? 0,
+            score: Score.Intelligence,
+            level: entry.parts.level ?? 0,
           };
       }
     }
@@ -343,6 +342,7 @@ export default class Character {
       ? prefix
       : prefix + Attribute[attribute].toUpperCase();
     this.attributes[attribute].total = parseInt(proficiencies[key].total ?? 0);
+    this.attributes[attribute].level = proficiencies[key].parts?.level ?? 0;
     this.attributes[attribute].itemBonus =
       proficiencies[key].parts?.breakdown?.bonusValue ?? 0;
     this.attributes[attribute].proficiency = (proficiencies[key].parts
@@ -389,7 +389,13 @@ export default class Character {
       data.stats?.totalPerception ?? 0;
     const setAttribute = (k: string, v: number) => {
       if (k.includes('Lore')) {
-        this.lore[k] = { proficiency: 0, total: v, itemBonus: 0 };
+        this.lore[k] = {
+          proficiency: 0,
+          total: v,
+          itemBonus: 0,
+          level: 0,
+          score: Score.Intelligence,
+        };
       } else {
         this.attributes[
           Object.values(Attribute).indexOf(k) as Attribute
@@ -414,6 +420,8 @@ export default class Character {
               this.level +
               Math.floor((this.scores[Score.Intelligence] - 10) / 2),
             itemBonus: 0,
+            score: Score.Intelligence,
+            level: proficiency != Proficiency.Untrained ? this.level : 0,
           };
         }
         continue;
@@ -560,11 +568,14 @@ type Scores = {
   [score in Score]: number;
 };
 
+type AttributeEntry = {
+  total: number;
+  score: Score;
+  itemBonus: number;
+  level: number;
+  proficiency: Proficiency;
+};
+
 type Attributes = {
-  [attribute in Attribute]: {
-    total: number;
-    score: Score;
-    itemBonus: number;
-    proficiency: Proficiency;
-  };
+  [attribute in Attribute]: AttributeEntry;
 };
