@@ -1468,6 +1468,11 @@ div.spell-cost-optional > span {
     font-size: 0.6rem;
     font-weight: normal;
   }
+
+  .wip-stat-mod {
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 .popup-spells-table {

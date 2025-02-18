@@ -81,7 +81,7 @@ export enum Attribute {
   PrimalSpellDCs,
   Computers,
   Piloting,
-  AttackRolls,
+  Attacks,
   DamageRolls,
   Saves,
   SkillChecks,
@@ -529,9 +529,21 @@ export class StatMod {
     this.attrs = attrs;
     this.amount = amount;
   }
+
+  static clone(mod: StatMod): StatMod {
+    return new StatMod(mod.type, [...mod.attrs], mod.amount);
+  }
 }
 export class ModEffect {
   name: string = '';
   statMods: StatMod[] = [];
   enabled = false;
+
+  static clone(mod: ModEffect): ModEffect {
+    const newMod = new ModEffect();
+    newMod.name = mod.name;
+    newMod.enabled = mod.enabled;
+    newMod.statMods = mod.statMods.map((sm) => StatMod.clone(sm));
+    return newMod;
+  }
 }
