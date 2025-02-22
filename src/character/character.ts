@@ -27,6 +27,7 @@ import { abilityMod, getProficiency, parseDescription } from './util';
 import vm from 'node:vm';
 import { ModEffect } from './modifiers';
 
+type DamageEffects = { [type: string]: number };
 export default class Character {
   remaster = false;
   starfinder = false;
@@ -46,6 +47,9 @@ export default class Character {
   speed = 25;
   classDC = 10;
   hp = 69;
+  immunities: DamageEffects = {};
+  resistances: DamageEffects = {};
+  weaknesses: DamageEffects = {};
   ac = 23;
   combat = {
     armor: {
@@ -182,6 +186,24 @@ export default class Character {
     this.combat.shield.ac =
       data.content?.shield_item?.item?.meta_data?.ac_bonus ?? 0;
     this.hp = data.content?.max_hp ?? 0;
+
+    const addDamageEffect = (s: string, e: DamageEffects) => {
+      const info = s.split(',');
+      if (!info[0] || !info[1]) return;
+      e[info[0].trim()] = parseInt(info[1]);
+    };
+
+    // Immunities, Resistances, Weaknesses
+    data.content.raw_data_dump.variables.IMMUNITIES.value.forEach((s: string) =>
+      addDamageEffect(s, this.immunities),
+    );
+    data.content.raw_data_dump.variables.RESISTANCES.value.forEach(
+      (s: string) => addDamageEffect(s, this.resistances),
+    );
+    data.content.raw_data_dump.variables.WEAKNESSES.value.forEach((s: string) =>
+      addDamageEffect(s, this.weaknesses),
+    );
+
     this.setProficiency(data, Attribute.Perception);
     this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');

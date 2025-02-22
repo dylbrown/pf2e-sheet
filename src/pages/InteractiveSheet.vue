@@ -101,73 +101,11 @@
           <div class="sectionLabel">Health</div>
           <div class="row-between">
             <div class="line">
-              <div class="numBox rounded" style="position: relative">
-                <q-linear-progress
-                  :value="(currHP - character.hp) / character.hp"
-                  color="yellow-4"
-                  track-color="white"
-                  class="rounded"
-                  style="
-                    position: absolute;
-                    z-index: 10;
-                    width: 100%;
-                    height: 100%;
-                  "
-                >
-                  <div
-                    class="absolute-full flex flex-center"
-                    style="color: black; font-size: calc(1rem + 0.5px)"
-                  >
-                    {{ currHP }} / {{ character.hp }}
-                  </div>
-                  <q-popup-proxy
-                    @show="workingHP = currHP"
-                    @hide="currHP = workingHP"
-                  >
-                    <q-linear-progress
-                      :value="(workingHP - character.hp) / character.hp"
-                      color="yellow-4"
-                      track-color="white"
-                      style="
-                        height: 2rem;
-                        width: 20rem;
-                        position: absolute;
-                        z-index: 10;
-                      "
-                    >
-                      <div
-                        class="absolute-full flex flex-center"
-                        style="color: black; font-size: 1rem"
-                      >
-                        {{ workingHP }}
-                        <span style="color: gray">
-                          &nbsp;({{ Util.signed(workingHP - currHP) }})
-                        </span>
-                      </div>
-                    </q-linear-progress>
-                    <q-linear-progress
-                      :value="workingHP / character.hp"
-                      color="blue-2"
-                      track-color="white"
-                      style="height: 2rem"
-                    />
-                    <q-btn-group style="width: 20rem" spread stretch>
-                      <q-btn label="-10" @click="workingHP -= 10" />
-                      <q-btn label="-5" @click="workingHP -= 5" />
-                      <q-btn label="-1" @click="workingHP -= 1" />
-                      <q-btn label="+1" @click="workingHP += 1" />
-                      <q-btn label="+5" @click="workingHP += 5" />
-                      <q-btn label="+10" @click="workingHP += 10" />
-                    </q-btn-group>
-                  </q-popup-proxy>
-                </q-linear-progress>
-                <q-linear-progress
-                  :value="currHP / character.hp"
-                  color="blue-2"
-                  track-color="white"
-                  class="rounded"
-                />
-              </div>
+              <ClickableHealth
+                :character="character"
+                :curr-hp="currHP"
+                :update-curr-hp="(hp: number) => (currHP = hp)"
+              />
               <div class="labello">Current</div>
             </div>
           </div>
@@ -574,6 +512,7 @@ import {
   Proficiency,
   Score,
 } from 'src/character/model';
+import ClickableHealth from 'src/components/interactive/ClickableHealth.vue';
 import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -620,9 +559,6 @@ const expInfo = ref<QExpansionItem | null>(null);
 const expStrike = ref<QExpansionItem | null>(null);
 const expAct = ref<QExpansionItem | null>(null);
 const currHP = ref<number>(
-  LS.load(props.character.name, 'hp') ?? props.character.hp,
-);
-const workingHP = ref<number>(
   LS.load(props.character.name, 'hp') ?? props.character.hp,
 );
 const focus = ref<number>(
