@@ -113,16 +113,30 @@
           </q-item>
         </q-list>
       </q-card-section>
-      <div class="row" style="justify-content: stretch">
-        <q-btn flat icon="done" @click="reset(true)" style="flex-grow: 1" />
-        <q-btn
-          flat
-          icon="delete"
-          @click="deleteAndReset()"
-          style="flex-grow: 1"
-          v-if="editingModEffect != undefined"
-        />
-        <q-btn flat icon="close" @click="reset()" style="flex-grow: 1" />
+
+      <div class="column">
+        <span
+          v-if="WIPmodEffect.name == ''"
+          style="font-size: 0.5em; padding-left: 3.5em"
+          >Please give it a name.</span
+        >
+        <div class="row" style="justify-content: stretch">
+          <q-btn
+            flat
+            icon="done"
+            @click="reset(true)"
+            style="flex-grow: 1"
+            :disable="WIPmodEffect.name == ''"
+          />
+          <q-btn
+            flat
+            icon="delete"
+            @click="deleteAndReset()"
+            style="flex-grow: 1"
+            v-if="editingModEffect != undefined"
+          />
+          <q-btn flat icon="close" @click="reset()" style="flex-grow: 1" />
+        </div>
       </div>
     </q-card>
   </q-dialog>
@@ -162,6 +176,8 @@ WIPmodEffect.value.statMods.push(new StatMod());
 
 const loadedMods = LS.load<ModEffect[]>(props.character.name, 'modifiers');
 if (loadedMods != null) {
+  // eslint-disable-next-line vue/no-mutating-props
+  props.character.modifiers.splice(0, props.character.modifiers.length);
   for (const mod of loadedMods) {
     // eslint-disable-next-line vue/no-mutating-props
     props.character.modifiers.push(ModEffect.clone(mod));
