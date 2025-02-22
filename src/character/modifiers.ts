@@ -1,4 +1,12 @@
-import { ac, attacks, Attribute, Attributes, saves, skills } from './model';
+import {
+  ac,
+  attacks,
+  Attribute,
+  Attributes,
+  DamageInstance,
+  saves,
+  skills,
+} from './model';
 
 export enum StatModType {
   None = '',
@@ -44,11 +52,13 @@ export function applyMods(
   attrs: Attributes,
   modifiedAttr: Attribute,
 ) {
-  const [rawTotal, bonuses, penalties] = calculateMods(
+  const attrEntry = attrs[modifiedAttr];
+  const [bonuses, penalties] = calculateMods(
     mods,
-    attrs,
     modifiedAttr,
+    attrEntry.itemBonus,
   );
+  const rawTotal = attrEntry.total - attrEntry.itemBonus;
   return (
     rawTotal +
     Object.values(bonuses).reduce((a, b) => a + b, 0) +
@@ -92,23 +102,38 @@ export function applyAttackMods(mods: ModEffect[], base: number) {
     Object.values(penalties).reduce((a, b) => a + b, 0)
   );
 }
+
+export function applyDamageMods(
+  mods: ModEffect[],
+  damage: DamageInstance,
+): DamageInstance {
+  const [bonuses, penalties] = calculateMods(mods, Attribute.DamageRolls);
+
+  return new DamageInstance(
+    damage.bonus +
+      Object.values(bonuses).reduce((a, b) => a + b, 0) +
+      Object.values(penalties).reduce((a, b) => a + b, 0),
+    damage.damageType,
+    damage.dice,
+    damage.die,
+  );
+}
+
 type ModNumberList = { [s in StatModType]: number };
 export function calculateMods(
   mods: ModEffect[],
-  attrs: Attributes,
   modifiedAttr: Attribute,
-): [number, ModNumberList, ModNumberList] {
-  const attrEntry = attrs[modifiedAttr];
-  const rawTotal = attrEntry.total - attrEntry.itemBonus;
+  itemBonus: number = 0,
+): [ModNumberList, ModNumberList] {
   const bonuses: ModNumberList = {
     [StatModType.None]: 0,
-    [StatModType.Item]: Math.max(attrEntry.itemBonus, 0),
+    [StatModType.Item]: Math.max(0, itemBonus),
     [StatModType.Status]: 0,
     [StatModType.Circumstance]: 0,
   };
   const penalties: ModNumberList = {
     [StatModType.None]: 0,
-    [StatModType.Item]: Math.min(attrEntry.itemBonus, 0),
+    [StatModType.Item]: Math.min(0, itemBonus),
     [StatModType.Status]: 0,
     [StatModType.Circumstance]: 0,
   };
@@ -154,5 +179,5 @@ export function calculateMods(
       }
     }
   }
-  return [rawTotal, bonuses, penalties];
+  return [bonuses, penalties];
 }

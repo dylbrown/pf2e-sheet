@@ -143,6 +143,7 @@ const props = defineProps<{
 const options_temp = [
   Attribute.Attacks,
   Attribute.DamageRolls,
+  Attribute.AC,
   Attribute.Saves,
   Attribute.SkillChecks,
 ];

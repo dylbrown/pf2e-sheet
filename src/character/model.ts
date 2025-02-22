@@ -282,7 +282,7 @@ export class Item {
 
 export class Weapon extends Item {
   readonly attack: number;
-  readonly damage: string;
+  readonly damage: DamageInstance;
   readonly hands: string;
   readonly range?: number;
   readonly reload?: string;
@@ -325,7 +325,8 @@ export class DamageType {
 
   private static damageTypes: { [name: string]: DamageType } = {};
   private static nameKeys: { [name: string]: string | null } = {};
-  static get(name: string): DamageType {
+  static get(name: DamageType | string): DamageType {
+    if (name instanceof DamageType) return name;
     let dt = this.damageTypes[name.toLowerCase()];
     if (dt) return dt;
     const lastSpace = name.lastIndexOf(' ');
@@ -353,13 +354,74 @@ DamageType.get('Slashing');
 DamageType.get('Bludgeoning');
 DamageType.get('Piercing');
 
-export interface Rune {
-  bonus: number;
-  damageType: DamageType;
-  dice: number;
-  die: string;
+export class DamageInstance {
+  readonly bonus: number;
+  readonly damageType: DamageType;
+  readonly dice: number;
+  readonly die: string;
+
+  constructor(
+    bonus: number,
+    damageType: DamageType | string,
+    dice: number,
+    die: string,
+  ) {
+    this.bonus = bonus;
+    this.damageType = DamageType.get(damageType);
+    this.dice = dice;
+    this.die = die;
+  }
+
+  splitString(): string[] {
+    const damage: string[] = [];
+    if (this.dice > 0) {
+      damage[0] = this.dice + this.die;
+    }
+    if (this.bonus != 0) {
+      if (damage[0])
+        damage[1] = (this.bonus > 0 ? '+' : '-') + Math.abs(this.bonus);
+      else damage[0] = this.bonus.toString();
+    }
+    damage.push(' ' + this.damageType.shortName);
+    return damage;
+  }
+
+  toString(): string {
+    return this.splitString().join('');
+  }
+
+  static parseFromString(s: string): DamageInstance {
+    const dIndex = s.indexOf('d');
+    const dice = dIndex != -1 ? parseInt(s.substring(0, dIndex)) : 0;
+    const modIndex = s.search('[ +-]');
+    const die =
+      dice > 0
+        ? s.substring(dIndex, modIndex == -1 ? undefined : modIndex)
+        : '';
+    const backwards = [...s].reverse().join('');
+    const damageTypeIndex = s.length - backwards.search('[ \\d]');
+    const bonus = parseInt(s.substring(Math.max(0, modIndex), damageTypeIndex));
+    const damageType = s.substring(damageTypeIndex);
+    return new DamageInstance(bonus, damageType, dice, die);
+  }
+}
+
+export class Rune extends DamageInstance {
   name: string;
   description: string;
+
+  constructor(
+    bonus: number,
+    damageType: DamageType | string,
+    dice: number,
+    die: string,
+    name: string,
+    description: string,
+  ) {
+    super(bonus, damageType, dice, die);
+    this.name = name;
+    this.description = description;
+  }
 }
 
 export class Ability {

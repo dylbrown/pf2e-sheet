@@ -83,10 +83,11 @@ const item = props.attribute
     : 0;
 
 const c = computed(() => {
-  const [, bonuses, penalties] = calculateMods(
+  const [bonuses, penalties] = calculateMods(
     props.character.modifiers,
-    props.character.attributes,
     props.attribute || Attribute.LoreChecks,
+    props.character.attributes[props.attribute || Attribute.LoreChecks]
+      .itemBonus ?? 0,
   );
   return { bonuses, penalties };
 });

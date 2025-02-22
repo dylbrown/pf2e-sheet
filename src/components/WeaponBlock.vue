@@ -19,17 +19,21 @@
         </div>
         <div class="line">
           <div class="underlined weapon-info bounded-line" data-max="1.8">
-            <span class="list-flow"
-              >{{ weapon.damage
+            <span class="list-flow">
+              <template v-if="modifiedDamage.dice > 0">{{
+                damageSplitString[0]
+              }}</template
+              ><span
+                v-if="modifiedDamage.bonus != 0"
+                :class="
+                  (modifiedDamage.bonus < weapon.damage.bonus ? 'de' : '') +
+                  (modifiedDamage.bonus != weapon.damage.bonus ? 'buffed' : '')
+                "
+                >{{ damageSplitString[modifiedDamage.dice > 0 ? 1 : 0] }}</span
+              >&nbsp;{{ damageSplitString[damageSplitString.length - 1]?.trim()
               }}<template v-for="rune of weapon.runes ?? []" :key="rune.name">
                 <ClickableRune :rune="rune" v-if="interactive">
-                  &nbsp;+ {{ rune.dice }}{{ rune.die
-                  }}<template v-if="rune.bonus > 0">
-                    + {{ rune.bonus }}</template
-                  >
-                  {{
-                    rune.damageType.shortName.replaceAll('persistent ', 'p.')
-                  }}</ClickableRune
+                  &nbsp;+ {{ rune.toString() }}</ClickableRune
                 ><template v-else>
                   &nbsp;+ {{ rune.dice }}{{ rune.die
                   }}<template v-if="rune.bonus > 0">
@@ -113,7 +117,7 @@ import type { Weapon } from 'src/character/model';
 import ClickableRune from './interactive/ClickableRune.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
 import Character from 'src/character/character';
-import { applyAttackMods } from 'src/character/modifiers';
+import { applyAttackMods, applyDamageMods } from 'src/character/modifiers';
 import { signed } from 'src/character/util';
 import { computed } from 'vue';
 
@@ -127,5 +131,13 @@ const modifiedAttack = computed(() => {
   return interactive
     ? applyAttackMods(character.modifiers, weapon.attack)
     : weapon.attack;
+});
+const modifiedDamage = computed(() => {
+  return interactive
+    ? applyDamageMods(character.modifiers, weapon.damage)
+    : weapon.damage;
+});
+const damageSplitString = computed(() => {
+  return modifiedDamage.value.splitString();
 });
 </script>

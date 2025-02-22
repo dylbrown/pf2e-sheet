@@ -5,10 +5,10 @@ import {
   Item,
   Builder,
   Rune,
-  DamageType,
   Scores,
   Attributes,
   Lores,
+  DamageInstance,
 } from './model';
 import {
   Proficiency,
@@ -238,28 +238,29 @@ export default class Character {
         range: entry.item.meta_data.range,
         reload: entry.item.meta_data.reload,
       };
-      b.partial.damage =
-        entry.stats.damage.dice.toString() +
-        entry.stats.damage.die +
-        '+' +
-        entry.stats.damage.bonus.total +
-        ' ' +
-        entry.stats.damage.damageType;
+      b.partial.damage = new DamageInstance(
+        entry.stats.damage.bonus.total,
+        entry.stats.damage.damageType,
+        entry.stats.damage.dice.toString(),
+        entry.stats.damage.die,
+      );
       const runes: Array<Rune> = [];
       for (const otherDamage of entry.stats.damage.other ?? []) {
-        runes.push({
-          bonus: otherDamage.bonus,
-          damageType: DamageType.get(otherDamage.damageType),
-          dice: otherDamage.dice,
-          die: otherDamage.die,
-          name: otherDamage.source.substring(
-            otherDamage.source.indexOf('<') + 1,
-            otherDamage.source.indexOf('>'),
+        runes.push(
+          new Rune(
+            otherDamage.bonus,
+            otherDamage.damageType,
+            otherDamage.dice,
+            otherDamage.die,
+            otherDamage.source.substring(
+              otherDamage.source.indexOf('<') + 1,
+              otherDamage.source.indexOf('>'),
+            ),
+            parseDescription(
+              otherDamage.source.substring(otherDamage.source.indexOf('>') + 1),
+            ),
           ),
-          description: parseDescription(
-            otherDamage.source.substring(otherDamage.source.indexOf('>') + 1),
-          ),
-        });
+        );
       }
       b.partial.runes = runes;
       if (entry.item.meta_data.starfinder) {
@@ -463,7 +464,7 @@ export default class Character {
           count: -1,
           weight: '',
           attack: parseInt(entry.Bonus),
-          damage: entry.Damage,
+          damage: DamageInstance.parseFromString(entry.Damage),
           hands: '0',
           traits: [],
           weapon: true,
