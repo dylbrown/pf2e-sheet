@@ -161,7 +161,7 @@ const options_temp = [
   Attribute.Saves,
   Attribute.SkillChecks,
 ];
-options_temp.push(...saves);
+options_temp.push(...saves, Attribute.Perception);
 options_temp.push(...(props.character.starfinder ? sfSkills : skills));
 const OPTIONS = options_temp.map((s) => s as Attribute);
 const AttrLabel = (a: Attribute) =>

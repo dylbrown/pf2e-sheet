@@ -1,3 +1,4 @@
+import Character from './character';
 import {
   ac,
   attacks,
@@ -119,6 +120,21 @@ export function applyDamageMods(
   );
 }
 
+export function applyACMods(mods: ModEffect[], character: Character): number {
+  const [bonuses, penalties] = calculateMods(
+    mods,
+    Attribute.AC,
+    character.combat.armor.ac,
+  );
+
+  return (
+    character.ac -
+    character.combat.armor.ac +
+    Object.values(bonuses).reduce((a, b) => a + b, 0) +
+    Object.values(penalties).reduce((a, b) => a + b, 0)
+  );
+}
+
 type ModNumberList = { [s in StatModType]: number };
 export function calculateMods(
   mods: ModEffect[],
@@ -158,7 +174,7 @@ export function calculateMods(
             break;
           }
           case Attribute.AC: {
-            good = ac.includes(modifiedAttr);
+            good = attr == modifiedAttr || ac.includes(modifiedAttr);
             break;
           }
           default: {

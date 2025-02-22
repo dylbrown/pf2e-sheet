@@ -176,9 +176,75 @@
           </div>
           <div class="sectionLabel">Armor Class</div>
           <div id="ac-grid">
-            <div class="top-right rollLabel">AC</div>
+            <div class="top-right rollLabel">
+              AC
+              <q-popup-proxy class="clickable-popup">
+                10 base
+                <br />
+                {{
+                  Util.signed(
+                    Util.abilityMod(character.scores[Score.Dexterity]),
+                  )
+                }}
+                from Dexterity
+                <br />
+                {{ Util.signed(character.combat.armor.proficiency ?? 0) }} from
+                being
+                {{ Proficiency[character.combat.armor.proficiency] }}
+                <br />
+                {{
+                  Util.signed(
+                    character.combat.armor.proficiency != Proficiency.Untrained
+                      ? character.level
+                      : 0,
+                  )
+                }}
+                from level
+                <template
+                  v-for="[type, bonus] of Object.entries(
+                    acEffects.bonuses,
+                  ).filter(
+                    ([type, bonus]) =>
+                      bonus > 0 || acEffects.penalties[type as StatModType] < 0,
+                  )"
+                  :key="type"
+                >
+                  <br />
+                  <span
+                    :class="
+                      type != StatModType.Item ||
+                      bonus > character.combat.armor.ac ||
+                      acEffects.penalties[type as StatModType] < 0
+                        ? bonus + acEffects.penalties[type as StatModType] > 0
+                          ? 'buffed'
+                          : 'debuffed'
+                        : ''
+                    "
+                    >{{
+                      Util.signed(
+                        bonus + acEffects.penalties[type as StatModType],
+                      )
+                    }}
+                    {{ type }}
+                    {{
+                      bonus + acEffects.penalties[type as StatModType] > 0
+                        ? 'bonus'
+                        : 'penalty'
+                    }}</span
+                  >
+                </template>
+              </q-popup-proxy>
+            </div>
             <div class="line">
-              <div class="underlined-roll">{{ character.ac }}</div>
+              <div
+                class="underlined-roll"
+                :class="
+                  (moddedAC < character.ac ? 'de' : '') +
+                  (moddedAC != character.ac ? 'buffed' : '')
+                "
+              >
+                {{ moddedAC }}
+              </div>
               <div class="labello">Total</div>
             </div>
             <div class="line">
@@ -502,17 +568,27 @@ import * as Util from 'src/character/util';
 import * as LS from 'src/pages/localStorage';
 import type Character from 'src/character/character';
 import RightThird from 'src/components/interactive/RightThird.vue';
-import { AbilityType, Attribute, Score } from 'src/character/model';
+import {
+  AbilityType,
+  Attribute,
+  Proficiency,
+  Score,
+} from 'src/character/model';
 import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
 import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
 import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
 import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
 import PipCounter from 'src/components/PipCounter.vue';
 import StatModsButton from 'src/components/interactive/StatModsButton.vue';
 import WeaponsList from 'src/components/interactive/WeaponsList.vue';
-import { applyMods } from 'src/character/modifiers';
+import {
+  applyACMods,
+  applyMods,
+  calculateMods,
+  StatModType,
+} from 'src/character/modifiers';
 
 document.documentElement.classList.add('interactive');
 
@@ -523,6 +599,19 @@ const props = defineProps<{
 const moddedAttr = (attr: Attribute) => {
   return applyMods(props.character.modifiers, props.character.attributes, attr);
 };
+
+const moddedAC = computed(() => {
+  return applyACMods(props.character.modifiers, props.character);
+});
+
+const acEffects = computed(() => {
+  const [bonuses, penalties] = calculateMods(
+    props.character.modifiers,
+    Attribute.AC,
+    props.character.combat.armor.ac,
+  );
+  return { bonuses, penalties };
+});
 
 const root = ref<HTMLDivElement | null>(null);
 const abilityBlock = ref<HTMLDivElement | null>(null);
