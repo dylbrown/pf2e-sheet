@@ -580,6 +580,14 @@ div.weapon-label {
     font-size: 1em;
   }
 }
+.weapons-table .weapon-info,
+.weapons-table .weapon-traits {
+  padding-left: 5px;
+  text-align: right;
+  .list-flow {
+    align-self: flex-end;
+  }
+}
 .interactive .weapon-traits {
   font-style: italic;
 }

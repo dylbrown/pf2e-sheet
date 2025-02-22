@@ -1,6 +1,6 @@
 <template>
   <span class="clickable-trait">
-    {{ trait.name
+    {{ name
     }}<q-popup-proxy :class="popupClass + ' clickable-popup'">
       {{ trait.name }}
       <div style="max-width: 25vw">
@@ -13,8 +13,12 @@
 import { QPopupProxy } from 'quasar';
 import type { Trait } from 'src/character/model';
 
-defineProps<{
+const { trait } = defineProps<{
   trait: Trait;
   popupClass?: string;
 }>();
+let name = trait.name;
+if (trait.name.length > 13) {
+  name = name.substring(0, 12).trim() + '…';
+}
 </script>
