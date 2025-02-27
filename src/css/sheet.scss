@@ -1460,6 +1460,11 @@ div.spell-cost-optional > span {
     padding: 8px;
   }
 
+  .health {
+    color: black;
+    font-size: calc(1rem + 0.5px);
+  }
+
   .buff-button {
     height: 100%;
     padding: 0;
@@ -1474,6 +1479,30 @@ div.spell-cost-optional > span {
     justify-content: space-between;
     width: 100%;
   }
+
+  .condition-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 50vw;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .condition {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .value-condition {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 0;
+    padding-top: 5px;
+  }
+
   .buffed,
   .debuffed {
     font-weight: 500;

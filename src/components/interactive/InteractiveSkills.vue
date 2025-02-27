@@ -67,10 +67,9 @@ import { computed, reactive } from 'vue';
 const props = defineProps<{
   character: Character;
 }>();
-const mods = props.character.modifiers;
 
 const modifiedSkill = (skill: Attribute) => {
-  return applyMods(mods, props.character.attributes, skill);
+  return applyMods(props.character, skill);
 };
 
 const aList = props.character.spells.lists.find(

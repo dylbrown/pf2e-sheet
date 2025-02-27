@@ -95,7 +95,7 @@
               <div class="labello">Buffs/Debuffs</div>
             </div>
             <div class="line">
-              <div class="numBox rounded" style="min-height: 3.6em"></div>
+              <ConditionsButton :character="character" />
               <div class="labello">Conditions</div>
             </div>
           </div>
@@ -532,6 +532,7 @@ import {
   calculateMods,
   StatModType,
 } from 'src/character/modifiers';
+import ConditionsButton from 'src/components/interactive/ConditionsButton.vue';
 
 document.documentElement.classList.add('interactive');
 
@@ -540,16 +541,16 @@ const props = defineProps<{
 }>();
 
 const moddedAttr = (attr: Attribute) => {
-  return applyMods(props.character.modifiers, props.character.attributes, attr);
+  return applyMods(props.character, attr);
 };
 
 const moddedAC = computed(() => {
-  return applyACMods(props.character.modifiers, props.character);
+  return applyACMods(props.character);
 });
 
 const acEffects = computed(() => {
   const [bonuses, penalties] = calculateMods(
-    props.character.modifiers,
+    props.character,
     Attribute.AC,
     props.character.combat.armor.ac,
   );

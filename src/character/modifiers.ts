@@ -3,7 +3,7 @@ import {
   ac,
   attacks,
   Attribute,
-  Attributes,
+  attrScore,
   DamageInstance,
   saves,
   skills,
@@ -35,27 +35,149 @@ export class StatMod {
   }
 }
 export class ModEffect {
-  name: string = '';
-  statMods: StatMod[] = [];
-  enabled = false;
+  name: string;
+  statMods: StatMod[];
+  enabled;
+
+  constructor(
+    name: string = '',
+    statMods: StatMod[] = [],
+    enabled: boolean = false,
+  ) {
+    this.name = name;
+    this.statMods = statMods;
+    this.enabled = enabled;
+  }
 
   static clone(mod: ModEffect): ModEffect {
-    const newMod = new ModEffect();
-    newMod.name = mod.name;
-    newMod.enabled = mod.enabled;
-    newMod.statMods = mod.statMods.map((sm) => StatMod.clone(sm));
-    return newMod;
+    return new ModEffect(
+      mod.name,
+      mod.statMods.map((sm) => StatMod.clone(sm)),
+      mod.enabled,
+    );
   }
 }
 
-export function applyMods(
-  mods: ModEffect[],
-  attrs: Attributes,
-  modifiedAttr: Attribute,
-) {
-  const attrEntry = attrs[modifiedAttr];
+export class ConditionData extends ModEffect {
+  private _value = 1;
+  readonly has_value: boolean;
+  readonly icon: string;
+  constructor(name: string, statMods: StatMod[], icon: string, value?: number) {
+    super(name, statMods, true);
+    this.icon = icon;
+    this.has_value = value !== undefined;
+    if (value !== undefined) this._value = value;
+  }
+
+  get value(): number {
+    return this._value;
+  }
+  set value(value: number) {
+    if (value < 0 || !Number.isInteger(value)) return;
+    this._value = value;
+    for (const statMod of this.statMods) {
+      statMod.amount = value * -1;
+    }
+  }
+
+  static override clone(mod: ConditionData): ConditionData {
+    return new ConditionData(
+      mod.name,
+      mod.statMods.map((sm) => StatMod.clone(sm)),
+      mod.icon,
+      mod.has_value ? mod.value : undefined,
+    );
+  }
+}
+
+export enum Condition {
+  Blinded = 'Blinded',
+  Clumsy = 'Clumsy',
+  Drained = 'Drained',
+  Enfeebled = 'Enfeebled',
+  Fascinated = 'Fascinated',
+  Fatigued = 'Fatigued',
+  Frightened = 'Frightened',
+  OffGuard = 'Off-Guard',
+  Sickened = 'Sickened',
+  Stupefied = 'Stupefied',
+}
+
+export const conditionEffects: { [condition in Condition]: ConditionData } = {
+  [Condition.Blinded]: new ConditionData(
+    Condition.Blinded,
+    [new StatMod(StatModType.Status, [Attribute.Perception], -4)],
+    'visibility_off',
+  ),
+  [Condition.Clumsy]: new ConditionData(
+    Condition.Clumsy,
+    [new StatMod(StatModType.Status, [Attribute.DexChecks], -1)],
+    'ra-player-despair',
+    1,
+  ),
+  [Condition.Drained]: new ConditionData(
+    Condition.Drained,
+    [new StatMod(StatModType.Status, [Attribute.ConChecks], -1)],
+    'ra-bleeding-hearts',
+    1,
+  ),
+  [Condition.Enfeebled]: new ConditionData(
+    Condition.Enfeebled,
+    [new StatMod(StatModType.Status, [Attribute.StrChecks], -1)],
+    'ra-broken-bone',
+    1,
+  ),
+  [Condition.Fascinated]: new ConditionData(
+    Condition.Fascinated,
+    [
+      new StatMod(
+        StatModType.Status,
+        [Attribute.Perception, Attribute.SkillChecks],
+        -2,
+      ),
+    ],
+    'ra-eyeball',
+  ),
+  [Condition.Fatigued]: new ConditionData(
+    Condition.Fatigued,
+    [new StatMod(StatModType.Status, [Attribute.AC, Attribute.Saves], -1)],
+    'ra-broken-skull',
+  ),
+  [Condition.Frightened]: new ConditionData(
+    Condition.Frightened,
+    [new StatMod(StatModType.Status, [Attribute.ChecksAndDCs], -1)],
+    'priority_high',
+    1,
+  ),
+  [Condition.OffGuard]: new ConditionData(
+    Condition.OffGuard,
+    [new StatMod(StatModType.Circumstance, [Attribute.AC], -2)],
+    'ra-uncertainty',
+  ),
+  [Condition.Sickened]: new ConditionData(
+    Condition.Sickened,
+    [new StatMod(StatModType.Status, [Attribute.ChecksAndDCs], -1)],
+    'o_sick',
+    1,
+  ),
+  [Condition.Stupefied]: new ConditionData(
+    Condition.Stupefied,
+    [
+      new StatMod(
+        StatModType.Status,
+        [Attribute.IntChecks, Attribute.WisChecks, Attribute.ChaChecks],
+        -1,
+      ),
+    ],
+    'o_psychology_alt',
+    1,
+  ),
+};
+
+export function applyMods(character: Character, modifiedAttr: Attribute) {
+  const attrEntry = character.attributes[modifiedAttr];
   const [bonuses, penalties] = calculateMods(
-    mods,
+    character,
     modifiedAttr,
     attrEntry.itemBonus,
   );
@@ -67,7 +189,7 @@ export function applyMods(
   );
 }
 
-export function applyAttackMods(mods: ModEffect[], base: number) {
+export function applyAttackMods(character: Character, base: number) {
   const bonuses: ModNumberList = {
     [StatModType.None]: 0,
     [StatModType.Item]: 0, // TODO: determine
@@ -81,8 +203,12 @@ export function applyAttackMods(mods: ModEffect[], base: number) {
     [StatModType.Circumstance]: 0,
   };
 
-  for (const mod of mods) {
-    if (!mod.enabled) continue;
+  const conditionsList = Object.values(character.conditions);
+  const condCount = conditionsList.length;
+  for (let i = 0; i < condCount + character.modifiers.length; i++) {
+    const mod =
+      i < condCount ? conditionsList[i] : character.modifiers[i - condCount];
+    if (mod == undefined || !mod.enabled) continue;
     for (const sMod of mod.statMods) {
       if (
         sMod.type == StatModType.Item ||
@@ -105,10 +231,10 @@ export function applyAttackMods(mods: ModEffect[], base: number) {
 }
 
 export function applyDamageMods(
-  mods: ModEffect[],
+  character: Character,
   damage: DamageInstance,
 ): DamageInstance {
-  const [bonuses, penalties] = calculateMods(mods, Attribute.DamageRolls);
+  const [bonuses, penalties] = calculateMods(character, Attribute.DamageRolls);
 
   return new DamageInstance(
     damage.bonus +
@@ -120,9 +246,9 @@ export function applyDamageMods(
   );
 }
 
-export function applyACMods(mods: ModEffect[], character: Character): number {
+export function applyACMods(character: Character): number {
   const [bonuses, penalties] = calculateMods(
-    mods,
+    character,
     Attribute.AC,
     character.combat.armor.ac,
   );
@@ -137,7 +263,7 @@ export function applyACMods(mods: ModEffect[], character: Character): number {
 
 type ModNumberList = { [s in StatModType]: number };
 export function calculateMods(
-  mods: ModEffect[],
+  character: Character,
   modifiedAttr: Attribute,
   itemBonus: number = 0,
 ): [ModNumberList, ModNumberList] {
@@ -154,13 +280,24 @@ export function calculateMods(
     [StatModType.Circumstance]: 0,
   };
 
-  for (const mod of mods) {
-    if (!mod.enabled) continue;
+  const conditionsList = Object.values(character.conditions);
+  const condCount = conditionsList.length;
+  for (let i = 0; i < condCount + character.modifiers.length; i++) {
+    const mod =
+      i < condCount ? conditionsList[i] : character.modifiers[i - condCount];
+    if (mod == undefined || !mod.enabled) continue;
     for (const sMod of mod.statMods) {
+      let amount = sMod.amount;
       let matches = false;
       for (const attr of sMod.attrs) {
         let good = false;
         switch (attr) {
+          case Attribute.ChecksAndDCs: {
+            good = ![Attribute.HP, Attribute.DamageRolls].includes(
+              modifiedAttr,
+            );
+            break;
+          }
           case Attribute.Attacks: {
             good = attacks.includes(modifiedAttr);
             break;
@@ -177,6 +314,24 @@ export function calculateMods(
             good = attr == modifiedAttr || ac.includes(modifiedAttr);
             break;
           }
+          case Attribute.ConChecks: {
+            if (modifiedAttr == Attribute.HP) {
+              good = true;
+              amount *= character.level;
+              break;
+            }
+            // falls through
+          }
+          case Attribute.StrChecks:
+          case Attribute.DexChecks:
+          case Attribute.IntChecks:
+          case Attribute.WisChecks:
+          case Attribute.ChaChecks: {
+            const score = attrScore[Attribute[attr]];
+            if (score === undefined) break;
+            good = score == attrScore[Attribute[modifiedAttr]];
+            break;
+          }
           default: {
             good = attr == modifiedAttr;
             break;
@@ -188,10 +343,10 @@ export function calculateMods(
         }
       }
       if (!matches) continue;
-      if (sMod.amount > 0) {
-        bonuses[sMod.type] = Math.max(bonuses[sMod.type], sMod.amount);
-      } else if (sMod.amount < 0) {
-        penalties[sMod.type] = Math.min(penalties[sMod.type], sMod.amount);
+      if (amount > 0) {
+        bonuses[sMod.type] = Math.max(bonuses[sMod.type], amount);
+      } else if (amount < 0) {
+        penalties[sMod.type] = Math.min(penalties[sMod.type], amount);
       }
     }
   }

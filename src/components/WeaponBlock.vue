@@ -127,12 +127,12 @@ const { character, weapon, interactive } = defineProps<{
 
 const modifiedAttack = computed(() => {
   return interactive
-    ? applyAttackMods(character.modifiers, weapon.attack)
+    ? applyAttackMods(character, weapon.attack)
     : weapon.attack;
 });
 const modifiedDamage = computed(() => {
   return interactive
-    ? applyDamageMods(character.modifiers, weapon.damage)
+    ? applyDamageMods(character, weapon.damage)
     : weapon.damage;
 });
 const damageSplitString = computed(() => {

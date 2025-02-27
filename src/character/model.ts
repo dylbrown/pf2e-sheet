@@ -87,6 +87,14 @@ export enum Attribute {
   SkillChecks,
   AC,
   LoreChecks,
+  StrChecks,
+  DexChecks,
+  ConChecks,
+  IntChecks,
+  WisChecks,
+  ChaChecks,
+  ChecksAndDCs,
+  HP,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -120,7 +128,14 @@ export const attrScore: { [a in Attribute as string]: Score } = {
   LightArmor: Score.Dexterity,
   MediumArmor: Score.Dexterity,
   HeavyArmor: Score.Dexterity,
-  ClassDC: Score.Strength,
+  AC: Score.Dexterity,
+  LoreChecks: Score.Intelligence,
+  StrChecks: Score.Strength,
+  DexChecks: Score.Dexterity,
+  ConChecks: Score.Constitution,
+  IntChecks: Score.Intelligence,
+  WisChecks: Score.Wisdom,
+  ChaChecks: Score.Charisma,
 };
 
 export const skills = [

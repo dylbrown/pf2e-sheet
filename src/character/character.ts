@@ -25,7 +25,7 @@ import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
 import { abilityMod, getProficiency, parseDescription } from './util';
 import vm from 'node:vm';
-import { ModEffect } from './modifiers';
+import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
 export default class Character {
@@ -71,6 +71,7 @@ export default class Character {
   money = 0;
   spells = new Spells();
   modifiers: Reactive<ModEffect[]>;
+  conditions: Reactive<{ [key in Condition]?: ConditionData }>;
 
   constructor() {
     this.scores = {} as Scores;
@@ -79,13 +80,14 @@ export default class Character {
     Object.values(Attribute).forEach((a) => {
       if (isNaN(a as number)) return;
       this.attributes[a as Attribute] = {
-        total: -1,
+        total: 0,
         score: attrScore[Attribute[a as Attribute]] as Score,
         itemBonus: 0,
         level: 0,
         proficiency: Proficiency.Untrained,
       };
     });
+    this.conditions = reactive({});
     this.modifiers = reactive([]);
   }
 
