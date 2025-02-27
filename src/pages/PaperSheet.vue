@@ -30,7 +30,7 @@
             Ability Scores
           </div>
           <div id="ability-grid">
-            <template v-for="score of [0, 3, 1, 4, 2, 5]" :key="score">
+            <template v-for="score of [0, 1, 2, 3, 4, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
                   {{ Score[score]?.substring(0, 3).toUpperCase() }}
@@ -38,16 +38,15 @@
                 <div class="labello invisible">A</div>
               </div>
               <div class="line">
-                <div class="underlined-roll">
+                <div
+                  :class="
+                    'underlined-roll' +
+                    (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  "
+                >
                   {{ signed(abilityMod(character.scores[score as Score])) }}
                 </div>
                 <div class="labello">Mod</div>
-              </div>
-              <div class="line">
-                <div class="numBox rounded">
-                  {{ character.scores[score as Score] }}
-                </div>
-                <div class="labello">Score</div>
               </div>
             </template>
           </div>
@@ -58,7 +57,11 @@
           <div class="row-between">
             <div class="line">
               <div class="numBox rounded bounded-line" data-max="2.1">
-                {{ character.speed }} ft.
+                {{
+                  Object.entries(character.speed)
+                    .map(([type, speed]) => type + ' ' + speed + ' ft.')
+                    .join(', ')
+                }}
               </div>
               <div class="labello">Speed</div>
             </div>
@@ -545,7 +548,7 @@ onMounted(() => {
         const bound =
           parseFloat(val.getAttribute('data-max') ?? '2.1') *
           parseFloat(getComputedStyle(value).lineHeight);
-        while (value.offsetHeight >= bound && size > 4) {
+        while (value.offsetHeight >= bound && size > 6) {
           size -= 0.25;
           value.style.fontSize = size.toString() + 'px';
         }

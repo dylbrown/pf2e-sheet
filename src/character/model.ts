@@ -330,7 +330,9 @@ export class DamageType {
     let dt = this.damageTypes[name.toLowerCase()];
     if (dt) return dt;
     const lastSpace = name.lastIndexOf(' ');
-    let key = name.substring(0, lastSpace + 1);
+    let key = name
+      .substring(0, lastSpace + 1)
+      .replaceAll(/persistent /gi, 'p.');
     for (let i = 1; i <= name.length; i++) {
       const letter = name.substring(lastSpace + i, lastSpace + i + 1);
       key += i == 1 ? letter.toUpperCase() : letter.toLowerCase();

@@ -27,7 +27,7 @@ import { abilityMod, getProficiency, parseDescription } from './util';
 import vm from 'node:vm';
 import { ModEffect } from './modifiers';
 
-type DamageEffects = { [type: string]: number };
+type NumbersOfType = { [type: string]: number };
 export default class Character {
   remaster = false;
   starfinder = false;
@@ -44,12 +44,12 @@ export default class Character {
   senses = Array<string>();
   languages = Array<string>();
   scores: Scores;
-  speed = 25;
+  speed: NumbersOfType = { '': 25 };
   classDC = 10;
   hp = 69;
-  immunities: DamageEffects = {};
-  resistances: DamageEffects = {};
-  weaknesses: DamageEffects = {};
+  immunities: NumbersOfType = {};
+  resistances: NumbersOfType = {};
+  weaknesses: NumbersOfType = {};
   ac = 23;
   combat = {
     armor: {
@@ -164,16 +164,11 @@ export default class Character {
     );
 
     // Speed
-    (data.content?.speeds ?? [])
-      .map((speed: any) => {
-        const name = speed.name.replaceAll(/SPEED_?/gi, '');
-        if (speed.value.value == 0) return '';
-        return name.length == 0
-          ? speed.value.total
-          : name + ' ' + speed.value.total;
-      })
-      .filter((s: string) => s.length > 0)
-      .join(', ');
+    (data.content?.speeds ?? []).forEach((speed: any) => {
+      const name: string = speed.name.replaceAll(/SPEED_?/gi, '');
+      if (speed.value.value == 0) return;
+      this.speed[name] = speed.value.total;
+    });
 
     this.classDC =
       10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
@@ -187,7 +182,7 @@ export default class Character {
       data.content?.shield_item?.item?.meta_data?.ac_bonus ?? 0;
     this.hp = data.content?.max_hp ?? 0;
 
-    const addDamageEffect = (s: string, e: DamageEffects) => {
+    const addDamageEffect = (s: string, e: NumbersOfType) => {
       const info = s.split(',');
       if (!info[0] || !info[1]) return;
       e[info[0].trim()] = parseInt(info[1]);

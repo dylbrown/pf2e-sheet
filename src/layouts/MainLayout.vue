@@ -2,21 +2,19 @@
   <div v-if="!ready" id="load-box">
     <h5>Pathfinder Second Edition Character Sheet for Wanderer's Guide</h5>
     <q-toggle
-      :label="`Generating ${
-        interactiveMode ? 'Interactive (WIP)' : 'Paper'
-      } Sheet`"
+      :label="`Generating ${interactiveMode ? 'Interactive' : 'Paper'} Sheet`"
       v-model="interactiveMode"
     />
     <q-file
       v-model="file"
-      label="Pick one file"
+      label="Pick a file"
       accept=".guidechar,.json"
       filled
       style="max-width: 20em; align-self: flex-start"
       :item-aligned="true"
       @update:model-value="(_$event) => load()"
     />
-    <q-linear-progress :value="progress" />
+    <q-linear-progress :value="progress" style="min-height: 50px" />
   </div>
   <InteractiveSheet v-if="ready && interactiveMode" :character="character" />
   <PaperSheet v-if="ready && !interactiveMode" :character="character" />

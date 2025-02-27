@@ -18,8 +18,8 @@
           <div class="labello compact">Attack</div>
         </div>
         <div class="line">
-          <div class="underlined weapon-info bounded-line" data-max="1.8">
-            <span class="list-flow">
+          <div class="underlined weapon-info bounded-line" data-max="2.2">
+            <span class="list-flow" style="word-spacing: -0.5em">
               <template v-if="modifiedDamage.dice > 0">{{
                 damageSplitString[0]
               }}</template
@@ -33,9 +33,9 @@
               >&nbsp;{{ damageSplitString[damageSplitString.length - 1]?.trim()
               }}<template v-for="rune of weapon.runes ?? []" :key="rune.name">
                 <ClickableRune :rune="rune" v-if="interactive">
-                  &nbsp;+ {{ rune.toString() }}</ClickableRune
+                  + {{ rune.toString() }}</ClickableRune
                 ><template v-else>
-                  &nbsp;+ {{ rune.dice }}{{ rune.die
+                  + {{ rune.dice }}{{ rune.die
                   }}<template v-if="rune.bonus > 0">
                     + {{ rune.bonus }}</template
                   >
@@ -72,7 +72,7 @@
           <div
             class="underlined weapon-traits bounded-line"
             :data-pass="3"
-            :data-max="1.5"
+            :data-max="1.8"
           >
             <span v-if="interactive" class="list-flow">
               <template v-for="(rune, index) in weapon.runes" :key="rune.name">
@@ -90,7 +90,7 @@
           <div
             class="underlined weapon-traits bounded-line"
             :data-pass="2"
-            :data-max="1.5"
+            :data-max="1.8"
           >
             <span v-if="interactive" class="list-flow">
               <template

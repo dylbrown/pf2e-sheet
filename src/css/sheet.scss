@@ -448,7 +448,7 @@ body {
 .dashed {
   border-style: dashed;
 }
-.labello {
+div.labello {
   font-size: 0.5em;
   min-height: 0.5em;
   color: #333;
@@ -458,7 +458,7 @@ body {
   text-align: left;
   align-self: flex-end;
 }
-.labello.invisible {
+div.labello.invisible {
   color: white;
 }
 .underlined.character-name {
@@ -485,7 +485,7 @@ body {
   background-color: lightgrey;
   border-color: darkgrey;
 }
-.sectionDivider {
+div.sectionDivider {
   flex-grow: 0;
 }
 
@@ -585,6 +585,7 @@ div.weapon-label {
   padding-left: 5px;
   text-align: right;
   .list-flow {
+    word-spacing: -0.25em;
     align-self: flex-end;
   }
 }
@@ -642,12 +643,12 @@ div.action-label {
   &.inline {
     display: inline-flex;
   }
-  .ability-box & {
+  .ability-box > &:is(div) {
     height: 2em;
     min-width: 2em;
     padding: 0.18rem;
-    border-radius: 1.25em;
-    font-size: 1.15em;
+    border-radius: 1em;
+    font-size: 1.3em;
   }
 }
 .action-details .underlined {
@@ -747,18 +748,10 @@ div.action-label {
 
 #ability-grid {
   display: grid;
-  .paper & {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    column-gap: 5px;
-    row-gap: 5px;
-    grid-template-rows: 1fr 1fr 1fr;
-  }
-  .interactive & {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    column-gap: 1px;
-    row-gap: 1px;
-    grid-template-rows: 1fr 1fr;
-  }
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 1px;
+  row-gap: 1px;
   align-items: start;
   justify-items: center;
 }
