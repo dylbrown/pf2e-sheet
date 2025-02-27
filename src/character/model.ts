@@ -315,46 +315,52 @@ export class Weapon extends Item {
 export class DamageType {
   private _shortName: string;
   readonly name: string;
+  readonly priority: boolean;
   get shortName(): string {
     return this._shortName;
   }
-  private constructor(name: string, shortName: string) {
+  private constructor(name: string, shortName: string, priority: boolean) {
     this.name = name;
     this._shortName = shortName;
+    this.priority = priority;
   }
 
   private static damageTypes: { [name: string]: DamageType } = {};
   private static nameKeys: { [name: string]: string | null } = {};
-  static get(name: DamageType | string): DamageType {
+  static get(name: DamageType | string, priority: boolean = false): DamageType {
     if (name instanceof DamageType) return name;
     let dt = this.damageTypes[name.toLowerCase()];
     if (dt) return dt;
     const lastSpace = name.lastIndexOf(' ');
     let key = name
       .substring(0, lastSpace + 1)
-      .replaceAll(/persistent /gi, 'p.');
+      .replaceAll(/persistent /gi, 'P.');
+    let finalWordKey = '';
     for (let i = 1; i <= name.length; i++) {
       const letter = name.substring(lastSpace + i, lastSpace + i + 1);
-      key += i == 1 ? letter.toUpperCase() : letter.toLowerCase();
+      const capitalized = i == 1 ? letter.toUpperCase() : letter.toLowerCase();
+      key += capitalized;
+      finalWordKey += capitalized;
       const nameKey = this.nameKeys[key];
-      if (nameKey === null) continue;
+      if (!nameKey && !this.nameKeys[finalWordKey]) break;
       else if (nameKey) {
         const conflict = this.damageTypes[nameKey.toLowerCase()];
         if (!conflict) break;
+        if (!priority && conflict?.priority) continue;
         conflict._shortName += conflict.name[conflict._shortName.length];
         delete this.nameKeys[key];
         this.nameKeys[conflict._shortName] = nameKey;
-      } else break;
+      }
     }
-    dt = new DamageType(name, key);
+    dt = new DamageType(name, key, priority);
     this.damageTypes[name.toLowerCase()] = dt;
     this.nameKeys[key] = name;
     return dt;
   }
 }
-DamageType.get('Slashing');
-DamageType.get('Bludgeoning');
-DamageType.get('Piercing');
+DamageType.get('Slashing', true);
+DamageType.get('Bludgeoning', true);
+DamageType.get('Piercing', true);
 
 export class DamageInstance {
   readonly bonus: number;

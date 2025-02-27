@@ -39,9 +39,7 @@
                   }}<template v-if="rune.bonus > 0">
                     + {{ rune.bonus }}</template
                   >
-                  {{
-                    rune.damageType.name.replaceAll('persistent ', 'p.')
-                  }}</template
+                  {{ rune.damageType.shortName }}</template
                 >
               </template></span
             >
