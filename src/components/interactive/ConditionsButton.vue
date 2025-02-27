@@ -32,7 +32,16 @@
               v-for="[i, statMod] of Object.entries(effect.statMods)"
               :key="i"
             >
-              {{ signed(statMod.amount) }} {{ statMod.type }} to
+              {{
+                effect.has_value
+                  ? conditions[effect.name as Condition]
+                    ? signed(
+                        -1 * (conditions[effect.name as Condition]?.value ?? 0),
+                      )
+                    : '-X'
+                  : statMod.amount
+              }}
+              {{ statMod.type }} to
               {{ statMod.attrs.map(AttrLabel).join(', ') }}
             </div>
             <q-toggle
