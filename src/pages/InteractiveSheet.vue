@@ -76,7 +76,13 @@
               <div class="numBox rounded bounded-line" data-max="2.1">
                 {{
                   Object.entries(character.speed)
-                    .map(([type, speed]) => type + ' ' + speed + ' ft.')
+                    .map(
+                      ([type, speed]) =>
+                        type +
+                        ' ' +
+                        (speed + applyMods(character, Attribute.Speeds)) +
+                        ' ft.',
+                    )
                     .join(', ')
                 }}
               </div>

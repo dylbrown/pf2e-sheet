@@ -5,6 +5,7 @@ import {
   Attribute,
   attrScore,
   DamageInstance,
+  notChecksAndDCs,
   saves,
   skills,
 } from './model';
@@ -49,6 +50,75 @@ export class ModEffect {
     this.enabled = enabled;
   }
 
+  apply(
+    modifiedAttr: Attribute,
+    character: Character,
+    bonuses: ModNumberList,
+    penalties: ModNumberList,
+  ) {
+    for (const sMod of this.statMods) {
+      let amount = sMod.amount;
+      let matches = false;
+      for (const attr of sMod.attrs) {
+        let good = false;
+        switch (attr) {
+          case Attribute.ChecksAndDCs: {
+            good = !notChecksAndDCs.includes(modifiedAttr);
+            break;
+          }
+          case Attribute.Attacks: {
+            good = attacks.includes(modifiedAttr);
+            break;
+          }
+          case Attribute.Saves: {
+            good = saves.includes(modifiedAttr);
+            break;
+          }
+          case Attribute.SkillChecks: {
+            good = skills.includes(modifiedAttr);
+            break;
+          }
+          case Attribute.AC: {
+            good = attr == modifiedAttr || ac.includes(modifiedAttr);
+            break;
+          }
+          case Attribute.ConChecks: {
+            if (modifiedAttr == Attribute.HP) {
+              good = true;
+              amount *= character.level;
+              break;
+            }
+            // falls through
+          }
+          case Attribute.StrChecks:
+          case Attribute.DexChecks:
+          case Attribute.IntChecks:
+          case Attribute.WisChecks:
+          case Attribute.ChaChecks: {
+            const score = attrScore[Attribute[attr]];
+            if (score === undefined) break;
+            good = score == attrScore[Attribute[modifiedAttr]];
+            break;
+          }
+          default: {
+            good = attr == modifiedAttr;
+            break;
+          }
+        }
+        if (good) {
+          matches = true;
+          break;
+        }
+      }
+      if (!matches) continue;
+      if (amount > 0) {
+        bonuses[sMod.type] = Math.max(bonuses[sMod.type], amount);
+      } else if (amount < 0) {
+        penalties[sMod.type] = Math.min(penalties[sMod.type], amount);
+      }
+    }
+  }
+
   static clone(mod: ModEffect): ModEffect {
     return new ModEffect(
       mod.name,
@@ -58,21 +128,55 @@ export class ModEffect {
   }
 }
 
+type ConditionList = { [c in Condition]?: number | boolean };
 export class ConditionData extends ModEffect {
-  private _value = 1;
+  private _value = 0;
+  readonly condition: Condition;
   readonly has_value: boolean;
   readonly icon: string;
-  constructor(name: string, statMods: StatMod[], icon: string, value?: number) {
-    super(name, statMods, true);
+  readonly child_conditions: ConditionList;
+
+  private _lock_minimum: ConditionList = {};
+  get lock_minimum() {
+    return this._lock_minimum;
+  }
+
+  constructor(
+    condition: Condition,
+    statMods: StatMod[],
+    icon: string,
+    child_conditions?: ConditionList,
+    has_value?: boolean,
+  ) {
+    super(condition, statMods, true);
+    this.condition = condition;
     this.icon = icon;
-    this.has_value = value !== undefined;
-    if (value !== undefined) this._value = value;
+    this.has_value = has_value ?? false;
+    this.child_conditions = child_conditions ?? {};
+  }
+
+  get locked(): boolean {
+    if (this.has_value) {
+      return (
+        this._value <=
+        Math.max(
+          0,
+          ...Object.values(this.lock_minimum).filter(
+            (s) => typeof s === 'number',
+          ),
+        )
+      );
+    }
+    return Object.values(this.lock_minimum).length > 0;
   }
 
   get value(): number {
-    return this._value;
+    return Math.max(
+      this._value,
+      ...Object.values(this.lock_minimum).filter((s) => typeof s === 'number'),
+    );
   }
-  set value(value: number) {
+  private set value(value: number) {
     if (value < 0 || !Number.isInteger(value)) return;
     this._value = value;
     for (const statMod of this.statMods) {
@@ -80,13 +184,75 @@ export class ConditionData extends ModEffect {
     }
   }
 
-  static override clone(mod: ConditionData): ConditionData {
-    return new ConditionData(
-      mod.name,
+  static override clone(mod: ConditionData, value?: number): ConditionData {
+    const cc: ConditionList = {};
+    Object.assign(cc, mod.child_conditions);
+    const c = new ConditionData(
+      mod.condition,
       mod.statMods.map((sm) => StatMod.clone(sm)),
       mod.icon,
-      mod.has_value ? mod.value : undefined,
+      cc,
+      mod.has_value,
     );
+    if (c.has_value && value !== undefined) c.value = value;
+    return c;
+  }
+
+  static add(condition: Condition, character: Character) {
+    if (
+      !conditionEffects[condition].has_value &&
+      character.conditions[condition]
+    )
+      return;
+    if (!character.conditions[condition]) {
+      character.conditions[condition] = ConditionData.clone(
+        conditionEffects[condition],
+      );
+
+      const c = character.conditions[condition];
+
+      for (const [cs, amount] of Object.entries(c.child_conditions)) {
+        const condition = cs as Condition;
+        character.conditions[condition] =
+          character.conditions[condition] ??
+          ConditionData.clone(conditionEffects[condition]);
+        const data = character.conditions[condition];
+        data.lock_minimum[condition] = amount;
+      }
+    }
+    character.conditions[condition].value += 1;
+  }
+
+  static remove(condition: Condition, character: Character) {
+    if (
+      !character.conditions[condition] ||
+      (character.conditions[condition].locked &&
+        !character.conditions[condition].has_value)
+    )
+      return;
+    if (
+      character.conditions[condition].has_value &&
+      character.conditions[condition].value > 0
+    ) {
+      character.conditions[condition].value -= 1;
+      if (character.conditions[condition].value > 0) {
+        return;
+      }
+    }
+
+    for (const [cs] of Object.entries(
+      character.conditions[condition].child_conditions,
+    )) {
+      const condition = cs as Condition;
+      const data = character.conditions[condition];
+      if (data === undefined) return;
+      delete data.lock_minimum[condition];
+      if (!data.has_value || data.value == 0) {
+        this.remove(data.condition, character);
+      }
+    }
+
+    delete character.conditions[condition];
   }
 }
 
@@ -94,13 +260,16 @@ export enum Condition {
   Blinded = 'Blinded',
   Clumsy = 'Clumsy',
   Drained = 'Drained',
+  Encumbered = 'Encumbered',
   Enfeebled = 'Enfeebled',
   Fascinated = 'Fascinated',
   Fatigued = 'Fatigued',
   Frightened = 'Frightened',
   OffGuard = 'Off-Guard',
+  Prone = 'Prone',
   Sickened = 'Sickened',
   Stupefied = 'Stupefied',
+  Unconscious = 'Unconscious',
 }
 
 export const conditionEffects: { [condition in Condition]: ConditionData } = {
@@ -113,19 +282,28 @@ export const conditionEffects: { [condition in Condition]: ConditionData } = {
     Condition.Clumsy,
     [new StatMod(StatModType.Status, [Attribute.DexChecks], -1)],
     'ra-player-despair',
-    1,
+    undefined,
+    true,
   ),
   [Condition.Drained]: new ConditionData(
     Condition.Drained,
     [new StatMod(StatModType.Status, [Attribute.ConChecks], -1)],
     'ra-bleeding-hearts',
-    1,
+    undefined,
+    true,
+  ),
+  [Condition.Encumbered]: new ConditionData(
+    Condition.Encumbered,
+    [new StatMod(StatModType.None, [Attribute.Speeds], -10)],
+    'ra-boot-stomp',
+    { [Condition.Clumsy]: 1 },
   ),
   [Condition.Enfeebled]: new ConditionData(
     Condition.Enfeebled,
     [new StatMod(StatModType.Status, [Attribute.StrChecks], -1)],
     'ra-broken-bone',
-    1,
+    undefined,
+    true,
   ),
   [Condition.Fascinated]: new ConditionData(
     Condition.Fascinated,
@@ -147,18 +325,26 @@ export const conditionEffects: { [condition in Condition]: ConditionData } = {
     Condition.Frightened,
     [new StatMod(StatModType.Status, [Attribute.ChecksAndDCs], -1)],
     'priority_high',
-    1,
+    undefined,
+    true,
   ),
   [Condition.OffGuard]: new ConditionData(
     Condition.OffGuard,
     [new StatMod(StatModType.Circumstance, [Attribute.AC], -2)],
     'ra-uncertainty',
   ),
+  [Condition.Prone]: new ConditionData(
+    Condition.Prone,
+    [new StatMod(StatModType.Circumstance, [Attribute.Attacks], -2)],
+    'ra-falling',
+    { [Condition.OffGuard]: true },
+  ),
   [Condition.Sickened]: new ConditionData(
     Condition.Sickened,
     [new StatMod(StatModType.Status, [Attribute.ChecksAndDCs], -1)],
     'o_sick',
-    1,
+    undefined,
+    true,
   ),
   [Condition.Stupefied]: new ConditionData(
     Condition.Stupefied,
@@ -170,7 +356,20 @@ export const conditionEffects: { [condition in Condition]: ConditionData } = {
       ),
     ],
     'o_psychology_alt',
-    1,
+    undefined,
+    true,
+  ),
+  [Condition.Unconscious]: new ConditionData(
+    Condition.Unconscious,
+    [
+      new StatMod(
+        StatModType.Status,
+        [Attribute.AC, Attribute.Perception, Attribute.Reflex],
+        -4,
+      ),
+    ],
+    'airline_seat_flat',
+    { [Condition.Blinded]: true, [Condition.OffGuard]: true },
   ),
 };
 
@@ -286,69 +485,7 @@ export function calculateMods(
     const mod =
       i < condCount ? conditionsList[i] : character.modifiers[i - condCount];
     if (mod == undefined || !mod.enabled) continue;
-    for (const sMod of mod.statMods) {
-      let amount = sMod.amount;
-      let matches = false;
-      for (const attr of sMod.attrs) {
-        let good = false;
-        switch (attr) {
-          case Attribute.ChecksAndDCs: {
-            good = ![Attribute.HP, Attribute.DamageRolls].includes(
-              modifiedAttr,
-            );
-            break;
-          }
-          case Attribute.Attacks: {
-            good = attacks.includes(modifiedAttr);
-            break;
-          }
-          case Attribute.Saves: {
-            good = saves.includes(modifiedAttr);
-            break;
-          }
-          case Attribute.SkillChecks: {
-            good = skills.includes(modifiedAttr);
-            break;
-          }
-          case Attribute.AC: {
-            good = attr == modifiedAttr || ac.includes(modifiedAttr);
-            break;
-          }
-          case Attribute.ConChecks: {
-            if (modifiedAttr == Attribute.HP) {
-              good = true;
-              amount *= character.level;
-              break;
-            }
-            // falls through
-          }
-          case Attribute.StrChecks:
-          case Attribute.DexChecks:
-          case Attribute.IntChecks:
-          case Attribute.WisChecks:
-          case Attribute.ChaChecks: {
-            const score = attrScore[Attribute[attr]];
-            if (score === undefined) break;
-            good = score == attrScore[Attribute[modifiedAttr]];
-            break;
-          }
-          default: {
-            good = attr == modifiedAttr;
-            break;
-          }
-        }
-        if (good) {
-          matches = true;
-          break;
-        }
-      }
-      if (!matches) continue;
-      if (amount > 0) {
-        bonuses[sMod.type] = Math.max(bonuses[sMod.type], amount);
-      } else if (amount < 0) {
-        penalties[sMod.type] = Math.min(penalties[sMod.type], amount);
-      }
-    }
+    mod.apply(modifiedAttr, character, bonuses, penalties);
   }
   return [bonuses, penalties];
 }

@@ -95,6 +95,7 @@ export enum Attribute {
   ChaChecks,
   ChecksAndDCs,
   HP,
+  Speeds,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -192,6 +193,12 @@ export const ac = [
   Attribute.LightArmor,
   Attribute.MediumArmor,
   Attribute.HeavyArmor,
+];
+
+export const notChecksAndDCs = [
+  Attribute.HP,
+  Attribute.DamageRolls,
+  Attribute.Speeds,
 ];
 
 export const weaponsAndArmor: { [s: string]: Attribute } = {

@@ -1488,11 +1488,26 @@ div.spell-cost-optional > span {
     padding: 10px;
   }
 
-  .condition {
+  .condition,
+  .condition-header {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
+  }
+
+  .condition {
+    justify-content: space-between;
+    padding-bottom: 5px;
+  }
+
+  .condition-header {
+    justify-content: flex-start;
+  }
+
+  .condition-desc {
+    color: grey;
+    font-size: 0.5em;
+    text-align: center;
   }
 
   .value-condition {
@@ -1500,7 +1515,7 @@ div.spell-cost-optional > span {
     flex-direction: row;
     align-items: center;
     padding: 2px 0;
-    padding-top: 5px;
+    padding-bottom: 5px;
   }
 
   .buffed,

@@ -26,13 +26,14 @@
                   />
                 </div>
               </q-item-label>
-              <q-item-label
-                caption
-                v-for="[i, statMod] of Object.entries(mod.statMods)"
-                :key="i"
-              >
-                {{ signed(statMod.amount) }} {{ statMod.type }} to
-                {{ statMod.attrs.map(AttrLabel).join(', ') }}
+              <q-item-label caption style="max-width: 30em">
+                <template
+                  v-for="[i, statMod] of Object.values(mod.statMods).entries()"
+                  :key="i"
+                  ><template v-if="i > 0">; </template
+                  >{{ signed(statMod.amount) }} {{ statMod.type }} to
+                  {{ statMod.attrs.map(AttrLabel).join(', ') }}</template
+                >
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -160,6 +161,7 @@ const options_temp = [
   Attribute.AC,
   Attribute.Saves,
   Attribute.SkillChecks,
+  Attribute.Speeds,
 ];
 options_temp.push(...saves, Attribute.Perception);
 options_temp.push(...(props.character.starfinder ? sfSkills : skills));

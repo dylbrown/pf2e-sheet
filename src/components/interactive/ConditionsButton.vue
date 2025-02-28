@@ -24,46 +24,64 @@
             v-for="[i, effect] of Object.values(conditionEffects).entries()"
             :key="i"
           >
-            <div class="row center-content">
-              <span><q-icon icon :name="effect.icon" /> {{ effect.name }}</span>
-            </div>
-            <div
-              style="color: grey; font-size: 0.5em"
-              v-for="[i, statMod] of Object.entries(effect.statMods)"
-              :key="i"
-            >
-              {{
-                effect.has_value
-                  ? conditions[effect.name as Condition]
-                    ? signed(
-                        -1 * (conditions[effect.name as Condition]?.value ?? 0),
-                      )
-                    : '-X'
-                  : statMod.amount
-              }}
-              {{ statMod.type }} to
-              {{ statMod.attrs.map(AttrLabel).join(', ') }}
+            <div class="condition-header">
+              <div class="row center-content">
+                <span
+                  ><q-icon icon :name="effect.icon" /> {{ effect.name }}</span
+                >
+              </div>
+              <div class="condition-desc">
+                <template
+                  v-for="[i, statMod] of Object.values(
+                    effect.statMods,
+                  ).entries()"
+                  :key="i"
+                >
+                  <template v-if="i > 0">; </template>
+                  {{
+                    effect.has_value
+                      ? conditions[effect.condition]
+                        ? signed(
+                            -1 * (conditions[effect.condition]?.value ?? 0),
+                          )
+                        : '-X'
+                      : statMod.amount
+                  }}
+                  {{ statMod.type }} to
+                  {{ statMod.attrs.map(AttrLabel).join(', ') }}
+                </template>
+                <template
+                  v-for="[c, value] of Object.entries(effect.child_conditions)"
+                  :key="c"
+                  >; {{ c
+                  }}<template v-if="typeof value === 'number'">{{
+                    ' ' + value
+                  }}</template>
+                </template>
+              </div>
             </div>
             <q-toggle
               v-if="!effect.has_value"
+              :disable="isLocked(effect.condition)"
               v-model="conditionEnabled[i]"
               @update:model-value="
-                (value) => updateCondition(effect.name as Condition, value)
+                (value) => updateCondition(effect.condition, value)
               "
             />
             <div v-if="effect.has_value" class="value-condition">
               <q-btn
                 dense
                 icon="remove"
-                @click="removeCondition(effect.name as Condition)"
+                :disable="isLocked(effect.condition)"
+                @click="ConditionData.remove(effect.condition, character)"
               />
               <div style="padding: 0 10px">
-                {{ conditions[effect.name as Condition]?.value ?? 0 }}
+                {{ conditions[effect.condition]?.value ?? 0 }}
               </div>
               <q-btn
                 dense
                 icon="add"
-                @click="addCondition(effect.name as Condition)"
+                @click="ConditionData.add(effect.condition, character)"
               />
             </div>
           </div>
@@ -85,7 +103,7 @@ import {
   conditionEffects,
 } from 'src/character/modifiers';
 
-const props = defineProps<{
+const { character } = defineProps<{
   character: Character;
 }>();
 
@@ -96,24 +114,24 @@ const viewConditions = ref<boolean>(false);
 
 type ConditionSaveData = { [key in Condition]?: number };
 const loadedConditions = LS.load<ConditionSaveData>(
-  props.character.name,
+  character.name,
   'conditions',
 );
 if (loadedConditions != null) {
   for (const condition of Object.values(Condition)) {
     // eslint-disable-next-line vue/no-mutating-props
-    delete props.character.conditions[condition];
+    delete character.conditions[condition];
   }
   for (const [condition, value] of Object.entries(loadedConditions)) {
     const effect = ConditionData.clone(
       conditionEffects[condition as Condition],
+      value,
     );
-    if (effect.has_value) effect.value = value;
     // eslint-disable-next-line vue/no-mutating-props
-    props.character.conditions[condition as Condition] = effect;
+    character.conditions[condition as Condition] = effect;
   }
 }
-const conditions = props.character.conditions;
+const conditions = character.conditions;
 
 const conditionEnabled = ref<boolean[]>(
   Array(Object.keys(conditionEffects).length).fill(false),
@@ -121,22 +139,15 @@ const conditionEnabled = ref<boolean[]>(
 for (const [i, key] of Object.keys(conditionEffects).entries()) {
   conditionEnabled.value[i] = conditions[key as Condition] != null;
 }
-const addCondition = (condition: Condition) => {
-  if (!conditions[condition])
-    conditions[condition] = ConditionData.clone(conditionEffects[condition]);
-  else conditions[condition].value += 1;
-};
-const removeCondition = (condition: Condition) => {
-  if (!conditions[condition]) return;
-  if (conditions[condition].value > 1) conditions[condition].value -= 1;
-  else delete conditions[condition];
-};
+
+const isLocked = (c: Condition) =>
+  character.conditions[c] !== undefined && character.conditions[c]?.locked;
 
 const updateCondition = (condition: Condition, value: boolean) => {
-  if (value && !conditions[condition]) {
-    conditions[condition] = ConditionData.clone(conditionEffects[condition]);
-  } else if (!value && conditions[condition]) {
-    delete conditions[condition];
+  if (value) {
+    ConditionData.add(condition, character);
+  } else {
+    ConditionData.remove(condition, character);
   }
 };
 
@@ -145,6 +156,9 @@ watch(conditions, (val) => {
   Object.entries(val).forEach(([condition, effect]) => {
     data[condition as Condition] = effect.has_value ? effect.value : 1;
   });
-  LS.save(props.character.name, data, 'conditions');
+  LS.save(character.name, data, 'conditions');
+  for (const [i, key] of Object.keys(conditionEffects).entries()) {
+    conditionEnabled.value[i] = conditions[key as Condition] != null;
+  }
 });
 </script>
