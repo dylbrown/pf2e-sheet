@@ -69,7 +69,7 @@
                 v-model.number="statMod.amount"
                 type="number"
                 filled
-                style="max-width: 65px; padding-right: 5px"
+                style="padding-right: 5px"
                 :prefix="statMod.amount >= 0 ? '+' : ''"
               />
               <q-select

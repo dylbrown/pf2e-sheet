@@ -73,15 +73,18 @@
           <div class="sectionLabel">Misc.</div>
           <div class="row-between">
             <div class="line">
-              <div class="numBox rounded bounded-line" data-max="2.1">
+              <div
+                class="numBox rounded bounded-line"
+                data-max="2.1"
+                :class="
+                  speedMod > 0 ? 'buffed' : speedMod < 0 ? 'debuffed' : ''
+                "
+              >
                 {{
                   Object.entries(character.speed)
                     .map(
                       ([type, speed]) =>
-                        type +
-                        ' ' +
-                        (speed + applyMods(character, Attribute.Speeds)) +
-                        ' ft.',
+                        type + ' ' + (speed + speedMod) + ' ft.',
                     )
                     .join(', ')
                 }}
@@ -549,6 +552,10 @@ const props = defineProps<{
 const moddedAttr = (attr: Attribute) => {
   return applyMods(props.character, attr);
 };
+
+const speedMod = computed(() => {
+  return applyMods(props.character, Attribute.Speeds);
+});
 
 const moddedAC = computed(() => {
   return applyACMods(props.character);
