@@ -610,6 +610,8 @@ abstract class AbstractDataEntry implements DataEntry {
   }
 }
 
+let sourceDataMissing = false;
+
 class StaticBank<T extends DataEntry> {
   private bank: { [id: number]: T } = {};
   private ctor: (e: DataEntry) => T;
@@ -631,6 +633,13 @@ class StaticBank<T extends DataEntry> {
   }
   public get(id: number) {
     if (this.bank[id]) return this.bank[id];
+    if (!sourceDataMissing) {
+      sourceDataMissing = true;
+
+      alert(
+        "This character is missing info for a source it uses! Please re-export from Wanderer's Guide, and report this as a bug if that doesn't fix it.",
+      );
+    }
     return this.ctor({ name: id.toString(), id: id, description: '' });
   }
 

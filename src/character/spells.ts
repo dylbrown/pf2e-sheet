@@ -161,13 +161,13 @@ export default class Spells {
       }
     }
 
-    if (
-      this.lists.some((l) =>
-        [SpellListSubType.Tradition, SpellListSubType.Apparition].includes(
-          l.subtype,
-        ),
-      )
-    ) {
+    const allStuff = this.lists.some((l) =>
+      [SpellListSubType.Tradition, SpellListSubType.Apparition].includes(
+        l.subtype,
+      ),
+    );
+
+    if (allStuff && content.all_spells) {
       const allSpells = new Map<string, Spell>();
       Object.values(content.all_spells).forEach((s: any) => {
         const spell = this.makeSpell(s, context, '');
@@ -259,6 +259,10 @@ export default class Spells {
           }
         }
       }
+    } else if (allStuff) {
+      alert(
+        `Please re-export this character from Wanderer's Guide! It's missing some handy data that Wanderer's Guide now includes.`,
+      );
     }
 
     const maxCount = (prev: number, curr: number, id: number) =>
