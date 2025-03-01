@@ -174,10 +174,10 @@ const { character } = defineProps<{
 }>();
 
 const modifiedAttack = (weapon: Weapon) => {
-  return applyAttackMods(character, weapon.attack);
+  return applyAttackMods(character, weapon);
 };
 const modifiedDamage = (weapon: Weapon) => {
-  return applyDamageMods(character, weapon.damage);
+  return applyDamageMods(character, weapon);
 };
 const damageSplitString = (weapon: Weapon) => {
   return modifiedDamage(weapon).splitString();

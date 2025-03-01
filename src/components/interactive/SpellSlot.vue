@@ -15,7 +15,7 @@
           icon="fa-solid fa-wand-magic-sparkles"
           @click="cast = !cast"
           :style="cast ? 'color: grey' : ''"
-          v-if="contents && level > 0"
+          v-if="contents && level > 0 && !signature"
         />
         <q-btn
           icon="ra-scroll-unfurled"
@@ -39,10 +39,10 @@
   <q-dialog v-model="selecting">
     <q-card>
       <SpellsTable
-        :spells="spells"
+        :spells="computedSpells"
         :preparing="true"
         :list="list"
-        :is-heightened="(s) => (s.level < level ? level : 0)"
+        :is-heightened="(s) => (s.level != level ? level : 0)"
         extra-class="popup-spells-table"
         @select="
           (spell: Spell) => {
@@ -59,8 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { Spell, SpellList } from 'src/character/model';
-import { ref, watch } from 'vue';
+import { Spell, SpellList, SpellListType } from 'src/character/model';
+import { computed, ref, watch } from 'vue';
 import SpellsTable from './SpellsTable.vue';
 import * as LS from 'src/pages/localStorage';
 import { QPopupProxy } from 'quasar';
@@ -72,12 +72,30 @@ const props = defineProps<{
   charName: string;
   saveKey: string[];
   notifier: number;
+  minLevel?: number;
+  signature?: boolean;
 }>();
 
-const spells =
+let spells =
   (props.level > 0
     ? props.list.heightenedKnown[props.level]
     : props.list.known[0]) ?? [];
+if (props.signature) {
+  const minLevel = props.minLevel ?? props.level;
+  spells = [];
+  for (let level = minLevel; level <= props.level; level++) {
+    spells.push(...(props.list.known[level] ?? []));
+  }
+}
+
+const computedSpells = computed(() => {
+  if (props.signature)
+    return spells.filter((s) => !props.list.signature.spells[s.id]);
+  else if (props.list.type == SpellListType.Spontaneous) {
+    return [...spells, ...Object.values(props.list.signature.spells)];
+  }
+  return spells;
+});
 
 let initialSpell = null;
 const initialSpellName = LS.load(props.charName, ...props.saveKey);
@@ -95,7 +113,20 @@ const cast = ref<boolean>(LS.loadOrDefault(props.charName, false, ...CAST_KEY));
 const selecting = ref<boolean>(false);
 const viewing = ref<boolean>(false);
 
-watch(contents, (spell) => {
+if (contents.value !== null && props.signature) {
+  // eslint-disable-next-line vue/no-mutating-props
+  props.list.signature.spells[contents.value.id] = contents.value;
+}
+
+watch(contents, (spell, oldSpell) => {
+  if (oldSpell !== null) {
+    // eslint-disable-next-line vue/no-mutating-props
+    delete props.list.signature.spells[oldSpell.id];
+  }
+  if (spell !== null) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.list.signature.spells[spell.id] = spell;
+  }
   LS.save(props.charName, spell?.name, ...props.saveKey);
 });
 watch(cast, (isCast) => {

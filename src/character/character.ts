@@ -254,8 +254,9 @@ export default class Character {
         weapon: true,
         description: entry.item.description,
         source: Source.bank.get(entry.item.content_source_id),
-        range: entry.item.meta_data.range,
-        reload: entry.item.meta_data.reload,
+        range: entry.item.meta_data.range ?? undefined,
+        reload: entry.item.meta_data.reload ?? undefined,
+        potency: entry.item.meta_data.runes.potency ?? 0,
       };
       b.partial.damage = new DamageInstance(
         entry.stats.damage.bonus.total,

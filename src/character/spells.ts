@@ -11,7 +11,7 @@ import {
 } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
-import { capitalize } from 'vue';
+import { capitalize, reactive } from 'vue';
 import type vm from 'node:vm';
 import Abilities from './abilities';
 
@@ -38,6 +38,11 @@ export default class Spells {
         focus: [],
         tradition: '',
         score: -1 as Score,
+        signature: {
+          fixed: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          leq: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          spells: reactive({}),
+        },
       };
       this.lists.push(list);
     }
@@ -122,6 +127,40 @@ export default class Spells {
       this.addSpell(list, spell);
     }
 
+    for (const list of this.lists) {
+      if (list.type == SpellListType.Spontaneous) {
+        const maxLevel = list.slots.findLastIndex((v) => v > 0);
+        if (list.name == className) {
+          // Spontaneous Signature spells
+          if (
+            abilities.excluded.some((a) =>
+              a.name.startsWith('Signature Spells'),
+            )
+          ) {
+            for (let i = 1; i <= maxLevel; i++) {
+              list.signature.fixed[i] = (list.signature.fixed[i] ?? 0) + 1;
+            }
+          }
+          if (
+            abilities.excluded.some((a) =>
+              a.name.startsWith('Signature Spell Expansion'),
+            )
+          ) {
+            list.signature.leq[3] = (list.signature.leq[3] ?? 0) + 2;
+          }
+        } else {
+          let count = 0;
+          abilities.excluded.forEach((a) => {
+            if (
+              a.name.match(`(Basic|Expert|Master) ${list.name} Spellcasting.*`)
+            )
+              count += 1;
+          });
+          list.signature.leq[10] = (list.signature.leq[10] ?? 0) + count;
+        }
+      }
+    }
+
     if (
       this.lists.some((l) =>
         [SpellListSubType.Tradition, SpellListSubType.Apparition].includes(
@@ -136,11 +175,13 @@ export default class Spells {
       });
       for (const list of this.lists) {
         if (list.subtype == SpellListSubType.Tradition) {
+          // Full-tradition spells
           allSpells
             .values()
             .filter((s) => s.traditions.includes(list.tradition.toLowerCase()))
             .forEach((s) => this.addSpell(list, s));
         } else if (list.subtype == SpellListSubType.Apparition) {
+          // Special Apparition parsing logic for Animists
           const apparitionList = list as ApparitionList;
           apparitionList.apparitions = new Map<string, Ability>();
           apparitionList.currentApparitions = new Array<string>();
@@ -226,6 +267,7 @@ export default class Spells {
       (a, b) => b.slots.reduce(maxCount, 0) - a.slots.reduce(maxCount, 0),
     );
   }
+
   addSpell(list: SpellList, spell: Spell) {
     list.known[spell.level]?.push(spell);
     if (spell.level == 0) return;
@@ -252,7 +294,7 @@ export default class Spells {
       cost = entry.cast != null ? Util.getActions(entry.cast) : Action.None;
     }
     let description = Util.parseDescription(entry.description, context);
-    const h = new Heightening();
+    const h = new Heightening(entry.rank ?? 1);
     for (const heightening of entry.heightened.text || []) {
       const heightenText = `<b>${heightening.amount}</b> ${heightening.text}`;
       description += Util.parseDescription(heightenText);

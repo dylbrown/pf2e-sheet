@@ -4,7 +4,7 @@
   </span>
   <q-popup-proxy
     :class="popupClass + ' clickable-popup'"
-    :target="$refs.clickableName"
+    :target="$refs.clickableName as Element"
   >
     <SpellBlock :spell="spell" :interactive="true" :heightened="heightened" />
   </q-popup-proxy>

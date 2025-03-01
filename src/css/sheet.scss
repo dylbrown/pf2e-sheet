@@ -1364,7 +1364,8 @@ div.spell-cost-optional > span {
     font-size: 1em;
   }
 
-  .level-slots {
+  .level-slots,
+  .signature-slots {
     display: grid;
     justify-content: stretch;
 
@@ -1372,6 +1373,11 @@ div.spell-cost-optional > span {
       padding-bottom: 0.75em;
     }
   }
+
+  .signature-slots {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .prep-slot {
     border: 2px solid black;
     border-radius: 0.36rem;
@@ -1405,6 +1411,20 @@ div.spell-cost-optional > span {
         #ddd 8px
       );
       border-color: grey;
+    }
+    & > span {
+      max-width: 100%;
+    }
+  }
+  .signature-slots .prep-slot {
+    min-width: 4em;
+    max-width: 100%;
+    word-wrap: normal;
+    text-wrap: nowrap;
+    word-break: normal;
+    & > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 

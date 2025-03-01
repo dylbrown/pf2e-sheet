@@ -1,3 +1,4 @@
+import { Reactive } from 'vue';
 import { makeSource, parseDescription } from './util';
 import type vm from 'node:vm';
 
@@ -310,6 +311,7 @@ export class Weapon extends Item {
   readonly reload?: string;
   readonly capacity?: number;
   readonly usage?: number;
+  readonly potency: number;
   readonly runes: Rune[];
 
   protected constructor(w: Mutable<Weapon>) {
@@ -322,6 +324,7 @@ export class Weapon extends Item {
     if (w.capacity) this.capacity = w.capacity;
     if (w.usage) this.usage = w.usage;
     this.runes = w.runes ?? [];
+    this.potency = w.potency ?? 0;
   }
 
   static WBuilder = class extends ABuilder<Weapon> {
@@ -512,7 +515,7 @@ export class Spell {
   save = '';
   innate = false;
   castsPerDay?: number;
-  heightening = new Heightening();
+  heightening = new Heightening(0);
   traditions = new Array<string>();
 
   constructor(name: string, id: number) {
@@ -524,7 +527,26 @@ export class Spell {
 export class Heightening {
   intervals = Array<number>();
   fixed = Array<number>();
-  constructor() {}
+  readonly base: number;
+  constructor(base: number) {
+    this.base = base;
+  }
+
+  includes(level: number): boolean {
+    if (this.fixed.includes(level)) return true;
+    for (const increment of this.intervals) {
+      for (let l = this.base; l <= 10; l += increment) {
+        if (level == l) return true;
+      }
+    }
+    return false;
+  }
+}
+
+export interface SignatureInfo {
+  fixed: Array<number>;
+  leq: Array<number>;
+  spells: Reactive<{ [id: number]: Spell }>;
 }
 
 export interface SpellList {
@@ -541,6 +563,7 @@ export interface SpellList {
   heightenedKnown: Array<Array<Spell>>;
   slots: Array<number>;
   focus: Array<Spell>;
+  signature: SignatureInfo;
 }
 
 export interface ApparitionList extends SpellList {

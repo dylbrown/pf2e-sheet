@@ -7,7 +7,10 @@ import {
   DamageInstance,
   notChecksAndDCs,
   saves,
+  Score,
   skills,
+  SpellList,
+  Weapon,
 } from './model';
 
 export enum StatModType {
@@ -55,6 +58,7 @@ export class ModEffect {
     character: Character,
     bonuses: ModNumberList,
     penalties: ModNumberList,
+    score?: Score,
   ) {
     for (const sMod of this.statMods) {
       let amount = sMod.amount;
@@ -67,7 +71,9 @@ export class ModEffect {
             break;
           }
           case Attribute.Attacks: {
-            good = attacks.includes(modifiedAttr);
+            good =
+              attacks.includes(modifiedAttr) ||
+              modifiedAttr == Attribute.SpellAttacks;
             break;
           }
           case Attribute.Saves: {
@@ -95,9 +101,9 @@ export class ModEffect {
           case Attribute.IntChecks:
           case Attribute.WisChecks:
           case Attribute.ChaChecks: {
-            const score = attrScore[Attribute[attr]];
-            if (score === undefined) break;
-            good = score == attrScore[Attribute[modifiedAttr]];
+            const aScore = attrScore[Attribute[attr]];
+            if (aScore === undefined) break;
+            good = aScore == (score ?? attrScore[Attribute[modifiedAttr]]);
             break;
           }
           default: {
@@ -388,42 +394,26 @@ export function applyMods(character: Character, modifiedAttr: Attribute) {
   );
 }
 
-export function applyAttackMods(character: Character, base: number) {
-  const bonuses: ModNumberList = {
-    [StatModType.None]: 0,
-    [StatModType.Item]: 0, // TODO: determine
-    [StatModType.Status]: 0,
-    [StatModType.Circumstance]: 0,
-  };
-  const penalties: ModNumberList = {
-    [StatModType.None]: 0,
-    [StatModType.Item]: 0, // TODO: determine
-    [StatModType.Status]: 0,
-    [StatModType.Circumstance]: 0,
-  };
-
-  const conditionsList = Object.values(character.conditions);
-  const condCount = conditionsList.length;
-  for (let i = 0; i < condCount + character.modifiers.length; i++) {
-    const mod =
-      i < condCount ? conditionsList[i] : character.modifiers[i - condCount];
-    if (mod == undefined || !mod.enabled) continue;
-    for (const sMod of mod.statMods) {
-      if (
-        sMod.type == StatModType.Item ||
-        !sMod.attrs.includes(Attribute.Attacks)
-      )
-        continue;
-      if (sMod.amount > 0) {
-        bonuses[sMod.type] = Math.max(bonuses[sMod.type], sMod.amount);
-      } else if (sMod.amount < 0) {
-        penalties[sMod.type] = Math.min(penalties[sMod.type], sMod.amount);
-      }
-    }
+export function applyAttackMods(character: Character, weapon: Weapon) {
+  let score: Score = Score.Strength;
+  if (
+    (character.scores[Score.Dexterity] > character.scores[Score.Strength] &&
+      weapon.traits.some((t) => t.name.startsWith('Finesse'))) ||
+    (weapon.range !== undefined &&
+      !weapon.traits.some((t) => t.name.startsWith('Thrown')))
+  ) {
+    score = Score.Dexterity;
   }
+  const [bonuses, penalties] = calculateMods(
+    character,
+    Attribute.Attacks,
+    weapon.potency,
+    score,
+  );
 
   return (
-    base +
+    weapon.attack -
+    weapon.potency +
     Object.values(bonuses).reduce((a, b) => a + b, 0) +
     Object.values(penalties).reduce((a, b) => a + b, 0)
   );
@@ -431,10 +421,20 @@ export function applyAttackMods(character: Character, base: number) {
 
 export function applyDamageMods(
   character: Character,
-  damage: DamageInstance,
+  weapon: Weapon,
 ): DamageInstance {
-  const [bonuses, penalties] = calculateMods(character, Attribute.DamageRolls);
-
+  const score: Score | undefined =
+    weapon.range === undefined ||
+    weapon.traits.some((t) => t.name.startsWith('Thrown'))
+      ? Score.Strength
+      : undefined;
+  const [bonuses, penalties] = calculateMods(
+    character,
+    Attribute.DamageRolls,
+    undefined,
+    score,
+  );
+  const damage = weapon.damage;
   return new DamageInstance(
     damage.bonus +
       Object.values(bonuses).reduce((a, b) => a + b, 0) +
@@ -460,11 +460,46 @@ export function applyACMods(character: Character): number {
   );
 }
 
+export function applySpellAttackMods(
+  character: Character,
+  list: SpellList,
+): number {
+  const [bonuses, penalties] = calculateMods(
+    character,
+    Attribute.SpellAttacks,
+    0,
+    list.score,
+  );
+  return (
+    list.attack +
+    Object.values(bonuses).reduce((a, b) => a + b, 0) +
+    Object.values(penalties).reduce((a, b) => a + b, 0)
+  );
+}
+
+export function applySpellDCMods(
+  character: Character,
+  list: SpellList,
+): number {
+  const [bonuses, penalties] = calculateMods(
+    character,
+    Attribute.SpellDCs,
+    0,
+    list.score,
+  );
+  return (
+    list.dc +
+    Object.values(bonuses).reduce((a, b) => a + b, 0) +
+    Object.values(penalties).reduce((a, b) => a + b, 0)
+  );
+}
+
 type ModNumberList = { [s in StatModType]: number };
 export function calculateMods(
   character: Character,
   modifiedAttr: Attribute,
   itemBonus: number = 0,
+  score?: Score,
 ): [ModNumberList, ModNumberList] {
   const bonuses: ModNumberList = {
     [StatModType.None]: 0,
@@ -485,7 +520,7 @@ export function calculateMods(
     const mod =
       i < condCount ? conditionsList[i] : character.modifiers[i - condCount];
     if (mod == undefined || !mod.enabled) continue;
-    mod.apply(modifiedAttr, character, bonuses, penalties);
+    mod.apply(modifiedAttr, character, bonuses, penalties, score);
   }
   return [bonuses, penalties];
 }
