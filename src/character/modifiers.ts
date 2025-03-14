@@ -185,6 +185,7 @@ export class ConditionData extends ModEffect {
   private set value(value: number) {
     if (value < 0 || !Number.isInteger(value)) return;
     this._value = value;
+    if (!this.has_value) return;
     for (const statMod of this.statMods) {
       statMod.amount = value * -1;
     }
