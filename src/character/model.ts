@@ -185,6 +185,7 @@ export const attacks = [
   Attribute.SimpleWeapons,
   Attribute.MartialWeapons,
   Attribute.AdvancedWeapons,
+  Attribute.Attacks,
 ];
 
 export const saves = [Attribute.Fortitude, Attribute.Reflex, Attribute.Will];
