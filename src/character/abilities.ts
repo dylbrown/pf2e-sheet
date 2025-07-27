@@ -100,6 +100,7 @@ export default class Abilities extends Array<Ability> {
     const substringExceptions = ['In addition', 'Enhancement'];
     if (
       exclude > 0 &&
+      !feat.activity &&
       !substringExceptions.some((s) => feat.description.includes(s))
     )
       this.excluded.push(feat);
