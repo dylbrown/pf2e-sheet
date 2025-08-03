@@ -120,7 +120,6 @@
   position: fixed;
   left: 50vw;
   transform: translateX(-50%);
-  max-width: 1000px;
   width: auto;
   top: 25vh;
   height: 50vh;
