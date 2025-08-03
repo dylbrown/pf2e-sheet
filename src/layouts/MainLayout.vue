@@ -2,10 +2,10 @@
   <div v-if="!ready" id="load-box">
     <h5>Pathfinder Second Edition Character Sheet<br />for Wanderer's Guide</h5>
     <div style="flex-grow: 1; width: 100%">
-      <div style="position: relative; height: 50px; flex-grow: 1">
+      <div style="position: relative; height: 6vh; flex-grow: 1">
         <q-linear-progress
           :value="progress"
-          style="min-height: 50px; position: absolute"
+          style="min-height: 6vh; position: absolute"
         />
         <q-toggle
           style="
@@ -33,6 +33,7 @@
             :rows="saves"
             :rows-per-page-options="[4]"
             :columns="COLUMNS"
+            class="saves"
             row-key="filename"
           >
             <template v-slot:header="props">
@@ -48,15 +49,13 @@
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
                 </q-td>
-                <q-td>
+                <q-td auto-width>
                   <q-btn
-                    size="sm"
                     icon="fa-solid fa-right-to-bracket"
                     push
                     v-on:click="loadCached(props.row.filename)"
                   />
                   <q-btn
-                    size="sm"
                     icon="fa-regular fa-trash-can"
                     push
                     v-on:click="confirmDelete(props.row.filename)"
@@ -117,12 +116,12 @@
 
 <style>
 #load-box {
-  position: fixed;
+  position: absolute;
   left: 50vw;
-  transform: translateX(-50%);
-  width: auto;
-  top: 25vh;
-  height: 50vh;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  max-width: max-content;
+  top: 50vh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -130,6 +129,10 @@
 }
 #load-box .q-toggle__label {
   width: 19em;
+}
+
+.saves .q-table tbody td {
+  font-size: 0.8em;
 }
 </style>
 
