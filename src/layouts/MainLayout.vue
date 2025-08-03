@@ -140,6 +140,7 @@ import PaperSheet from 'src/pages/PaperSheet.vue';
 import { Ref, ref, watch } from 'vue';
 import * as LS from 'src/pages/localStorage';
 import { QTableColumn } from 'quasar';
+import CharacterWorker from 'src/character/character-fs?worker';
 const file = ref<File | null>(null);
 const ready = ref(false);
 const interactiveMode = ref(LS.loadGlobalOrDefault(true, 'interactive'));
@@ -158,7 +159,7 @@ const COLUMNS: QTableColumn[] = [
   },
 ];
 
-const saveWorker = new Worker('src/character/character-fs.ts');
+const saveWorker = new CharacterWorker();
 const saves: Ref<Array<{ filename: string }>> = ref([]);
 
 navigator.storage.getDirectory().then(async (dir) => {
