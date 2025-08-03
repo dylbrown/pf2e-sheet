@@ -2,7 +2,7 @@
   "name": "2e Sheet",
   "orientation": "landscape",
   "background_color": "#ffffff",
-  "theme_color": "#1976d2",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "icons/windows11/SmallTile.scale-100.png",
