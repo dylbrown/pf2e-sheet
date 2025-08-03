@@ -9,7 +9,6 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 import { defineConfig } from '#q-app/wrappers';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -69,9 +68,7 @@ export default defineConfig((/* ctx */) => {
       // polyfillModulePreload: true,
       // distDir
 
-      extendViteConf(viteConf) {
-        viteConf.plugins?.push(nodePolyfills({ include: ['vm'] }));
-      },
+      // extendViteConf(viteConf) {},
       // viteVuePluginOptions: {},
 
       vitePlugins: [
@@ -146,7 +143,7 @@ export default defineConfig((/* ctx */) => {
       // extendSSRWebserverConf (esbuildConf) {},
       // extendPackageJson (json) {},
 
-      pwa: false,
+      pwa: true,
 
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,

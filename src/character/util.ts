@@ -1,7 +1,7 @@
 import { marked } from 'marked';
-import type { Ability } from './model';
+import type { Ability, CharacterContext } from './model';
 import { AbilityType, Action, Proficiency, Score } from './model';
-import vm from 'node:vm';
+import * as mathjs from 'mathjs';
 
 export function abilityMod(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -160,7 +160,7 @@ export function makeSource(s: string) {
   return parts.reduce((acc, value) => acc + value[0], '');
 }
 
-export function parseDescription(s: string, context?: vm.Context) {
+export function parseDescription(s: string, context?: CharacterContext) {
   const cleaned = marked
     .parse(s, { async: false })
     .replaceAll(
@@ -230,7 +230,7 @@ export function parseDescription(s: string, context?: vm.Context) {
           .substring(open, close)
           .replaceAll('&gt;', '>')
           .replaceAll('&quot;', '"');
-        const result = vm.runInContext(currString, vm.createContext(context));
+        const result = mathjs.evaluate(currString, context);
         if (
           tablecut.substring(openTag - 2, openTag) == '⬆️' ||
           tablecut.substring(openTag - 3, openTag - 1) == '⬆️'

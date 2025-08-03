@@ -1,16 +1,19 @@
-import { Ability } from './model';
+import { Ability, CharacterContext } from './model';
 import { AbilityType, Action, Source, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
-import type vm from 'node:vm';
 
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
   excluded: Ability[] = [];
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  loadRemaster(feats_features: any, selections: any, context: vm.Context) {
+  loadRemaster(
+    feats_features: any,
+    selections: any,
+    context: CharacterContext,
+  ) {
     const type: { [id: number]: AbilityType } = {};
     for (const [key, value] of Object.entries(selections)) {
       const id = value as number;
@@ -43,7 +46,7 @@ export default class Abilities extends Array<Ability> {
     this.sort((a, b) => b.level - a.level);
   }
 
-  loadFeat(feature: any, type: AbilityType, context: vm.Context) {
+  loadFeat(feature: any, type: AbilityType, context: CharacterContext) {
     const feat = new Ability(
       feature.name ?? '',
       feature.id ?? -1,

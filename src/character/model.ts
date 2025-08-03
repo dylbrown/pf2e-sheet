@@ -1,6 +1,5 @@
 import { Reactive } from 'vue';
 import { makeSource, parseDescription } from './util';
-import type vm from 'node:vm';
 
 export enum AbilityType {
   ClassFeat,
@@ -483,7 +482,7 @@ export class Ability {
     source: Source,
     traits: Trait[],
     description: string,
-    context?: vm.Context,
+    context?: CharacterContext,
   ) {
     this.name = name;
     this.id = id;
@@ -671,3 +670,9 @@ export class Source extends AbstractDataEntry {
 
   public static readonly None = new Source('', -1, '');
 }
+
+export type CharacterContext = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  level: number;
+};

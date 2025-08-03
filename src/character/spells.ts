@@ -1,4 +1,10 @@
-import type { Ability, ApparitionList, Score, SpellList } from './model';
+import type {
+  Ability,
+  ApparitionList,
+  CharacterContext,
+  Score,
+  SpellList,
+} from './model';
 import {
   Action,
   Attribute,
@@ -12,7 +18,6 @@ import {
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize, reactive } from 'vue';
-import type vm from 'node:vm';
 import Abilities from './abilities';
 
 export default class Spells {
@@ -54,7 +59,7 @@ export default class Spells {
   loadRemaster(
     content: any,
     className: string,
-    context: vm.Context,
+    context: CharacterContext,
     chaMod: number,
     abilities: Abilities,
   ) {
@@ -287,7 +292,11 @@ export default class Spells {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private makeSpell(entry: any, context: vm.Context, listName: string): Spell {
+  private makeSpell(
+    entry: any,
+    context: CharacterContext,
+    listName: string,
+  ): Spell {
     let cost = Action.None;
     let maxCost = Action.None;
     if (entry.cast && entry.cast.includes('TO')) {

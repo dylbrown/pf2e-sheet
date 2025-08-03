@@ -9,6 +9,7 @@ import {
   Attributes,
   Lores,
   DamageInstance,
+  CharacterContext,
 } from './model';
 import {
   Proficiency,
@@ -24,7 +25,6 @@ import {
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
 import { abilityMod, getProficiency, parseDescription } from './util';
-import vm from 'node:vm';
 import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
@@ -108,19 +108,19 @@ export default class Character {
   /* eslint-disable @typescript-eslint/no-explicit-any */
 
   private loadRemaster(data: any) {
-    const contextRaw: { [key: string]: any } = {
-      ceil: Math.ceil,
-      floor: Math.floor,
-      max: Math.max,
-      min: Math.min,
-    };
     this.remaster = true;
     this.starfinder = data.character.content_sources.enabled.includes(276);
     Source.bank.build(data.content.all_sources);
     Trait.bank.build(data.content.all_traits);
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
-    contextRaw.level = this.level;
+    const context: CharacterContext = {
+      ceil: Math.ceil,
+      floor: Math.floor,
+      max: Math.max,
+      min: Math.min,
+      level: this.level,
+    };
 
     // Ancestry & Heritage name
     this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
@@ -148,8 +148,8 @@ export default class Character {
       const entry = data.content?.attributes[key];
       if (!entry) continue;
       this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
-      contextRaw[key] = abilityMod(this.scores[score]);
-      contextRaw[key.toLowerCase()] = abilityMod(this.scores[score]);
+      context[key] = abilityMod(this.scores[score]);
+      context[key.toLowerCase()] = abilityMod(this.scores[score]);
     }
 
     // Senses
@@ -174,7 +174,7 @@ export default class Character {
 
     this.classDC =
       10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
-    contextRaw.CLASS_DC = this.classDC;
+    context.CLASS_DC = this.classDC;
     this.ac = data.content?.ac ?? 0;
     this.combat.armor.ac =
       data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
@@ -341,9 +341,8 @@ export default class Character {
     )) {
       const entry = e as any;
       if (entry && entry.value && entry.type == 'num')
-        contextRaw[key] = Number(entry.value);
+        context[key] = Number(entry.value);
     }
-    const context = vm.createContext(contextRaw);
     this.abilities.loadRemaster(
       data.content.feats_features,
       data.character.operation_data.selections,
