@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  rpg-awesome: 42b92fcc654465dec522e66c7696631ee1e791d5c596b327367e28249e49d793
+  rpg-awesome: 8b375f57e5ffb8b4ea00fca523a396a068ffa636afdce530f79b62c0c9a50bb1
 
 importers:
 
@@ -55,7 +55,7 @@ importers:
         version: 1.7.2
       rpg-awesome:
         specifier: ^0.2.0
-        version: 0.2.0(patch_hash=42b92fcc654465dec522e66c7696631ee1e791d5c596b327367e28249e49d793)
+        version: 0.2.0(patch_hash=8b375f57e5ffb8b4ea00fca523a396a068ffa636afdce530f79b62c0c9a50bb1)
       vite:
         specifier: ^6.0.4
         version: 6.0.4(@types/node@22.10.2)(jiti@2.4.2)(sass-embedded@1.83.0)(terser@5.43.1)(yaml@2.9.1)
@@ -12895,7 +12895,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  rpg-awesome@0.2.0(patch_hash=42b92fcc654465dec522e66c7696631ee1e791d5c596b327367e28249e49d793): {}
+  rpg-awesome@0.2.0(patch_hash=8b375f57e5ffb8b4ea00fca523a396a068ffa636afdce530f79b62c0c9a50bb1): {}
 
   run-applescript@7.0.0: {}
 
