@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import type { Trait } from 'src/character/model';
+import type { Trait } from '@/character/model';
 
 const { trait } = defineProps<{
   trait: Trait;

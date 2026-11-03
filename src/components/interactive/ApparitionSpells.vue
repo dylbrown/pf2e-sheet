@@ -68,8 +68,8 @@
 </template>
 
 <script setup lang="ts">
-import Character from 'src/character/character';
-import { ApparitionList, Spell } from 'src/character/model';
+import Character from '@/character/character';
+import { ApparitionList, Spell } from '@/character/model';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';
 import { reactive, ref } from 'vue';

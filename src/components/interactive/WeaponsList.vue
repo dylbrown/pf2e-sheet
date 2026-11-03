@@ -156,11 +156,11 @@
   </q-table>
 </template>
 <script setup lang="ts">
-import type { Weapon } from 'src/character/model';
-import Character from 'src/character/character';
+import type { Weapon } from '@/character/model';
+import Character from '@/character/character';
 import { QTableColumn } from 'quasar';
-import { applyAttackMods, applyDamageMods } from 'src/character/modifiers';
-import { signed } from 'src/character/util';
+import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
+import { signed } from '@/character/util';
 import ClickableRune from './ClickableRune.vue';
 import ClickableTrait from './ClickableTrait.vue';
 

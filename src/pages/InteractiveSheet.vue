@@ -515,33 +515,28 @@
 </template>
 
 <script setup lang="ts">
-import * as Util from 'src/character/util';
-import * as LS from 'src/pages/localStorage';
-import type Character from 'src/character/character';
-import RightThird from 'src/components/interactive/RightThird.vue';
-import {
-  AbilityType,
-  Attribute,
-  Proficiency,
-  Score,
-} from 'src/character/model';
-import ClickableHealth from 'src/components/interactive/ClickableHealth.vue';
-import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
-import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
+import * as Util from '@/character/util';
+import * as LS from '@/pages/localStorage';
+import type Character from '@/character/character';
+import RightThird from '@/components/interactive/RightThird.vue';
+import { AbilityType, Attribute, Proficiency, Score } from '@/character/model';
+import ClickableHealth from '@/components/interactive/ClickableHealth.vue';
+import ClickableTrait from '@/components/interactive/ClickableTrait.vue';
+import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
-import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
-import AbilitiesTable from 'src/components/interactive/AbilitiesTable.vue';
-import PipCounter from 'src/components/PipCounter.vue';
-import StatModsButton from 'src/components/interactive/StatModsButton.vue';
-import WeaponsList from 'src/components/interactive/WeaponsList.vue';
+import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import AbilitiesTable from '@/components/interactive/AbilitiesTable.vue';
+import PipCounter from '@/components/PipCounter.vue';
+import StatModsButton from '@/components/interactive/StatModsButton.vue';
+import WeaponsList from '@/components/interactive/WeaponsList.vue';
 import {
   applyACMods,
   applyMods,
   calculateMods,
   StatModType,
-} from 'src/character/modifiers';
-import ConditionsButton from 'src/components/interactive/ConditionsButton.vue';
+} from '@/character/modifiers';
+import ConditionsButton from '@/components/interactive/ConditionsButton.vue';
 
 document.documentElement.classList.add('interactive');
 

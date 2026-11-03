@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import { QTableColumn } from 'quasar';
-import { Spell, SpellList } from 'src/character/model';
+import { Spell, SpellList } from '@/character/model';
 import ClickableSpell from './ClickableSpell.vue';
 import PipCounter from '../PipCounter.vue';
 import { ref } from 'vue';

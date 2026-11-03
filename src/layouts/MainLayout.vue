@@ -137,13 +137,13 @@
 </style>
 
 <script setup lang="ts">
-import Character from 'src/character/character';
-import InteractiveSheet from 'src/pages/InteractiveSheet.vue';
-import PaperSheet from 'src/pages/PaperSheet.vue';
+import Character from '@/character/character';
+import InteractiveSheet from '@/pages/InteractiveSheet.vue';
+import PaperSheet from '@/pages/PaperSheet.vue';
 import { Ref, ref, watch } from 'vue';
-import * as LS from 'src/pages/localStorage';
+import * as LS from '@/pages/localStorage';
 import { QTableColumn } from 'quasar';
-import CharacterWorker from 'src/character/character-fs?worker';
+import CharacterWorker from '@/character/character-fs?worker';
 const file = ref<File | null>(null);
 const ready = ref(false);
 const interactiveMode = ref(LS.loadGlobalOrDefault(true, 'interactive'));

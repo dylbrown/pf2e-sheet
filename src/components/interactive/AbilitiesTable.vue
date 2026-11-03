@@ -52,10 +52,10 @@
   </q-dialog>
 </template>
 <script setup lang="ts">
-import AbilityBlock from 'src/components/AbilityBlock.vue';
-import ClickableTrait from 'src/components/interactive/ClickableTrait.vue';
+import AbilityBlock from '@/components/AbilityBlock.vue';
+import ClickableTrait from '@/components/interactive/ClickableTrait.vue';
 import type { QTableColumn } from 'quasar';
-import type { Ability } from 'src/character/model';
+import type { Ability } from '@/character/model';
 import { ref } from 'vue';
 
 defineProps<{

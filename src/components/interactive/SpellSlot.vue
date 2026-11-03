@@ -59,10 +59,10 @@
 </template>
 
 <script setup lang="ts">
-import { Spell, SpellList, SpellListType } from 'src/character/model';
+import { Spell, SpellList, SpellListType } from '@/character/model';
 import { computed, ref, watch } from 'vue';
 import SpellsTable from './SpellsTable.vue';
-import * as LS from 'src/pages/localStorage';
+import * as LS from '@/pages/localStorage';
 import { QPopupProxy } from 'quasar';
 import SpellBlock from '../SpellBlock.vue';
 

@@ -144,12 +144,12 @@
 </template>
 
 <script setup lang="ts">
-import Character from 'src/character/character';
-import { Attribute, saves, sfSkills, skills } from 'src/character/model';
-import { signed } from 'src/character/util';
+import Character from '@/character/character';
+import { Attribute, saves, sfSkills, skills } from '@/character/model';
+import { signed } from '@/character/util';
 import { reactive, ref, watch } from 'vue';
-import * as LS from 'src/pages/localStorage';
-import { ModEffect, StatMod, StatModType } from 'src/character/modifiers';
+import * as LS from '@/pages/localStorage';
+import { ModEffect, StatMod, StatModType } from '@/character/modifiers';
 
 const props = defineProps<{
   character: Character;

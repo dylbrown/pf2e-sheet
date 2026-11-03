@@ -50,18 +50,18 @@
 </template>
 
 <script setup lang="ts">
-import ClickableAttribute from 'src/components/interactive/ClickableAttribute.vue';
-import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
-import type Character from 'src/character/character';
-import * as Util from 'src/character/util';
+import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
+import type Character from '@/character/character';
+import * as Util from '@/character/util';
 import {
   skills,
   sfSkills,
   SpellListSubType,
   ApparitionList,
   Attribute,
-} from 'src/character/model';
-import { applyMods } from 'src/character/modifiers';
+} from '@/character/model';
+import { applyMods } from '@/character/modifiers';
 import { computed, reactive } from 'vue';
 
 const props = defineProps<{

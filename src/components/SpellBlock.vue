@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Spell } from 'src/character/model';
+import type { Spell } from '@/character/model';
 import LinePart from './LinePart.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
 import { ref } from 'vue';

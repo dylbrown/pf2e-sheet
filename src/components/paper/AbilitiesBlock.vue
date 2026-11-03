@@ -131,14 +131,14 @@
 </template>
 
 <script setup lang="ts">
-import AbilityBlock from 'src/components/AbilityBlock.vue';
-import SpellBlock from 'src/components/SpellBlock.vue';
-import InnateList from 'src/components/InnateList.vue';
-import PreparedList from 'src/components/PreparedList.vue';
-import SpontaneousList from 'src/components/SpontaneousList.vue';
-import { signed, types } from 'src/character/util';
-import type Character from 'src/character/character';
-import { AbilityType, SpellListType } from 'src/character/model';
+import AbilityBlock from '@/components/AbilityBlock.vue';
+import SpellBlock from '@/components/SpellBlock.vue';
+import InnateList from '@/components/InnateList.vue';
+import PreparedList from '@/components/PreparedList.vue';
+import SpontaneousList from '@/components/SpontaneousList.vue';
+import { signed, types } from '@/character/util';
+import type Character from '@/character/character';
+import { AbilityType, SpellListType } from '@/character/model';
 
 import { ref, onMounted } from 'vue';
 import * as Positioning from './positioning';
