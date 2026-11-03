@@ -20,7 +20,7 @@
             dense
             flat
             @click="props.expand = !props.expand"
-            :icon="props.expand ? 'sym_o_info' : 'sym_o_info'"
+            :icon="props.expand ? 'info' : 'sym_o_info'"
             v-if="remotelyInteresting(props.row as Weapon)"
           />
         </q-td>
