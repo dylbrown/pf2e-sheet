@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import { Spell } from 'src/character/model';
+import { Spell } from '@/character/model';
 import SpellBlock from '../SpellBlock.vue';
 
 defineProps<{

@@ -9,7 +9,7 @@
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import { Item } from 'src/character/model';
+import { Item } from '@/character/model';
 import ItemBlock from '../ItemBlock.vue';
 
 defineProps<{

@@ -29,7 +29,7 @@
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
-import type { Item } from 'src/character/model';
+import type { Item } from '@/character/model';
 import * as Positioning from './paper/positioning';
 const props = defineProps<{
   item: Item;

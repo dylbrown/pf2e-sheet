@@ -245,19 +245,16 @@
 </template>
 
 <script setup lang="ts">
-import * as Util from 'src/character/util';
+import * as Util from '@/character/util';
 import {
   ApparitionList,
   Spell,
   SpellList,
   SpellListSubType,
   SpellListType,
-} from 'src/character/model';
-import {
-  applySpellAttackMods,
-  applySpellDCMods,
-} from 'src/character/modifiers';
-import type Character from 'src/character/character';
+} from '@/character/model';
+import { applySpellAttackMods, applySpellDCMods } from '@/character/modifiers';
+import type Character from '@/character/character';
 import ApparitionSpells from './ApparitionSpells.vue';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';

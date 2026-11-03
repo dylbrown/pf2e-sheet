@@ -32,10 +32,10 @@
 
 <script setup lang="ts">
 import type { QTableColumn } from 'quasar';
-import type Character from 'src/character/character';
-import { Item } from 'src/character/model';
-import ClickableItem from 'src/components/interactive/ClickableItem.vue';
-import * as LS from 'src/pages/localStorage';
+import type Character from '@/character/character';
+import { Item } from '@/character/model';
+import ClickableItem from '@/components/interactive/ClickableItem.vue';
+import * as LS from '@/pages/localStorage';
 import { ref } from 'vue';
 
 const COLUMNS: QTableColumn[] = [

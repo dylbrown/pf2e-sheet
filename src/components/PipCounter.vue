@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as LS from 'src/pages/localStorage';
+import * as LS from '@/pages/localStorage';
 import { onMounted, ref, watch } from 'vue';
 
 const SIZE = 2.5;

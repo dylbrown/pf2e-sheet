@@ -37,7 +37,7 @@
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
-import type { Ability } from 'src/character/model';
+import type { Ability } from '@/character/model';
 import * as Positioning from './paper/positioning';
 const props = defineProps<{
   ability: Ability;

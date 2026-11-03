@@ -98,11 +98,11 @@
 </template>
 
 <script setup lang="ts">
-import Character from 'src/character/character';
+import Character from '@/character/character';
 import { ref, watch } from 'vue';
-import { signed, abilityMod } from 'src/character/util';
-import { Score } from 'src/character/model';
-import * as TS from 'src/pages/localStorage';
+import { signed, abilityMod } from '@/character/util';
+import { Score } from '@/character/model';
+import * as TS from '@/pages/localStorage';
 import InteractiveItems from './InteractiveItems.vue';
 
 const props = defineProps<{

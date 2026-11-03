@@ -1,0 +1,9 @@
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: true
+  esbuild: true
+  netlify-cli: true
+  sharp: true
+  unix-dgram: true
+patchedDependencies:
+  rpg-awesome: patches/rpg-awesome.patch

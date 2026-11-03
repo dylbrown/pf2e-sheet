@@ -92,16 +92,16 @@
 </template>
 
 <script setup lang="ts">
-import Character from 'src/character/character';
-import { Attribute } from 'src/character/model';
-import { signed } from 'src/character/util';
+import Character from '@/character/character';
+import { Attribute } from '@/character/model';
+import { signed } from '@/character/util';
 import { ref, watch } from 'vue';
-import * as LS from 'src/pages/localStorage';
+import * as LS from '@/pages/localStorage';
 import {
   Condition,
   ConditionData,
   conditionEffects,
-} from 'src/character/modifiers';
+} from '@/character/modifiers';
 
 const { character } = defineProps<{
   character: Character;

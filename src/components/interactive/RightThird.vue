@@ -96,11 +96,11 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import type Character from 'src/character/character';
-import InteractiveSkills from 'src/components/interactive/InteractiveSkills.vue';
-import InteractiveItems from 'src/components/interactive/InteractiveItems.vue';
+import type Character from '@/character/character';
+import InteractiveSkills from '@/components/interactive/InteractiveSkills.vue';
+import InteractiveItems from '@/components/interactive/InteractiveItems.vue';
 import InteractiveItemsFooter from './InteractiveItemsFooter.vue';
-import InteractiveSpells from 'src/components/interactive/InteractiveSpells.vue';
+import InteractiveSpells from '@/components/interactive/InteractiveSpells.vue';
 import { QTabs } from 'quasar';
 defineProps<{
   character: Character;

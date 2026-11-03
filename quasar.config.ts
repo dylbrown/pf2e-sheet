@@ -8,7 +8,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-import { defineConfig } from '#q-app/wrappers';
+import { defineConfig } from '#q-app';
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -36,13 +36,15 @@ export default defineConfig((/* ctx */) => {
     extras: [
       // 'ionicons-v4',
       // 'mdi-v5',
-      'fontawesome-v6',
+      'fontawesome-v7',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-      // 'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      // 'roboto-font',
+      'material-icons',
+      'material-symbols-rounded',
+      'material-symbols-outlined',
       'material-icons-outlined',
     ],
 
@@ -71,20 +73,7 @@ export default defineConfig((/* ctx */) => {
       // extendViteConf(viteConf) {},
       // viteVuePluginOptions: {},
 
-      vitePlugins: [
-        [
-          'vite-plugin-checker',
-          {
-            vueTsc: true,
-            eslint: {
-              lintCommand:
-                'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-              useFlatConfig: true,
-            },
-          },
-          { server: false },
-        ],
-      ],
+      vitePlugins: [],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
@@ -125,9 +114,9 @@ export default defineConfig((/* ctx */) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
     // sourceFiles: {
-    //   rootComponent: 'src/App.vue',
-    //   router: 'src/router/index',
-    //   store: 'src/store/index',
+    //   rootComponent: '@/App.vue',
+    //   router: '@/router/index',
+    //   store: '@/store/index',
     //   registerServiceWorker: 'src-pwa/register-service-worker',
     //   serviceWorker: 'src-pwa/custom-service-worker',
     //   pwaManifestFile: 'src-pwa/manifest.json',
@@ -149,7 +138,7 @@ export default defineConfig((/* ctx */) => {
       // manualPostHydrationTrigger: true,
 
       prodPort: 3000, // The default port that the production server should use
-      // (gets superseded if process.env.PORT is specified at runtime)
+      // (gets superseded if import.meta.env.PORT is specified at runtime)
 
       middlewares: [
         'render', // keep this as last one
@@ -159,7 +148,7 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
       workboxMode: 'GenerateSW', // or 'injectManifest'
-      injectPwaMetaTags: true,
+      injectPWAMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',
       useCredentialsForManifestTag: false,

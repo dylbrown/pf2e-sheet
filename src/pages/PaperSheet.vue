@@ -516,13 +516,13 @@
 </template>
 
 <script setup lang="ts">
-import { abilityMod, nonzero, signed } from 'src/character/util';
-import type Character from 'src/character/character';
-import { Attribute, skills, sfSkills, Score } from 'src/character/model';
-import ActionBlock from 'src/components/ActionBlock.vue';
-import ProficiencyDisplay from 'src/components/ProficiencyDisplay.vue';
-import WeaponBlock from 'src/components/WeaponBlock.vue';
-import AbilitiesBlock from 'src/components/paper/AbilitiesBlock.vue';
+import { abilityMod, nonzero, signed } from '@/character/util';
+import type Character from '@/character/character';
+import { Attribute, skills, sfSkills, Score } from '@/character/model';
+import ActionBlock from '@/components/ActionBlock.vue';
+import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
+import WeaponBlock from '@/components/WeaponBlock.vue';
+import AbilitiesBlock from '@/components/paper/AbilitiesBlock.vue';
 import { onMounted, ref } from 'vue';
 import makeSheet from './pdf-sheet';
 

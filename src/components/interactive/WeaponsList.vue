@@ -20,7 +20,7 @@
             dense
             flat
             @click="props.expand = !props.expand"
-            :icon="props.expand ? 'info' : 'o_info'"
+            :icon="props.expand ? 'info' : 'sym_o_info'"
             v-if="remotelyInteresting(props.row as Weapon)"
           />
         </q-td>
@@ -95,7 +95,7 @@
                     v-for="(trait, index) in props.row.traits"
                     :key="trait.name"
                   >
-                    <template v-if="index > 0">, </template>
+                    <template v-if="(index as number) > 0">, </template>
                     <ClickableTrait :trait="trait" />
                   </template>
                 </span>
@@ -142,7 +142,7 @@
                     v-for="(rune, index) in props.row.runes"
                     :key="rune.name"
                   >
-                    <template v-if="index > 0">, </template>
+                    <template v-if="(index as number) > 0">, </template>
                     <ClickableRune :rune="rune">{{ rune.name }}</ClickableRune>
                   </template>
                 </span>
@@ -156,11 +156,11 @@
   </q-table>
 </template>
 <script setup lang="ts">
-import type { Weapon } from 'src/character/model';
-import Character from 'src/character/character';
+import type { Weapon } from '@/character/model';
+import Character from '@/character/character';
 import { QTableColumn } from 'quasar';
-import { applyAttackMods, applyDamageMods } from 'src/character/modifiers';
-import { signed } from 'src/character/util';
+import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
+import { signed } from '@/character/util';
 import ClickableRune from './ClickableRune.vue';
 import ClickableTrait from './ClickableTrait.vue';
 

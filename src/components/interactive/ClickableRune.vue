@@ -10,7 +10,7 @@
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import type { Rune } from 'src/character/model';
+import type { Rune } from '@/character/model';
 
 defineProps<{
   rune: Rune;

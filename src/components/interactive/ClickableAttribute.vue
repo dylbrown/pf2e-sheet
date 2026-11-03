@@ -39,10 +39,10 @@
 </template>
 <script setup lang="ts">
 import { QPopupProxy } from 'quasar';
-import type Character from 'src/character/character';
-import { Attribute, Proficiency, Score } from 'src/character/model';
-import { calculateMods, StatModType } from 'src/character/modifiers';
-import * as Util from 'src/character/util';
+import type Character from '@/character/character';
+import { Attribute, Proficiency, Score } from '@/character/model';
+import { calculateMods, StatModType } from '@/character/modifiers';
+import * as Util from '@/character/util';
 import { computed } from 'vue';
 
 const props = defineProps<{

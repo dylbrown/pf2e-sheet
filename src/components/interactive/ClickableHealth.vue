@@ -83,10 +83,10 @@
 
 <script setup lang="ts">
 import { capitalize, computed, ref } from 'vue';
-import { signed } from 'src/character/util';
-import Character from 'src/character/character';
-import { Attribute } from 'src/character/model';
-import { applyMods } from 'src/character/modifiers';
+import { signed } from '@/character/util';
+import Character from '@/character/character';
+import { Attribute } from '@/character/model';
+import { applyMods } from '@/character/modifiers';
 
 const { character, currHp } = defineProps<{
   character: Character;

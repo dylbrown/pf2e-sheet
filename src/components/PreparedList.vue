@@ -55,8 +55,8 @@
 </template>
 
 <script setup lang="ts">
-import { signed } from 'src/character/util';
-import type { SpellList } from 'src/character/model';
+import { signed } from '@/character/util';
+import type { SpellList } from '@/character/model';
 
 defineProps<{
   list: SpellList;

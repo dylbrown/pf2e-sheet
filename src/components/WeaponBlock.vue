@@ -111,12 +111,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Weapon } from 'src/character/model';
+import type { Weapon } from '@/character/model';
 import ClickableRune from './interactive/ClickableRune.vue';
 import ClickableTrait from './interactive/ClickableTrait.vue';
-import Character from 'src/character/character';
-import { applyAttackMods, applyDamageMods } from 'src/character/modifiers';
-import { signed } from 'src/character/util';
+import Character from '@/character/character';
+import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
+import { signed } from '@/character/util';
 import { computed } from 'vue';
 
 const { character, weapon, interactive } = defineProps<{
