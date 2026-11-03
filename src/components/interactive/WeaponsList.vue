@@ -20,7 +20,7 @@
             dense
             flat
             @click="props.expand = !props.expand"
-            :icon="props.expand ? 'info' : 'o_info'"
+            :icon="props.expand ? 'sym_o_info' : 'sym_o_info'"
             v-if="remotelyInteresting(props.row as Weapon)"
           />
         </q-td>
@@ -95,7 +95,7 @@
                     v-for="(trait, index) in props.row.traits"
                     :key="trait.name"
                   >
-                    <template v-if="index > 0">, </template>
+                    <template v-if="(index as number) > 0">, </template>
                     <ClickableTrait :trait="trait" />
                   </template>
                 </span>
@@ -142,7 +142,7 @@
                     v-for="(rune, index) in props.row.runes"
                     :key="rune.name"
                   >
-                    <template v-if="index > 0">, </template>
+                    <template v-if="(index as number) > 0">, </template>
                     <ClickableRune :rune="rune">{{ rune.name }}</ClickableRune>
                   </template>
                 </span>

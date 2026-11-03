@@ -41,8 +41,10 @@ export default defineConfig((/* ctx */) => {
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-      // 'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      // 'roboto-font',
+      'material-icons',
+      'material-symbols-rounded',
+      'material-symbols-outlined',
       'material-icons-outlined',
     ],
 
@@ -71,20 +73,7 @@ export default defineConfig((/* ctx */) => {
       // extendViteConf(viteConf) {},
       // viteVuePluginOptions: {},
 
-      vitePlugins: [
-        [
-          'vite-plugin-checker',
-          {
-            vueTsc: true,
-            eslint: {
-              lintCommand:
-                'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-              useFlatConfig: true,
-            },
-          },
-          { server: false },
-        ],
-      ],
+      vitePlugins: [],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
