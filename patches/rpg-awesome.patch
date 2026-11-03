@@ -1,0 +1,29 @@
+diff --git a/scss/_fixed-width.scss b/scss/_fixed-width.scss
+index 0eadff4b5b886fcc290567d088e9c4047c39a4af..3fd804377f78503f7ce49b09c90ddddbbe0c828f 100644
+--- a/scss/_fixed-width.scss
++++ b/scss/_fixed-width.scss
+@@ -2,5 +2,5 @@
+ // -------------------------
+ .#{$ra-css-prefix}-fw {
+   text-align: center;
+-  width: (18em / 14);
++  width: calc(18em / 14);
+ }
+diff --git a/scss/_list.scss b/scss/_list.scss
+index dddf8c4a5a713687049f32a8c86398d0cf3fe190..72d25a4e57e7b5cfd0ecc4e5b77bf811b80907eb 100644
+--- a/scss/_list.scss
++++ b/scss/_list.scss
+@@ -12,11 +12,11 @@
+   left: -$ra-li-width;
+   position: absolute;
+   text-align: center;
+-  top: (2em / 14);
++  top: calc(2em / 14);
+   width: $ra-li-width;
+ 
+   &.#{$ra-css-prefix}-lg {
+-    left: -$ra-li-width + (4em / 14);
++    left: -$ra-li-width + calc(4em / 14);
+   }
+ 
+ }
