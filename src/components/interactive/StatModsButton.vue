@@ -8,32 +8,18 @@
       </div>
       <q-popup-proxy self="top left" anchor="bottom left" v-model="viewMods">
         <q-list>
-          <q-item
-            v-for="[i, mod] of mods.entries()"
-            :key="mod.name"
-            class="stat-mod-item"
-          >
+          <q-item v-for="[i, mod] of mods.entries()" :key="mod.name" class="stat-mod-item">
             <q-item-section>
               <q-item-label>
                 <div class="row center-content">
                   <span>{{ mod.name }}</span>
-                  <q-btn
-                    dense
-                    flat
-                    icon="edit"
-                    style="font-size: 0.5em; margin-left: 8px"
-                    @click="startEdit(i, mod)"
-                  />
+                  <q-btn dense flat icon="edit" style="font-size: 0.5em; margin-left: 8px" @click="startEdit(i, mod)" />
                 </div>
               </q-item-label>
               <q-item-label caption style="max-width: 30em">
-                <template
-                  v-for="[i, statMod] of Object.values(mod.statMods).entries()"
-                  :key="i"
-                  ><template v-if="i > 0">; </template
-                  >{{ signed(statMod.amount) }} {{ statMod.type }} to
-                  {{ statMod.attrs.map(AttrLabel).join(', ') }}</template
-                >
+                <template v-for="[i, statMod] of Object.values(mod.statMods).entries()" :key="i"><template
+                    v-if="i > 0">; </template>{{ signed(statMod.amount) }} {{ statMod.type }} to
+                  {{ statMod.attrs.map(AttrLabel).join(', ') }}</template>
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -52,90 +38,41 @@
   <q-dialog v-model="addModEffect">
     <q-card>
       <q-card-section>
-        <q-input
-          v-model="WIPmodEffect.name"
-          label="Buff / Debuff Name"
-          style="padding-left: 5px"
-        />
+        <q-input v-model="WIPmodEffect.name" label="Buff / Debuff Name" style="padding-left: 5px" />
       </q-card-section>
-      <q-card-section
-        ><q-list>
-          <q-item
-            v-for="[i, statMod] of WIPmodEffect.statMods.entries()"
-            :key="i"
-          >
+      <q-card-section><q-list>
+          <q-item v-for="[i, statMod] of WIPmodEffect.statMods.entries()" :key="i">
             <div class="row no-wrap wip-stat-mod">
-              <q-input
-                v-model.number="statMod.amount"
-                type="number"
-                filled
-                style="padding-right: 5px"
-                :prefix="statMod.amount >= 0 ? '+' : ''"
-              />
-              <q-select
-                v-model="statMod.type"
-                :options="Object.values(StatModType)"
-                label="Type"
-                style="min-width: 165px"
-              />
-              <span
-                style="
+              <q-input v-model.number="statMod.amount" type="number" filled style="padding-right: 5px; max-width: 5em"
+                :prefix="statMod.amount >= 0 ? '+' : ''" />
+              <q-select v-model="statMod.type" :options="Object.values(StatModType)" label="Type"
+                style="min-width: 10em" />
+              <span style="
                   display: flex;
                   justify-content: center;
                   align-items: center;
-                "
-              >
+                ">
                 &nbsp;to&nbsp;
               </span>
-              <q-select
-                v-model="statMod.attrs"
-                multiple
-                :options="OPTIONS"
-                :option-label="AttrLabel"
-                clearable
-                label="Attribute(s)"
-                style="min-width: 165px"
-              />
-              <q-btn
-                icon="close"
-                flat
-                dense
-                @click="WIPmodEffect.statMods.splice(i, 1)"
-              />
+              <q-select v-model="statMod.attrs" multiple :options="OPTIONS" :option-label="AttrLabel" clearable
+                label="Attribute(s)" style="min-width: 15em" />
+              <q-btn icon="close" flat dense @click="WIPmodEffect.statMods.splice(i, 1)" />
             </div>
           </q-item>
           <q-item class="stat-mod-item">
             <q-item-section>
-              <q-btn
-                icon="add"
-                @click="WIPmodEffect.statMods.push(new StatMod())"
-              />
+              <q-btn icon="add" @click="WIPmodEffect.statMods.push(new StatMod())" />
             </q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
 
       <div class="column">
-        <span
-          v-if="WIPmodEffect.name == ''"
-          style="font-size: 0.5em; padding-left: 3.5em"
-          >Please give it a name.</span
-        >
+        <span v-if="WIPmodEffect.name == ''" style="font-size: 0.5em; padding-left: 3.5em">Please give it a name.</span>
         <div class="row" style="justify-content: stretch">
-          <q-btn
-            flat
-            icon="done"
-            @click="reset(true)"
-            style="flex-grow: 1"
-            :disable="WIPmodEffect.name == ''"
-          />
-          <q-btn
-            flat
-            icon="delete"
-            @click="deleteAndReset()"
-            style="flex-grow: 1"
-            v-if="editingModEffect != undefined"
-          />
+          <q-btn flat icon="done" @click="reset(true)" style="flex-grow: 1" :disable="WIPmodEffect.name == ''" />
+          <q-btn flat icon="delete" @click="deleteAndReset()" style="flex-grow: 1"
+            v-if="editingModEffect != undefined" />
           <q-btn flat icon="close" @click="reset()" style="flex-grow: 1" />
         </div>
       </div>

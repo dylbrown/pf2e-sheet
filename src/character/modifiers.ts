@@ -118,9 +118,19 @@ export class ModEffect {
       }
       if (!matches) continue;
       if (amount > 0) {
-        bonuses[sMod.type] = Math.max(bonuses[sMod.type], amount);
+        if (sMod.type == StatModType.None) {
+          // Untyped bonuses stack, so we can add them together
+          bonuses[sMod.type] += amount;
+        } else {
+          bonuses[sMod.type] = Math.max(bonuses[sMod.type], amount);
+        }
       } else if (amount < 0) {
-        penalties[sMod.type] = Math.min(penalties[sMod.type], amount);
+        if (sMod.type == StatModType.None) {
+          // Untyped penalties also stack, so we can add them together
+          penalties[sMod.type] += amount;
+        } else {
+          penalties[sMod.type] = Math.min(penalties[sMod.type], amount);
+        }
       }
     }
   }

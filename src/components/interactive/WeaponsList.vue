@@ -1,28 +1,11 @@
 <template>
-  <q-table
-    flat
-    bordered
-    dense
-    :rows="weapons"
-    :columns="COLUMNS"
-    :rows-per-page-options="[0]"
-    row-key="name"
-    hide-header
-    hide-title
-    hide-bottom
-    class="weapons-table"
-  >
+  <q-table flat bordered dense :rows="weapons" :columns="COLUMNS" :rows-per-page-options="[0]" row-key="name"
+    hide-header hide-title hide-bottom class="weapons-table">
     <template v-slot:body="props">
       <q-tr :props="props">
         <q-td auto-width>
-          <q-btn
-            size="sm"
-            dense
-            flat
-            @click="props.expand = !props.expand"
-            :icon="props.expand ? 'info' : 'sym_o_info'"
-            v-if="remotelyInteresting(props.row as Weapon)"
-          />
+          <q-btn dense size=".6em" flat @click="props.expand = !props.expand"
+            :icon="props.expand ? 'info' : 'sym_o_info'" v-if="remotelyInteresting(props.row as Weapon)" />
         </q-td>
         <q-td auto-width style="padding-left: 0">
           {{ props.row.name }}
@@ -30,17 +13,13 @@
         <q-td>
           <div class="row-stretch">
             <div class="line" style="flex-grow: 0">
-              <div
-                class="underlined weapon-info"
-                :class="
-                  (modifiedAttack(props.row as Weapon) < props.row.attack
-                    ? 'de'
-                    : '') +
-                  (modifiedAttack(props.row as Weapon) != props.row.attack
-                    ? 'buffed'
-                    : '')
-                "
-              >
+              <div class="underlined weapon-info" :class="(modifiedAttack(props.row as Weapon) < props.row.attack
+                ? 'de'
+                : '') +
+                (modifiedAttack(props.row as Weapon) != props.row.attack
+                  ? 'buffed'
+                  : '')
+                ">
                 {{ signed(modifiedAttack(props.row as Weapon)) }}
               </div>
               <div class="labello compact">Attack</div>
@@ -48,53 +27,34 @@
             <div class="line" style="flex-grow: 0.5">
               <div class="underlined weapon-info bounded-line" data-max="1.8">
                 <span class="list-flow">
-                  <template
-                    v-if="modifiedDamage(props.row as Weapon).dice > 0"
-                    >{{ damageSplitString(props.row as Weapon)[0] }}</template
-                  ><span
-                    v-if="modifiedDamage(props.row as Weapon).bonus != 0"
-                    :class="
-                      (modifiedDamage(props.row as Weapon).bonus <
+                  <template v-if="modifiedDamage(props.row as Weapon).dice > 0">{{ damageSplitString(props.row as
+                    Weapon)[0] }}</template><span v-if="modifiedDamage(props.row as Weapon).bonus != 0" :class="(modifiedDamage(props.row as Weapon).bonus <
                       props.row.damage.bonus
-                        ? 'de'
-                        : '') +
+                      ? 'de'
+                      : '') +
                       (modifiedDamage(props.row as Weapon).bonus !=
-                      props.row.damage.bonus
+                        props.row.damage.bonus
                         ? 'buffed'
                         : '')
-                    "
-                    >{{
-                      damageSplitString(props.row as Weapon)[
+                      ">{{
+                        damageSplitString(props.row as Weapon)[
                         modifiedDamage(props.row as Weapon).dice > 0 ? 1 : 0
-                      ]
-                    }}</span
-                  >&nbsp;{{
-                    damageSplitString(props.row as Weapon)[
-                      damageSplitString(props.row as Weapon).length - 1
-                    ]?.trim()
-                  }}<template
-                    v-for="rune of props.row.runes ?? []"
-                    :key="rune.name"
-                  >
+                        ]
+                      }}</span>&nbsp;{{
+                      damageSplitString(props.row as Weapon)[
+                        damageSplitString(props.row as Weapon).length - 1
+                      ]?.trim()
+                    }}<template v-for="rune of props.row.runes ?? []" :key="rune.name">
                     <ClickableRune :rune="rune">
-                      &nbsp;+ {{ rune.toString() }}</ClickableRune
-                    >
-                  </template></span
-                >
+                      &nbsp;+ {{ rune.toString() }}</ClickableRune>
+                  </template></span>
               </div>
               <div class="labello compact">Damage</div>
             </div>
             <div class="line">
-              <div
-                class="underlined weapon-traits bounded-line"
-                :data-pass="2"
-                :data-max="1.5"
-              >
+              <div class="underlined weapon-traits bounded-line" :data-pass="2" :data-max="1.5">
                 <span class="list-flow">
-                  <template
-                    v-for="(trait, index) in props.row.traits"
-                    :key="trait.name"
-                  >
+                  <template v-for="(trait, index) in props.row.traits" :key="trait.name">
                     <template v-if="(index as number) > 0">, </template>
                     <ClickableTrait :trait="trait" />
                   </template>
@@ -105,10 +65,7 @@
           </div>
         </q-td>
       </q-tr>
-      <q-tr
-        v-show="props.expand && remotelyInteresting(props.row as Weapon)"
-        :props="props"
-      >
+      <q-tr v-show="props.expand && remotelyInteresting(props.row as Weapon)" :props="props">
         <q-td colspan="100%">
           <div class="row-stretch">
             <div class="line" style="flex-grow: 0.5" v-if="props.row.hands">
@@ -132,16 +89,9 @@
               <div class="labello compact">Usage</div>
             </div>
             <div class="line" v-if="props.row.runes.length > 0">
-              <div
-                class="underlined weapon-traits bounded-line"
-                :data-pass="3"
-                :data-max="1.5"
-              >
+              <div class="underlined weapon-traits bounded-line" :data-pass="3" :data-max="1.5">
                 <span class="list-flow">
-                  <template
-                    v-for="(rune, index) in props.row.runes"
-                    :key="rune.name"
-                  >
+                  <template v-for="(rune, index) in props.row.runes" :key="rune.name">
                     <template v-if="(index as number) > 0">, </template>
                     <ClickableRune :rune="rune">{{ rune.name }}</ClickableRune>
                   </template>

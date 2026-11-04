@@ -1471,6 +1471,12 @@ div.spell-cost-optional > span {
     min-height: 2em;
   }
 
+  @media (min-width: 600px) {
+    .q-dialog__inner--minimized > div {
+      max-width: max(560px, 80vw);
+    }
+  }
+
   .apparitionChoices .q-field__native {
     font-size: 0.5em;
   }
