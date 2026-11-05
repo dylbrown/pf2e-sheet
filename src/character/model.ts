@@ -96,6 +96,7 @@ export enum Attribute {
   ChecksAndDCs,
   HP,
   Speeds,
+  MultipleAttackPenalty,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {
@@ -200,6 +201,7 @@ export const notChecksAndDCs = [
   Attribute.HP,
   Attribute.DamageRolls,
   Attribute.Speeds,
+  Attribute.MultipleAttackPenalty,
 ];
 
 export const weaponsAndArmor: { [s: string]: Attribute } = {
@@ -387,7 +389,17 @@ DamageType.get('Slashing', true);
 DamageType.get('Bludgeoning', true);
 DamageType.get('Piercing', true);
 
-export class DamageInstance {
+export abstract class PrintableDamage {
+  abstract getDamageInstances(): DamageInstance[];
+  abstract splitString(): string[];
+  abstract double(): PrintableDamage;
+
+  toString(): string {
+    return this.splitString().join('');
+  }
+}
+
+export class DamageInstance extends PrintableDamage {
   readonly bonus: number;
   readonly damageType: DamageType;
   readonly dice: number;
@@ -399,28 +411,51 @@ export class DamageInstance {
     dice: number,
     die: string,
   ) {
+    super();
     this.bonus = bonus;
     this.damageType = DamageType.get(damageType);
     this.dice = dice;
     this.die = die;
   }
 
+  getDamageInstances(): DamageInstance[] {
+    return [this];
+  }
+
+  double(): DamageInstance {
+    return new DamageInstance(
+      this.bonus * 2,
+      this.damageType,
+      this.dice * 2,
+      this.die,
+    );
+  }
+
+  get diceString(): string {
+    return this.dice > 0 ? this.dice + this.die : '';
+  }
+
+  get damageString(): string {
+    return this.bonus != 0
+      ? (this.bonus > 0 ? (this.dice > 0 ? '+' : '') : '-') +
+          Math.abs(this.bonus)
+      : '';
+  }
+
+  get typeString(): string {
+    return ' ' + this.damageType.shortName;
+  }
+
   splitString(): string[] {
     const damage: string[] = [];
     if (this.dice > 0) {
-      damage[0] = this.dice + this.die;
+      damage.push(this.diceString);
     }
     if (this.bonus != 0) {
-      if (damage[0])
-        damage[1] = (this.bonus > 0 ? '+' : '-') + Math.abs(this.bonus);
-      else damage[0] = this.bonus.toString();
+      damage.push(this.damageString);
     }
-    damage.push(' ' + this.damageType.shortName);
+    damage.push(this.typeString);
     return damage;
-  }
-
-  toString(): string {
-    return this.splitString().join('');
   }
 
   static parseFromString(s: string): DamageInstance {
@@ -439,6 +474,35 @@ export class DamageInstance {
   }
 }
 
+export class MultiDamageInstance extends PrintableDamage {
+  readonly instances: DamageInstance[];
+
+  constructor(instances: DamageInstance[]) {
+    super();
+    this.instances = instances;
+  }
+
+  getDamageInstances(): DamageInstance[] {
+    return this.instances;
+  }
+
+  double(): MultiDamageInstance {
+    return new MultiDamageInstance(
+      this.instances.map((instance) => instance.double() as DamageInstance),
+    );
+  }
+
+  splitString(): string[] {
+    const damage: string[] = [];
+    for (const instance of this.instances) {
+      damage.push(...instance.splitString());
+      damage.push('+');
+    }
+    damage.pop();
+    return damage;
+  }
+}
+
 export class Rune extends DamageInstance {
   name: string;
   description: string;
@@ -454,6 +518,17 @@ export class Rune extends DamageInstance {
     super(bonus, damageType, dice, die);
     this.name = name;
     this.description = description;
+  }
+
+  override double(): Rune {
+    return new Rune(
+      this.bonus * 2,
+      this.damageType,
+      this.dice * 2,
+      this.die,
+      this.name,
+      this.description,
+    );
   }
 }
 

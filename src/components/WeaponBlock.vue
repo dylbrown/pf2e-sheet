@@ -6,13 +6,9 @@
     <div class="flex-column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
-          <div
-            class="underlined weapon-info"
-            :class="
-              (modifiedAttack < weapon.attack ? 'de' : '') +
-              (modifiedAttack != weapon.attack ? 'buffed' : '')
-            "
-          >
+          <div class="underlined weapon-info" :class="(modifiedAttack < weapon.attack ? 'de' : '') +
+            (modifiedAttack != weapon.attack ? 'buffed' : '')
+            ">
             {{ signed(modifiedAttack) }}
           </div>
           <div class="labello compact">Attack</div>
@@ -20,29 +16,22 @@
         <div class="line">
           <div class="underlined weapon-info bounded-line" data-max="2.2">
             <span class="list-flow" style="word-spacing: -0.5em">
-              <template v-if="modifiedDamage.dice > 0">{{
-                damageSplitString[0]
-              }}</template
-              ><span
-                v-if="modifiedDamage.bonus != 0"
-                :class="
-                  (modifiedDamage.bonus < weapon.damage.bonus ? 'de' : '') +
-                  (modifiedDamage.bonus != weapon.damage.bonus ? 'buffed' : '')
-                "
-                >{{ damageSplitString[modifiedDamage.dice > 0 ? 1 : 0] }}</span
-              >&nbsp;{{ damageSplitString[damageSplitString.length - 1]?.trim()
-              }}<template v-for="rune of weapon.runes ?? []" :key="rune.name">
+              <template v-for="(instance, index) of modifiedDamage.getDamageInstances()" :key="instance.toString()">
+                <template v-if="index > 0">&nbsp;+ </template>
+                <template v-if="instance.dice > 0">{{ instance.diceString }}</template><span v-if="instance.bonus != 0"
+                  :class="(instance.bonus < weapon.damage.bonus ? 'de' : '') +
+                    (instance.bonus != weapon.damage.bonus ? 'buffed' : '')
+                    ">{{ instance.damageString }}</span>&nbsp;{{ instance.typeString.trim() }}
+              </template>
+              <template v-for="rune of weapon.runes ?? []" :key="rune.name">
                 <ClickableRune :rune="rune" v-if="interactive">
-                  + {{ rune.toString() }}</ClickableRune
-                ><template v-else>
+                  + {{ rune.toString() }}</ClickableRune><template v-else>
                   + {{ rune.dice }}{{ rune.die
                   }}<template v-if="rune.bonus > 0">
-                    + {{ rune.bonus }}</template
-                  >
-                  {{ rune.damageType.shortName }}</template
-                >
-              </template></span
-            >
+                    + {{ rune.bonus }}</template>
+                  {{ rune.damageType.shortName }}</template>
+              </template>
+            </span>
           </div>
           <div class="labello compact">Damage</div>
         </div>
@@ -67,11 +56,7 @@
           <div class="labello compact">Usage</div>
         </div>
         <div class="line" v-if="weapon.runes.length > 0">
-          <div
-            class="underlined weapon-traits bounded-line"
-            :data-pass="3"
-            :data-max="1.8"
-          >
+          <div class="underlined weapon-traits bounded-line" :data-pass="3" :data-max="1.8">
             <span v-if="interactive" class="list-flow">
               <template v-for="(rune, index) in weapon.runes" :key="rune.name">
                 <template v-if="index > 0">, </template>
@@ -85,16 +70,9 @@
           <div class="labello compact">Runes</div>
         </div>
         <div class="line">
-          <div
-            class="underlined weapon-traits bounded-line"
-            :data-pass="2"
-            :data-max="1.8"
-          >
+          <div class="underlined weapon-traits bounded-line" :data-pass="2" :data-max="1.8">
             <span v-if="interactive" class="list-flow">
-              <template
-                v-for="(trait, index) in weapon.traits"
-                :key="trait.name"
-              >
+              <template v-for="(trait, index) in weapon.traits" :key="trait.name">
                 <template v-if="index > 0">, </template>
                 <ClickableTrait :trait="trait" />
               </template>

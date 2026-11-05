@@ -3,9 +3,12 @@ import {
   ac,
   attacks,
   Attribute,
+  AttributeEntry,
   attrScore,
   DamageInstance,
+  MultiDamageInstance,
   notChecksAndDCs,
+  PrintableDamage,
   saves,
   Score,
   skills,
@@ -390,8 +393,11 @@ export const conditionEffects: { [condition in Condition]: ConditionData } = {
   ),
 };
 
-export function applyMods(character: Character, modifiedAttr: Attribute) {
-  const attrEntry = character.attributes[modifiedAttr];
+export function applyMods(
+  character: Character,
+  modifiedAttr: Attribute,
+  attrEntry: AttributeEntry = character.attributes[modifiedAttr],
+) {
   const [bonuses, penalties] = calculateMods(
     character,
     modifiedAttr,
@@ -433,7 +439,8 @@ export function applyAttackMods(character: Character, weapon: Weapon) {
 export function applyDamageMods(
   character: Character,
   weapon: Weapon,
-): DamageInstance {
+  critical: boolean = false,
+): PrintableDamage {
   const score: Score | undefined =
     weapon.range === undefined ||
     weapon.traits.some((t) => t.name.startsWith('Thrown'))
@@ -446,7 +453,7 @@ export function applyDamageMods(
     score,
   );
   const damage = weapon.damage;
-  return new DamageInstance(
+  let instance = new DamageInstance(
     damage.bonus +
       Object.values(bonuses).reduce((a, b) => a + b, 0) +
       Object.values(penalties).reduce((a, b) => a + b, 0),
@@ -454,6 +461,23 @@ export function applyDamageMods(
     damage.dice,
     damage.die,
   );
+
+  if (!critical) return instance;
+
+  const fatalTrait = weapon.traits.find((r) => r.name.startsWith('Fatal'));
+  instance = new DamageInstance(
+    instance.bonus * 2,
+    instance.damageType,
+    instance.dice * 2 + (fatalTrait ? 1 : 0),
+    fatalTrait ? fatalTrait.name.replaceAll(/^Fatal /gi, '') : instance.die,
+  );
+  const deadlyTrait = weapon.traits.find((r) => r.name.startsWith('Deadly'));
+  if (!deadlyTrait) return instance;
+  const deadlyDie = deadlyTrait.name.replaceAll(/^Deadly /gi, '');
+  return new MultiDamageInstance([
+    instance,
+    new DamageInstance(0, instance.damageType, damage.dice, deadlyDie),
+  ]);
 }
 
 export function applyACMods(character: Character): number {

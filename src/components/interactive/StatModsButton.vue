@@ -99,9 +99,11 @@ const options_temp = [
   Attribute.Saves,
   Attribute.SkillChecks,
   Attribute.Speeds,
+  Attribute.MultipleAttackPenalty,
 ];
 options_temp.push(...saves, Attribute.Perception);
 options_temp.push(...(props.character.starfinder ? sfSkills : skills));
+options_temp.push(Attribute.LoreChecks);
 const OPTIONS = options_temp.map((s) => s as Attribute);
 const AttrLabel = (a: Attribute) =>
   Attribute[a].replaceAll(/([a-z])([A-Z])/g, '$1 $2');

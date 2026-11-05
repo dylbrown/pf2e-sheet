@@ -3,39 +3,21 @@
     <h5>Pathfinder Second Edition Character Sheet<br />for Wanderer's Guide</h5>
     <div style="flex-grow: 1; width: 100%">
       <div style="position: relative; height: 6vh; flex-grow: 1">
-        <q-linear-progress
-          :value="progress"
-          style="min-height: 6vh; position: absolute"
-        />
-        <q-toggle
-          style="
+        <q-linear-progress :value="progress" style="min-height: 6vh; position: absolute" />
+        <q-toggle style="
             position: absolute;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-          "
-          :label="`Generating ${interactiveMode ? 'Interactive' : 'Paper'} Sheet`"
-          v-model="interactiveMode"
-        />
+          " :label="`Generating ${interactiveMode ? 'Interactive' : 'Paper'} Sheet`" v-model="interactiveMode" />
       </div>
     </div>
     <div class="row" style="gap: 8px; margin-top: 8px">
       <q-card>
         <q-card-section>
           <h6>Load a Saved Character</h6>
-          <q-table
-            flat
-            bordered
-            dense
-            hide-header
-            :hide-bottom="saves.length <= 4"
-            v-if="saves.length > 0"
-            :rows="saves"
-            :rows-per-page-options="[4]"
-            :columns="COLUMNS"
-            class="saves"
-            row-key="filename"
-          >
+          <q-table flat bordered dense hide-header :hide-bottom="saves.length <= 4" v-if="saves.length > 0"
+            :rows="saves" :rows-per-page-options="[4]" :columns="COLUMNS" class="saves" row-key="filename">
             <template v-slot:header="props">
               <q-tr :props="props">
                 <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -50,16 +32,8 @@
                   {{ col.value }}
                 </q-td>
                 <q-td auto-width>
-                  <q-btn
-                    icon="fa-solid fa-right-to-bracket"
-                    push
-                    v-on:click="loadCached(props.row.filename)"
-                  />
-                  <q-btn
-                    icon="fa-regular fa-trash-can"
-                    push
-                    v-on:click="confirmDelete(props.row.filename)"
-                  />
+                  <q-btn icon="fa-solid fa-right-to-bracket" push v-on:click="loadCached(props.row.filename)" />
+                  <q-btn icon="fa-regular fa-trash-can" push v-on:click="confirmDelete(props.row.filename)" />
                 </q-td>
               </q-tr>
             </template>
@@ -69,15 +43,8 @@
       <q-card>
         <q-card-section>
           <h6>Import a New Character</h6>
-          <q-file
-            v-model="file"
-            label="Pick a file"
-            accept=".guidechar,.json"
-            filled
-            style="max-width: 20em; align-self: flex-start"
-            :item-aligned="true"
-            @update:model-value="loadNew"
-          />
+          <q-file v-model="file" label="Pick a file" accept=".guidechar,.json" filled
+            style="max-width: 20em; align-self: flex-start" :item-aligned="true" @update:model-value="loadNew" />
         </q-card-section>
       </q-card>
     </div>
@@ -85,30 +52,16 @@
   <InteractiveSheet v-if="ready && interactiveMode" :character="character" />
   <PaperSheet v-if="ready && !interactiveMode" :character="character" />
   <q-dialog v-model="deletePopup" persistent>
-    <q-card>
-      <q-card-section
-        class="row items-center"
-        style="flex-wrap: nowrap; gap: 4px"
-      >
-        <q-avatar
-          icon="fa-regular fa-trash-can"
-          color="primary"
-          text-color="white"
-        />
-        <span class="q-ml-sm"
-          >Are you sure you want to delete this character from the cache?</span
-        >
+    <q-card class="q-pa-lg">
+      <q-card-section class="row items-center" style="flex-wrap: nowrap; gap: 4px">
+        <q-avatar icon="fa-regular fa-trash-can" color="primary" text-color="white" />
+        <span class="q-ml-sm" style="font-size: 16px">Are you sure you want to delete this character from the
+          cache?</span>
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" v-close-popup />
-        <q-btn
-          push
-          label="Delete"
-          color="primary"
-          v-close-popup
-          @click="deleteCharacter"
-        />
+        <q-btn push label="Delete" color="primary" v-close-popup @click="deleteCharacter" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -127,6 +80,7 @@
   align-items: stretch;
   text-align: center;
 }
+
 #load-box .q-toggle__label {
   width: 19em;
 }

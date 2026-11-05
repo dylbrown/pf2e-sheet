@@ -1,43 +1,36 @@
 <template>
-  <div
-    class="flex-column tab"
-    style="justify-content: stretch; max-width: fit-content"
-  >
+  <div class="flex-column tab" style="justify-content: stretch; max-width: fit-content">
     <div id="skills-grid">
-      <template
-        v-for="skill of character.starfinder ? sfSkills : skills"
-        :key="skill"
-      >
+      <template v-for="skill of character.starfinder ? sfSkills : skills" :key="skill">
         <div class="skill-label">
           <ClickableAttribute :attribute="skill" :character="character" />
         </div>
         <div class="line">
-          <div
-            class="underlined-roll"
-            :class="
-              (modifiedSkill(skill) < character.attributes[skill].total
-                ? 'de'
-                : '') +
-              (modifiedSkill(skill) != character.attributes[skill].total
-                ? 'buffed'
-                : '')
-            "
-          >
+          <div class="underlined-roll" :class="(modifiedSkill(skill) < character.attributes[skill].total
+            ? 'de'
+            : '') +
+            (modifiedSkill(skill) != character.attributes[skill].total
+              ? 'buffed'
+              : '')
+            ">
             {{ Util.signed(modifiedSkill(skill)) }}
           </div>
         </div>
-        <ProficiencyDisplay
-          :grid="false"
-          :proficiency="character.attributes[skill].proficiency"
-        />
+        <ProficiencyDisplay :grid="false" :proficiency="character.attributes[skill].proficiency" />
       </template>
       <template v-for="[name, lore] of filteredLores" :key="name">
         <div class="skill-label lore-label">
           <ClickableAttribute :lore="name" :character="character" />
         </div>
         <div class="line">
-          <div class="underlined-roll">
-            {{ Util.signed(lore.total) }}
+          <div class="underlined-roll" :class="(modifiedLore(lore) < lore.total
+            ? 'de'
+            : '') +
+            (modifiedLore(lore) != lore.total
+              ? 'buffed'
+              : '')
+            ">
+            {{ Util.signed(modifiedLore(lore)) }}
           </div>
         </div>
         <ProficiencyDisplay :grid="false" :proficiency="lore.proficiency" />
@@ -60,6 +53,7 @@ import {
   SpellListSubType,
   ApparitionList,
   Attribute,
+  AttributeEntry,
 } from '@/character/model';
 import { applyMods } from '@/character/modifiers';
 import { computed, reactive } from 'vue';
@@ -70,6 +64,10 @@ const props = defineProps<{
 
 const modifiedSkill = (skill: Attribute) => {
   return applyMods(props.character, skill);
+};
+
+const modifiedLore = (lore: AttributeEntry) => {
+  return applyMods(props.character, Attribute.LoreChecks, lore);
 };
 
 const aList = props.character.spells.lists.find(
