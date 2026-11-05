@@ -24,7 +24,7 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { abilityMod, getProficiency, parseDescription } from './util';
+import { abilityMod, getProficiency, getScore, parseDescription } from './util';
 import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
@@ -232,7 +232,11 @@ export default class Character {
             proficiency: entry?.parts?.profValue as Proficiency,
             total: parseInt(entry?.total ?? '0'),
             itemBonus: entry.parts.breakdown.bonusValue ?? 0,
-            score: Score.Intelligence,
+            score: getScore(
+              data.content.raw_data_dump.variables[a].value.attribute.substring(
+                'ATTRIBUTE_'.length,
+              ),
+            ),
             level: entry.parts.level ?? 0,
           };
       }
