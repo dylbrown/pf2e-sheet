@@ -45,7 +45,6 @@ export default class Character {
   languages = Array<string>();
   scores: Scores;
   speed: NumbersOfType = { '': 25 };
-  classDC = 10;
   hp = 69;
   immunities: NumbersOfType = {};
   resistances: NumbersOfType = {};
@@ -423,7 +422,7 @@ export default class Character {
       }
     }
     this.speed = data.stats?.totalSpeed ?? 0;
-    this.classDC = data.stats?.totalClassDC ?? 0;
+    this.attributes[Attribute.ClassDC].total = data.stats?.totalClassDC ?? 0;
     this.ac = data.stats?.totalAC ?? 0;
     this.hp = data.stats?.maxHP ?? 0;
     this.attributes[Attribute.Perception].total =
