@@ -1,5 +1,6 @@
 import {
   Ability,
+  ABuilder,
   ApparitionList,
   CharacterContext,
   Rarity,
@@ -70,7 +71,7 @@ export default class Spells {
       );
       if (!list) continue;
       const spell = this.makeSpell(entry, context, list.name);
-      this.addSpell(list, spell);
+      this.addSpell(list, spell.build());
     }
     for (const entry of content.spell_sources) {
       const list = this.getOrCreateSpellsList(entry.source.name || className);
@@ -113,7 +114,7 @@ export default class Spells {
       const list = this.getOrCreateSpellsList(listName);
       if (!list) continue;
       const spell = this.makeSpell(entry, context, list.name);
-      list.focus.push(spell);
+      list.focus.push(spell.build());
     }
     this.focusPoints = Math.min(
       content.focus_spells.length +
@@ -128,9 +129,9 @@ export default class Spells {
       list.attack = context.level + (context.level >= 12 ? 4 : 2) + chaMod;
       list.dc = 10 + list.attack;
       const spell = this.makeSpell(entry.spell, context, list.name);
-      spell.innate = true;
-      spell.castsPerDay = entry.casts_max;
-      this.addSpell(list, spell);
+      spell.partial.innate = true;
+      spell.partial.castsPerDay = entry.casts_max;
+      this.addSpell(list, spell.build());
     }
 
     for (const list of this.lists) {
@@ -177,7 +178,7 @@ export default class Spells {
       const allSpells = new Map<string, Spell>();
       Object.values(content.all_spells).forEach((s: any) => {
         if (s.meta_data.focus || (s.traditions?.length ?? 0) == 0) return; // Skip focus spells, they are handled separately
-        const spell = this.makeSpell(s, context, '');
+        const spell = this.makeSpell(s, context, '').build();
         allSpells.set(spell.name.toLowerCase(), spell);
       });
       for (const list of this.lists) {
@@ -298,7 +299,7 @@ export default class Spells {
     entry: any,
     context: CharacterContext,
     listName: string,
-  ): Spell {
+  ): ABuilder<Spell> {
     let cost = Action.None;
     let maxCost = Action.None;
     if (entry.cast && entry.cast.includes('TO')) {
@@ -320,7 +321,8 @@ export default class Spells {
         h.fixed.push(parseInt(amount));
       }
     }
-    return {
+    const builder = new Spell.SBuilder();
+    builder.partial = {
       name: entry.name.replaceAll(' (legacy)', 'ᴸ'),
       id: entry.id,
       level: entry.rank ?? 1,
@@ -343,6 +345,7 @@ export default class Spells {
       traditions: entry.traditions,
       rarity: Util.getRarity(entry.rarity),
     };
+    return builder;
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -354,9 +357,12 @@ export default class Spells {
       for (const entry of data.spellBookSpells) {
         const list = this.getOrCreateSpellsList(entry.spellSRC);
         if (!list) continue;
-        const spell = new Spell(entry._spellName, entry.spellID);
-        promises.push(Wanderer.loadSpell(spell));
-        this.addSpell(list, spell);
+        const spell = new Spell.SBuilder(entry._spellName, entry.spellID);
+        promises.push(
+          Wanderer.loadSpell(spell.partial).then(() =>
+            this.addSpell(list, spell.build()),
+          ),
+        );
       }
     }
     function setTradition(list: SpellList, value: string) {
@@ -405,9 +411,12 @@ export default class Spells {
           break;
         }
         case 'focusSpell': {
-          const spell = new Spell(value, Number(value));
-          promises.push(Wanderer.loadSpell(spell));
-          list.focus.push(spell);
+          const spell = new Spell.SBuilder(value, Number(value));
+          promises.push(
+            Wanderer.loadSpell(spell.partial).then(() => {
+              list.focus.push(spell.build());
+            }),
+          );
           break;
         }
         case 'focusPoint': {
@@ -419,12 +428,12 @@ export default class Spells {
           if (!innateList) break;
           innateList.type = SpellListType.Innate;
           const bits = entry.value.split(':::');
-          const spell = new Spell(bits[0], Number(bits[0]));
+          const spell = new Spell.SBuilder(bits[0], Number(bits[0]));
           setTradition(innateList, bits[2]);
           innateList.score = Util.getScore(bits[4]);
           promises.push(
-            Wanderer.loadSpell(spell).then(() => {
-              this.addSpell(innateList, spell);
+            Wanderer.loadSpell(spell.partial).then(() => {
+              this.addSpell(innateList, spell.build());
             }),
           );
         }

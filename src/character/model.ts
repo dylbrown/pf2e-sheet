@@ -235,7 +235,7 @@ export type Lores = {
   [lore: string]: AttributeEntry;
 };
 
-type Mutable<T> = {
+export type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
@@ -245,7 +245,7 @@ export interface Builder<T> {
   partial: Partial<Mutable<T>>;
   build(): T;
 }
-abstract class ABuilder<T> {
+export abstract class ABuilder<T> {
   partial: Partial<Mutable<T>>;
   private ctor: (t: Mutable<T>) => T;
 
@@ -339,7 +339,7 @@ export class Weapon extends Item {
     this.potency = w.potency ?? 0;
   }
 
-  static WBuilder = class extends ABuilder<Weapon> {
+  public static WBuilder = class extends ABuilder<Weapon> {
     constructor(b?: Builder<Item>) {
       super((t: Mutable<Weapon>) => new Weapon(t), b?.partial);
       if (b) {
@@ -585,32 +585,46 @@ export class Ability {
 }
 
 export class Spell {
-  name: string;
-  id: number;
-  level = 0;
-  description = '';
-  cost: Action = Action.Free;
-  maxCost?: Action;
-  castTime = '';
-  components?: Array<string> = [];
-  source = Source.None;
-  traits: Array<Trait> = [];
-  requirements = '';
-  range = '';
-  area = '';
-  targets = '';
-  duration = '';
-  save = '';
-  innate = false;
-  castsPerDay?: number;
-  heightening = new Heightening(0);
-  traditions = new Array<string>();
-  rarity = Rarity.Common;
+  readonly name: string;
+  readonly id: number;
+  readonly level = 0;
+  readonly description: string = '';
+  readonly cost: Action = Action.Free;
+  readonly maxCost?: Action;
+  readonly castTime = '';
+  readonly components?: Array<string> = [];
+  readonly source = Source.None;
+  readonly traits: Array<Trait> = [];
+  readonly requirements = '';
+  readonly range = '';
+  readonly area = '';
+  readonly targets = '';
+  readonly duration = '';
+  readonly save: string = '';
+  readonly innate: boolean = false;
+  readonly castsPerDay?: number;
+  readonly heightening = new Heightening(0);
+  readonly traditions = new Array<string>();
+  readonly rarity: Rarity = Rarity.Common;
 
-  constructor(name: string, id: number) {
-    this.name = name;
-    this.id = id;
+  protected constructor(w: Mutable<Spell>) {
+    this.name = w.name;
+    this.id = w.id;
+    const record = this as unknown as Record<string, unknown>;
+    for (const [k, v] of Object.entries(w as Record<string, unknown>)) {
+      record[k] = v;
+    }
   }
+
+  static SBuilder = class extends ABuilder<Spell> {
+    constructor(name?: string, id?: number) {
+      super((t: Mutable<Spell>) => new Spell(t));
+      if (name !== undefined && id !== undefined) {
+        this.partial.name = name;
+        this.partial.id = id;
+      }
+    }
+  };
 }
 
 export class Heightening {

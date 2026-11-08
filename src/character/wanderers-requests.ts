@@ -1,5 +1,5 @@
 import { LocalStorage } from 'quasar';
-import { Ability, Builder, Item, Spell, Weapon } from './model';
+import { Ability, Builder, Item, Mutable, Spell, Weapon } from './model';
 import { Action, Source, Trait } from './model';
 import * as Util from './util';
 import runeLookupJSON from './examples/rune_lookup.json';
@@ -94,11 +94,11 @@ export async function loadItem(b: Builder<Item>) {
   }
 }
 
-export async function loadSpell(spell: Spell) {
+export async function loadSpell(spell: Partial<Mutable<Spell>>) {
   const data = await load(
     '/.netlify/functions/wanderers-request?type=spell&id=',
     'spell',
-    spell.id,
+    spell.id ?? -1,
   );
   const entry = data.spell;
   spell.name = entry.name;
