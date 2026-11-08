@@ -98,6 +98,7 @@ export enum Attribute {
   HP,
   Speeds,
   MultipleAttackPenalty,
+  ImpulseAttacks,
 }
 
 export const attrScore: { [a in Attribute as string]: Score } = {

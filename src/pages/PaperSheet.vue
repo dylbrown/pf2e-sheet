@@ -1,19 +1,10 @@
 <template>
-  <q-btn
-    color="primary"
-    class="printButton"
-    icon="fa-solid fa-floppy-disk"
-    label="Export to PDF"
-    @click="makePDF"
-  />
+  <q-btn color="primary" class="printButton" icon="fa-solid fa-floppy-disk" label="Export to PDF" @click="makePDF" />
   <div id="notice" v-if="character.abilities.excluded.length > 0">
     <div class="notice-header">Hidden Abilities</div>
     <ul>
       <li v-for="excluded of character.abilities.excluded" :key="excluded.name">
-        {{ excluded.name }}<br /><span
-          class="excluded-desc"
-          v-html="excluded.description"
-        />
+        {{ excluded.name }}<br /><span class="excluded-desc" v-html="excluded.description" />
       </li>
     </ul>
   </div>
@@ -38,12 +29,9 @@
                 <div class="labello invisible">A</div>
               </div>
               <div class="line">
-                <div
-                  :class="
-                    'underlined-roll' +
-                    (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
-                  "
-                >
+                <div :class="'underlined-roll' +
+                  (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  ">
                   {{ signed(abilityMod(character.scores[score as Score])) }}
                 </div>
                 <div class="labello">Mod</div>
@@ -67,7 +55,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ character.classDC }}
+                {{ character.attributes[Attribute.ClassDC].total + 10 }}
               </div>
               <div class="labello">Class DC</div>
             </div>
@@ -118,10 +106,7 @@
               </div>
               <div class="box-label">DEX</div>
             </div>
-            <ProficiencyDisplay
-              :proficiency="character.combat.armor.proficiency"
-              :grid="true"
-            />
+            <ProficiencyDisplay :proficiency="character.combat.armor.proficiency" :grid="true" />
             <div class="line">
               <div class="numBox">
                 {{ nonzero(character.combat.armor.ac) }}
@@ -157,12 +142,8 @@
               </div>
               <div class="labello">WIS</div>
             </div>
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.Perception].proficiency
-              "
-              :grid="true"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.Perception].proficiency
+              " :grid="true" />
             <div class="line">
               <div class="numBox">
                 {{
@@ -188,12 +169,8 @@
               </div>
               <div class="labello">CON</div>
             </div>
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.Fortitude].proficiency
-              "
-              :grid="true"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.Fortitude].proficiency
+              " :grid="true" />
             <div class="line">
               <div class="numBox">
                 {{
@@ -219,10 +196,7 @@
               </div>
               <div class="labello">DEX</div>
             </div>
-            <ProficiencyDisplay
-              :proficiency="character.attributes[Attribute.Reflex].proficiency"
-              :grid="true"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.Reflex].proficiency" :grid="true" />
             <div class="line">
               <div class="numBox">
                 {{ nonzero(character.attributes[Attribute.Reflex].itemBonus) }}
@@ -246,10 +220,7 @@
               </div>
               <div class="labello">WIS</div>
             </div>
-            <ProficiencyDisplay
-              :proficiency="character.attributes[Attribute.Will].proficiency"
-              :grid="true"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.Will].proficiency" :grid="true" />
             <div class="line">
               <div class="numBox">
                 {{ nonzero(character.attributes[Attribute.Will].itemBonus) }}
@@ -266,58 +237,26 @@
           </div>
           <div class="sectionLabel">Weapon & Armor Proficiencies</div>
           <div id="prof-grid">
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.UnarmedAttacks].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.SimpleWeapons].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.MartialWeapons].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.AdvancedWeapons].proficiency
-              "
-              :grid="false"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.UnarmedAttacks].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.SimpleWeapons].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.MartialWeapons].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.AdvancedWeapons].proficiency
+              " :grid="false" />
             <div class="labello">Unarmed</div>
             <div class="labello">Simple</div>
             <div class="labello">Martial</div>
             <div class="labello">Advanced</div>
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.UnarmoredDefense].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.LightArmor].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.MediumArmor].proficiency
-              "
-              :grid="false"
-            />
-            <ProficiencyDisplay
-              :proficiency="
-                character.attributes[Attribute.HeavyArmor].proficiency
-              "
-              :grid="false"
-            />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.UnarmoredDefense].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.LightArmor].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.MediumArmor].proficiency
+              " :grid="false" />
+            <ProficiencyDisplay :proficiency="character.attributes[Attribute.HeavyArmor].proficiency
+              " :grid="false" />
             <div class="labello">Unarmored</div>
             <div class="labello">Light</div>
             <div class="labello">Medium</div>
@@ -334,10 +273,7 @@
             Character Info
           </div>
           <div id="info-grid">
-            <div
-              class="line"
-              style="grid-row-end: span 2; grid-column-end: span 2"
-            >
+            <div class="line" style="grid-row-end: span 2; grid-column-end: span 2">
               <div class="underlined wrap">
                 {{ character.name }}
               </div>
@@ -373,7 +309,7 @@
             </div>
             <div class="line" style="grid-column-end: span 3">
               <div class="underlined bounded-line" data-max="1.7">
-                {{ character.traits.map((t) => t.name).join(', ') }}
+                {{character.traits.map((t) => t.name).join(', ')}}
               </div>
               <div class="labello">Traits</div>
             </div>
@@ -394,28 +330,16 @@
             <hr />
           </div>
           <div class="sectionLabel">Strikes</div>
-          <WeaponBlock
-            v-for="attack in character.combat.attacks"
-            :key="attack.name"
-            :character="character"
-            :weapon="attack"
-            :interactive="false"
-          />
+          <WeaponBlock v-for="attack in character.combat.attacks" :key="attack.name" :character="character"
+            :weapon="attack" :interactive="false" />
           <div class="sectionDivider">
             <hr />
           </div>
           <div class="sectionLabel">Actions and Activities</div>
-          <div
-            class="flex-column abilities"
-            ref="abilities"
-            style="flex-grow: 0"
-          >
-            <template
-              v-for="[index, ability] in Array.from(
-                character.abilities.entries(),
-              ).filter(([_, a]) => a.activity)"
-              :key="index"
-            >
+          <div class="flex-column abilities" ref="abilities" style="flex-grow: 0">
+            <template v-for="[index, ability] in Array.from(
+              character.abilities.entries(),
+            ).filter(([_, a]) => a.activity)" :key="index">
               <div class="action-divider" v-if="index > 0"></div>
               <ActionBlock :action="ability" :interactive="false" />
             </template>
@@ -423,10 +347,7 @@
           <div id="focus" v-if="character.spells.focusPoints > 0">
             <div class="line">
               <div class="numBox rounded"></div>
-              <div
-                class="labello"
-                style="align-self: center; text-align: center"
-              >
+              <div class="labello" style="align-self: center; text-align: center">
                 Focus
               </div>
             </div>
@@ -453,10 +374,7 @@
             <div class="labello">Stat</div>
             <div class="labello">Prof</div>
             <div class="labello">Item</div>
-            <template
-              v-for="skill of character.starfinder ? sfSkills : skills"
-              :key="skill"
-            >
+            <template v-for="skill of character.starfinder ? sfSkills : skills" :key="skill">
               <div class="skill-label">{{ Attribute[skill] }}</div>
               <div class="line">
                 <div class="underlined-roll">
@@ -466,10 +384,7 @@
               <div style="align-self: center; text-transform: uppercase">
                 {{ Score[character.attributes[skill].score].substring(0, 3) }}
               </div>
-              <ProficiencyDisplay
-                :grid="false"
-                :proficiency="character.attributes[skill].proficiency"
-              />
+              <ProficiencyDisplay :grid="false" :proficiency="character.attributes[skill].proficiency" />
               <div class="line">
                 <div class="numBox">
                   <template v-if="character.attributes[skill].itemBonus != 0">{{
@@ -478,10 +393,7 @@
                 </div>
               </div>
             </template>
-            <template
-              v-for="[name, lore] of Object.entries(character.lore)"
-              :key="name"
-            >
+            <template v-for="[name, lore] of Object.entries(character.lore)" :key="name">
               <div class="skill-label lore-label">{{ name }}</div>
               <div class="line">
                 <div class="underlined-roll">
@@ -491,18 +403,15 @@
               <div style="align-self: center; text-transform: uppercase">
                 INT
               </div>
-              <ProficiencyDisplay
-                :grid="false"
-                :proficiency="lore.proficiency"
-              />
+              <ProficiencyDisplay :grid="false" :proficiency="lore.proficiency" />
               <div class="line">
                 <div class="numBox">
                   <template v-if="lore.itemBonus != 0">{{
                     lore.itemBonus
                   }}</template>
                 </div>
-              </div></template
-            >
+              </div>
+            </template>
             <div class="line conditionals">
               {{ character.abilities.conditionals.join(', ') }}
             </div>

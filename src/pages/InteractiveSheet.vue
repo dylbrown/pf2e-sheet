@@ -56,7 +56,7 @@
           </div>
           <div class="sectionLabel">Misc.</div>
           <div class="row-between">
-            <div class="line">
+            <div class="line" style="flex-grow: 3">
               <div class="numBox rounded bounded-line" data-max="2.1" :class="speedMod > 0 ? 'buffed' : speedMod < 0 ? 'debuffed' : ''
                 ">
                 {{
@@ -70,9 +70,15 @@
               </div>
               <div class="labello">Speed</div>
             </div>
+            <div class="line" v-if="character.class == 'Kineticist'">
+              <div class="numBox rounded">
+                {{ Util.signed(moddedImpulse) }}
+              </div>
+              <div class="labello">Impulse</div>
+            </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ character.classDC }}
+                {{ character.attributes[Attribute.ClassDC].total + 10 }}
               </div>
               <div class="labello">Class DC</div>
             </div>
@@ -406,6 +412,19 @@ const moddedAttr = (attr: Attribute) => {
 
 const speedMod = computed(() => {
   return applyMods(props.character, Attribute.Speeds);
+});
+
+{
+  const entry = props.character.attributes[Attribute.ImpulseAttacks];
+  const classDCEntry = props.character.attributes[Attribute.ClassDC];
+  entry.itemBonus = Math.max(entry.itemBonus, classDCEntry.itemBonus);
+  entry.proficiency = classDCEntry.proficiency;
+  entry.score = classDCEntry.score;
+  entry.total = classDCEntry.total - classDCEntry.itemBonus + entry.itemBonus;
+}
+
+const moddedImpulse = computed(() => {
+  return applyMods(props.character, Attribute.ImpulseAttacks, props.character.attributes[Attribute.ImpulseAttacks]);
 });
 
 const moddedAC = computed(() => {

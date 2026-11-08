@@ -186,7 +186,7 @@ const filterMethod = (spells: readonly Spell[]) => {
       if (!actions.value.some((a) => {
         if (!s.maxCost) return a == s.cost;
         const min = Object.values(Action).indexOf(s.cost);
-        const i = Object.values(Action).indexOf(a);
+        const i = Object.values(Action).indexOf(a as Action);
         const max = Object.values(Action).indexOf(s.maxCost);
         return i >= min && i <= max;
       })) return false;

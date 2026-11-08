@@ -171,10 +171,6 @@ export default class Character {
       if (speed.value.value == 0) return;
       this.speed[name] = speed.value.total;
     });
-
-    this.classDC =
-      10 + parseInt(data.content?.proficiencies?.CLASS_DC?.total ?? 0);
-    context.CLASS_DC = this.classDC;
     this.ac = data.content?.ac ?? 0;
     this.combat.armor.ac =
       data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
@@ -201,6 +197,13 @@ export default class Character {
       addDamageEffect(s, this.weaknesses),
     );
 
+    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
+    this.attributes[Attribute.ClassDC].score = getScore(
+      data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
+        'ATTRIBUTE_'.length,
+      ),
+    );
+    context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
     this.setProficiency(data, Attribute.Perception);
     this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
@@ -328,6 +331,13 @@ export default class Character {
           source: Source.bank.get(entry.item.content_source_id),
         };
         this.items.push(b.build());
+        for (const foundryRule of entry.item.meta_data.foundry.rules ?? []) {
+          if (foundryRule.selector == 'impulse-attack-roll') {
+            const entry = this.attributes[Attribute.ImpulseAttacks];
+            const impulseBonus = Math.max(entry.itemBonus, foundryRule.value);
+            entry.itemBonus = impulseBonus;
+          }
+        }
       }
     }
 
@@ -378,8 +388,6 @@ export default class Character {
     this.attributes[attribute].level = proficiencies[key].parts?.level ?? 0;
     this.attributes[attribute].itemBonus =
       proficiencies[key].parts?.breakdown?.bonusValue ?? 0;
-    this.attributes[attribute].proficiency = (proficiencies[key].parts
-      ?.profValue ?? 0) as Proficiency;
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
