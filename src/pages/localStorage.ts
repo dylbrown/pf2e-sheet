@@ -1,9 +1,40 @@
+let cachedData: { [name: string]: any } = {};
+function getData(characterName: string, createIfAbsent: boolean = false) {
+  if (cachedData[characterName] === undefined) {
+    if (!localStorage['2e-sheet:' + characterName]) {
+      if (!createIfAbsent) return null;
+      localStorage['2e-sheet:' + characterName] = JSON.stringify({});
+      cachedData[characterName] = {};
+      return cachedData[characterName];
+    }
+    cachedData[characterName] = JSON.parse(
+      localStorage['2e-sheet:' + characterName],
+    );
+  }
+  return cachedData[characterName];
+}
+
 export function save<T>(characterName: string, value: T, ...key: string[]) {
-  const data = JSON.parse(localStorage['2e-sheet:' + characterName] ?? '{}');
+  const data = getData(characterName, true);
   let curr = data;
   for (const [i, k] of key.entries()) {
     if (i == key.length - 1) {
       curr[k] = value;
+    } else {
+      curr[k] = curr[k] ?? {};
+      curr = curr[k];
+    }
+  }
+  localStorage['2e-sheet:' + characterName] = JSON.stringify(data);
+}
+
+export function remove<T>(characterName: string, ...key: string[]) {
+  const data = getData(characterName);
+  if (!data) return;
+  let curr = data;
+  for (const [i, k] of key.entries()) {
+    if (i == key.length - 1) {
+      delete curr[k];
     } else {
       curr[k] = curr[k] ?? {};
       curr = curr[k];
@@ -19,8 +50,8 @@ export function saveGlobal<T>(value: T, ...key: string[]) {
 }
 
 export function load<T>(characterName: string, ...key: string[]): T | null {
-  if (!localStorage['2e-sheet:' + characterName]) return null;
-  const data = JSON.parse(localStorage['2e-sheet:' + characterName]);
+  const data = getData(characterName);
+  if (!data) return null;
 
   let curr = data;
   for (const [i, k] of key.entries()) {

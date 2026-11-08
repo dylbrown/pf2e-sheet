@@ -1,5 +1,6 @@
 import { Reactive } from 'vue';
 import { makeSource, parseDescription } from './util';
+import * as LS from '@/pages/localStorage';
 
 export enum AbilityType {
   ClassFeat,
@@ -28,13 +29,13 @@ export enum Score {
 }
 
 export enum Action {
+  Free = '◇',
+  Reaction = '↩',
   One = '1',
   Two = '2',
   OnePlus = '1+',
   TwoPlus = '2+',
   Three = '3',
-  Free = '◇',
-  Reaction = '↩',
   TwoRounds = '6',
   None = '',
 }
@@ -613,6 +614,26 @@ export class Spell {
     const record = this as unknown as Record<string, unknown>;
     for (const [k, v] of Object.entries(w as Record<string, unknown>)) {
       record[k] = v;
+    }
+  }
+
+  static getFavourite(spell: Spell, characterName: string): boolean {
+    return (
+      LS.load(characterName, 'spells', 'favourites', spell.id.toString()) ??
+      false
+    );
+  }
+  static setFavourite(spell: Spell, favourite: boolean, characterName: string) {
+    if (favourite) {
+      LS.save(
+        characterName,
+        favourite,
+        'spells',
+        'favourites',
+        spell.id.toString(),
+      );
+    } else {
+      LS.remove(characterName, 'spells', 'favourites', spell.id.toString());
     }
   }
 

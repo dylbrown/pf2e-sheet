@@ -21,8 +21,8 @@
   </div>
   <q-dialog v-model="selecting">
     <q-card>
-      <SpellsTable :spells="computedSpells" :preparing="true" :list="list"
-        :is-heightened="(s) => (s.level != level ? level : 0)" extra-class="popup-spells-table" @select="
+      <SpellsTable :spells="computedSpells" :preparing="true" :char-name="charName" :list="list"
+        :is-heightened="(s: Spell) => (s.level != level ? level : 0)" extra-class="popup-spells-table" @select="
           (spell: Spell) => {
             contents = spell;
             selecting = false;
