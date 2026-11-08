@@ -272,6 +272,14 @@ abstract class ABuilder<T> {
   }
 }
 
+export enum Rarity {
+  Common,
+  Uncommon,
+  Rare,
+  Unique,
+  COUNT,
+}
+
 export class Item {
   readonly name: string;
   readonly id: number;
@@ -282,6 +290,7 @@ export class Item {
   readonly weapon: boolean;
   readonly description: string;
   readonly source: Source;
+  readonly rarity: Rarity;
 
   protected constructor(i: Mutable<Item>) {
     this.name = i.name;
@@ -293,6 +302,7 @@ export class Item {
     this.weapon = i.weapon;
     this.description = i.description;
     this.source = i.source;
+    this.rarity = i.rarity;
   }
   private static verify(t: Partial<Mutable<Item>>): t is Mutable<Item> {
     throw new Error('Method not implemented.');
@@ -547,6 +557,7 @@ export class Ability {
   requirements?: string;
   trigger?: string;
   code?: string;
+  rarity: Rarity;
 
   constructor(
     name: string,
@@ -557,6 +568,7 @@ export class Ability {
     source: Source,
     traits: Trait[],
     description: string,
+    rarity: Rarity,
     context?: CharacterContext,
   ) {
     this.name = name;
@@ -567,6 +579,7 @@ export class Ability {
     this.source = source;
     this.traits = traits;
     this.description = parseDescription(description, context);
+    this.rarity = rarity;
     this.rawDescription = description;
   }
 }
@@ -592,6 +605,7 @@ export class Spell {
   castsPerDay?: number;
   heightening = new Heightening(0);
   traditions = new Array<string>();
+  rarity = Rarity.Common;
 
   constructor(name: string, id: number) {
     this.name = name;

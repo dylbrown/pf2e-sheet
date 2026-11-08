@@ -1,56 +1,33 @@
 <template>
-  <div class="prep-slot" :class="cast ? 'cast' : ''">
+  <div class="prep-slot" :class="cast ? 'cast' : ''" @click="if (!contents && spells.length > 0) selecting = true;">
     <div class="level-label">{{ level }}</div>
     <span v-if="contents != null">
       {{ contents.name }}<template v-if="contents.level < level">ᴴ</template>
     </span>
-    <q-popup-proxy
-      self="top middle"
-      anchor="bottom middle"
-      ref="buttonPopup"
-      v-if="contents || spells.length > 0"
-    >
+    <q-popup-proxy self="top middle" anchor="bottom middle" ref="buttonPopup" v-if="contents && spells.length > 0">
       <q-btn-group>
-        <q-btn
-          icon="fa-solid fa-wand-magic-sparkles"
-          @click="cast = !cast"
-          :style="cast ? 'color: grey' : ''"
-          v-if="contents && level > 0 && !signature"
-        />
-        <q-btn
-          icon="ra-scroll-unfurled"
-          @click="
-            viewing = true;
-            if ($refs.buttonPopup) ($refs.buttonPopup as QPopupProxy).hide();
-          "
-          v-if="contents"
-        />
-        <q-btn
-          icon="fa-solid fa-book"
-          @click="
-            selecting = true;
-            if ($refs.buttonPopup) ($refs.buttonPopup as QPopupProxy).hide();
-          "
-          v-if="spells.length > 0"
-        />
+        <q-btn icon="fa-solid fa-wand-magic-sparkles" @click="cast = !cast" :style="cast ? 'color: grey' : ''"
+          v-if="contents && level > 0 && !signature" />
+        <q-btn icon="ra-scroll-unfurled" @click="
+          viewing = true;
+        if ($refs.buttonPopup) ($refs.buttonPopup as QPopupProxy).hide();
+        " v-if="contents" />
+        <q-btn icon="fa-solid fa-book" @click="
+          selecting = true;
+        if ($refs.buttonPopup) ($refs.buttonPopup as QPopupProxy).hide();
+        " v-if="spells.length > 0" />
       </q-btn-group>
     </q-popup-proxy>
   </div>
   <q-dialog v-model="selecting">
     <q-card>
-      <SpellsTable
-        :spells="computedSpells"
-        :preparing="true"
-        :list="list"
-        :is-heightened="(s) => (s.level != level ? level : 0)"
-        extra-class="popup-spells-table"
-        @select="
+      <SpellsTable :spells="computedSpells" :preparing="true" :list="list"
+        :is-heightened="(s) => (s.level != level ? level : 0)" extra-class="popup-spells-table" @select="
           (spell: Spell) => {
             contents = spell;
             selecting = false;
           }
-        "
-      />
+        " />
     </q-card>
   </q-dialog>
   <q-dialog v-model="viewing">

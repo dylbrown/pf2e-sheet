@@ -1,7 +1,8 @@
-import type {
+import {
   Ability,
   ApparitionList,
   CharacterContext,
+  Rarity,
   Score,
   SpellList,
 } from './model';
@@ -175,6 +176,7 @@ export default class Spells {
     if (allStuff && content.all_spells) {
       const allSpells = new Map<string, Spell>();
       Object.values(content.all_spells).forEach((s: any) => {
+        if (s.meta_data.focus || (s.traditions?.length ?? 0) == 0) return; // Skip focus spells, they are handled separately
         const spell = this.makeSpell(s, context, '');
         allSpells.set(spell.name.toLowerCase(), spell);
       });
@@ -339,6 +341,7 @@ export default class Spells {
       innate: false,
       heightening: h,
       traditions: entry.traditions,
+      rarity: Util.getRarity(entry.rarity),
     };
   }
 

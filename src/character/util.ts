@@ -1,7 +1,8 @@
 import { marked } from 'marked';
-import type { Ability, CharacterContext } from './model';
+import { Ability, CharacterContext, Rarity } from './model';
 import { AbilityType, Action, Proficiency, Score } from './model';
 import * as mathjs from 'mathjs';
+import { capitalize } from 'vue';
 
 export function abilityMod(score: number): number {
   return Math.floor((score - 10) / 2);
@@ -75,6 +76,15 @@ export function getAbilityType(type: string) {
       return AbilityType.ClassFeat;
   }
   return AbilityType.Unknown;
+}
+
+export function getRarity(rarity?: string) {
+  if (rarity === undefined) return Rarity.Common;
+  return (
+    Rarity[
+      capitalize(rarity.toLowerCase()).toString() as keyof typeof Rarity
+    ] ?? Rarity.Common
+  );
 }
 
 export function ordinalToNumber(s: string): number {

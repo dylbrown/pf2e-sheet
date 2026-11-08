@@ -1,4 +1,4 @@
-import { Ability, CharacterContext } from './model';
+import { Ability, CharacterContext, Rarity } from './model';
 import { AbilityType, Action, Source, Trait } from './model';
 import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
@@ -56,6 +56,7 @@ export default class Abilities extends Array<Ability> {
       Source.bank.get(feature.content_source_id),
       Trait.bank.map(feature.traits),
       feature.description,
+      Util.getRarity(feature.rarity),
       context,
     );
     if (
@@ -156,6 +157,7 @@ export default class Abilities extends Array<Ability> {
             Source.bank.dummy(Util.makeSource(feature.contentSrc)),
             [],
             feature.description,
+            Util.getRarity(feature.rarity),
           );
           feat.code = feature.code ?? '';
           if (feat.code) this.checkConditionals(feat.code);
@@ -191,6 +193,7 @@ export default class Abilities extends Array<Ability> {
           Source.None,
           [],
           entry.value?.description,
+          Util.getRarity(entry.value?.rarity),
         );
         feat.cost = cost;
         feat.frequency = entry.value?.frequency;
