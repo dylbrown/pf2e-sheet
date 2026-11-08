@@ -387,6 +387,8 @@ export default class Character {
     this.attributes[attribute].level = proficiencies[key].parts?.level ?? 0;
     this.attributes[attribute].itemBonus =
       proficiencies[key].parts?.breakdown?.bonusValue ?? 0;
+    this.attributes[attribute].proficiency = (proficiencies[key].parts
+      ?.profValue ?? 0) as Proficiency;
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */

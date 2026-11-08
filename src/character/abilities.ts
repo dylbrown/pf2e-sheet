@@ -4,6 +4,8 @@ import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
 
+const MANUAL_EXCLUSIONS = ['Spell Repertoire', 'Signature Spells', 'Domains'];
+
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
   excluded: Ability[] = [];
@@ -45,7 +47,6 @@ export default class Abilities extends Array<Ability> {
     );
     this.sort((a, b) => b.level - a.level);
   }
-
   loadFeat(feature: any, type: AbilityType, context: CharacterContext) {
     const feat = new Ability(
       feature.name ?? '',
@@ -75,8 +76,7 @@ export default class Abilities extends Array<Ability> {
     let exclude = 0;
     if (
       feat.description.match(/You gain your \w+('|&#39;)s [\w ]+<\/p>$/gi) ||
-      feat.name.startsWith('Spell Repertoire') ||
-      feat.name.startsWith('Signature Spells')
+      MANUAL_EXCLUSIONS.some((e) => feat.name.startsWith(e))
     )
       exclude++;
     for (const entry of feature.operations ?? []) {
