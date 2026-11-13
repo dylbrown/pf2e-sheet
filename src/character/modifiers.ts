@@ -104,9 +104,10 @@ export class ModEffect {
           case Attribute.IntChecks:
           case Attribute.WisChecks:
           case Attribute.ChaChecks: {
-            const aScore = attrScore[Attribute[attr]];
+            const aScore = character.attributes[attr].score;
             if (aScore === undefined) break;
-            good = aScore == (score ?? attrScore[Attribute[modifiedAttr]]);
+            good =
+              aScore == (score ?? character.attributes[modifiedAttr].score);
             break;
           }
           default: {
@@ -411,7 +412,10 @@ export function applyMods(
   );
 }
 
-export function applyAttackMods(character: Character, weapon: Weapon) {
+export function getAttackMods(
+  character: Character,
+  weapon: Weapon,
+): AttributeEntry {
   let score: Score = Score.Strength;
   if (
     (character.scores.value[Score.Dexterity] >
@@ -422,16 +426,30 @@ export function applyAttackMods(character: Character, weapon: Weapon) {
   ) {
     score = Score.Dexterity;
   }
+
+  const attrEntry = character.attributes[weapon.attribute];
+
+  return {
+    total: weapon.attack,
+    score: score,
+    itemBonus: Math.max(weapon.potency, attrEntry.itemBonus),
+    level: character.level,
+    proficiency: attrEntry.proficiency,
+  };
+}
+
+export function applyAttackMods(character: Character, weapon: Weapon) {
+  const attrEntry = getAttackMods(character, weapon);
   const [bonuses, penalties] = calculateMods(
     character,
     Attribute.Attacks,
-    weapon.potency,
-    score,
+    attrEntry.itemBonus,
+    attrEntry.score,
   );
 
   return (
     weapon.attack -
-    weapon.potency +
+    attrEntry.itemBonus +
     Object.values(bonuses).reduce((a, b) => a + b, 0) +
     Object.values(penalties).reduce((a, b) => a + b, 0)
   );

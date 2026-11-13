@@ -1,5 +1,9 @@
 <template>
-  <Clickable :label="name" :popup-class="popupClass">
+  <Clickable :label="label ?? name" :popup-class="popupClass">
+    <template v-if="dc">
+      10 from base
+      <br />
+    </template>
     {{ Util.signed(abilityMod) }} from {{ scoreName }}
     <br />
     {{ Util.signed(attrEntry?.proficiency ?? 0) }} from being
@@ -13,7 +17,7 @@
     )" :key="type">
       <br />
       <span :class="type != StatModType.Item ||
-        bonus > item ||
+        bonus > attrEntry.itemBonus ||
         c.penalties[type as StatModType] < 0
         ? bonus + c.penalties[type as StatModType] > 0
           ? 'buffed'
@@ -28,8 +32,8 @@
 </template>
 <script setup lang="ts">
 import type Character from '@/character/character';
-import { Attribute, Proficiency, Score } from '@/character/model';
-import { applyMods, calculateMods, StatModType } from '@/character/modifiers';
+import { Attribute, Proficiency, Score, Weapon } from '@/character/model';
+import { applyMods, calculateMods, getAttackMods, StatModType } from '@/character/modifiers';
 import * as Util from '@/character/util';
 import { computed } from 'vue';
 import Clickable from './Clickable.vue';
@@ -39,41 +43,39 @@ const props = defineProps<{
   lore?: string;
   character: Character;
   popupClass?: string;
+  dc?: boolean;
+  weapon?: Weapon;
+  label?: string;
 }>();
 
-const isLore = props.attribute == Attribute.LoreChecks && props.lore;
+let attribute = props.attribute;
 
-const name = !isLore ? Attribute[props.attribute] : (props.lore ?? '');
+let name = Attribute[props.attribute];
 
-const attrEntry = !isLore
-  ? props.character.attributes[props.attribute]
-  : props.lore
-    ? props.character.lore[props.lore]
-    : undefined;
+let attrEntry = props.character.attributes[props.attribute];
 
-const abilityMod = Util.abilityMod(
-  props.character.scores.value[
-  !isLore
-    ? props.character.attributes[props.attribute].score
-    : (attrEntry?.score ?? Score.Intelligence)
-  ],
-);
+const isLore = props.attribute == Attribute.LoreChecks && props.lore && props.character.lore[props.lore];
+if (isLore) {
+  name = (props.lore ?? '');
+  attrEntry = props.character.lore[props.lore]!;
+} else if (props.attribute == Attribute.Attacks && props.weapon) {
+  name = props.weapon.name;
+  attribute = props.weapon.attribute;
+  attrEntry = getAttackMods(props.character, props.weapon);
+}
 
-const scoreName = !isLore
-  ? Score[props.character.attributes[props.attribute].score]
-  : Score[attrEntry?.score ?? Score.Intelligence];
+const abilityMod = attrEntry ? Util.abilityMod(
+  props.character.scores.value[attrEntry.score],
+) : 0;
 
-const item = !isLore
-  ? props.character.attributes[props.attribute].itemBonus
-  : props.lore
-    ? (props.character.lore[props.lore]?.itemBonus ?? 0)
-    : 0;
+const scoreName = Score[attrEntry.score];
 
 const c = computed(() => {
   const [bonuses, penalties] = calculateMods(
     props.character,
-    props.attribute,
-    item,
+    attribute,
+    attrEntry.itemBonus,
+    attrEntry.score
   );
   return { bonuses, penalties };
 });
@@ -89,8 +91,8 @@ Object.entries(c.value).forEach(([_s, m]) => {
 
 const actualTotal = applyMods(
   props.character,
-  props.attribute,
-  isLore ? props.character.lore[props.lore] : undefined,
+  attribute,
+  attrEntry
 );
 
 if (actualTotal !== displayedTotal) {

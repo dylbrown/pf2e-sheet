@@ -21,7 +21,8 @@
                 ? 'buffed'
                 : '')
               ">
-              {{ attacks(props.row as Weapon) }}
+              <ClickableAttribute :label="attacks(props.row as Weapon)" :attribute="Attribute.Attacks"
+                :weapon="props.row as Weapon" :character="character" />
             </div>
           </div>
         </q-td>
@@ -146,6 +147,7 @@ import { applyAttackMods, applyDamageMods, applyMods } from '@/character/modifie
 import { signed } from '@/character/util';
 import ClickableRune from './clickable/ClickableRune.vue';
 import ClickableTrait from './clickable/ClickableTrait.vue';
+import ClickableAttribute from './clickable/ClickableAttribute.vue';
 
 const COLUMNS: QTableColumn[] = [
   { name: 'info', label: '', field: 'name', align: 'left' },

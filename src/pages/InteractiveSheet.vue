@@ -78,7 +78,8 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ character.attributes[Attribute.ClassDC].total + 10 }}
+                <ClickableAttribute :label="(moddedAttr(Attribute.ClassDC) + 10).toString()"
+                  :attribute="Attribute.ClassDC" :character="character" dc />
               </div>
               <div class="labello">Class DC</div>
             </div>

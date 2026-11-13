@@ -10,6 +10,7 @@ import {
   Lores,
   DamageInstance,
   CharacterContext,
+  attacks,
 } from './model';
 import {
   Proficiency,
@@ -216,8 +217,19 @@ export default class Character {
     (this.starfinder ? sfSkills : skills).forEach((s) =>
       this.setProficiency(data, s, 'SKILL_'),
     );
+    this.attributes[Attribute.Attacks].itemBonus = parseInt(
+      data.content?.raw_data_dump?.bonuses?.NON_SPELL_ATTACK_ROLLS_BONUS[0]
+        ?.value ?? '0',
+    );
     Object.entries(weaponsAndArmor).forEach(([k, v]) =>
       this.setProficiency(data, v, k, true),
+    );
+    Object.entries(attacks).forEach(
+      ([_k, v]) =>
+        (this.attributes[v].itemBonus = Math.max(
+          this.attributes[v].itemBonus,
+          this.attributes[Attribute.Attacks].itemBonus,
+        )),
     );
     const armorCategory = data.content?.armor_item?.item?.meta_data?.category;
     if (armorCategory) {
@@ -254,6 +266,13 @@ export default class Character {
     const attackMap = new Map<string, Builder<Weapon>>();
     for (const entry of data?.content?.weapons ?? []) {
       const b = new Weapon.WBuilder();
+      let attribute = Attribute.UnarmedAttacks;
+      for (const [k, v] of Object.entries(weaponsAndArmor)) {
+        if (k.startsWith(entry.item.meta_data.category)) {
+          attribute = v;
+          break;
+        }
+      }
       b.partial = {
         name: entry.item.name,
         id: entry.item.id,
@@ -269,6 +288,7 @@ export default class Character {
         range: entry.item.meta_data.range ?? undefined,
         reload: entry.item.meta_data.reload ?? undefined,
         potency: entry.item.meta_data.runes.potency ?? 0,
+        attribute: attribute,
       };
       b.partial.damage = new DamageInstance(
         entry.stats.damage.bonus.total,

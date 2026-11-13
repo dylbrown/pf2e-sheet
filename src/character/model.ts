@@ -332,6 +332,7 @@ export class Weapon extends Item {
   readonly usage?: number;
   readonly potency: number;
   readonly runes: Rune[];
+  readonly attribute: Attribute;
 
   protected constructor(w: Mutable<Weapon>) {
     super(w);
@@ -344,6 +345,7 @@ export class Weapon extends Item {
     if (w.usage) this.usage = w.usage;
     this.runes = w.runes ?? [];
     this.potency = w.potency ?? 0;
+    this.attribute = w.attribute ?? Attribute.UnarmedAttacks;
   }
 
   public static WBuilder = class extends ABuilder<Weapon> {
