@@ -7,7 +7,7 @@ import {
   Rune,
   Scores,
   Attributes,
-  Lores,
+  ArbitraryAttributes,
   DamageInstance,
   CharacterContext,
   attacks,
@@ -61,10 +61,12 @@ export default class Character {
       ac: 0,
     },
     attacks: Array<Weapon>(),
+    weapon_groups: {} as ArbitraryAttributes,
+    armor_groups: {} as ArbitraryAttributes,
   };
   abilities = new Abilities();
   attributes: Attributes;
-  lore: Lores = {};
+  lore: ArbitraryAttributes = {};
   items = Array<Item>();
   totalBulk = 0;
   bulkLimitBonus = 0;
@@ -243,22 +245,71 @@ export default class Character {
           ].proficiency;
     }
 
-    // Lores
+    // Lores + Weapon Groups
+    const LORES = 'SKILL_LORE_';
+    const ARMOR_GROUPS = 'ARMOR_GROUP_';
+    const WEAPON_GROUPS = 'WEAPON_GROUP_';
     for (const [a, e] of Object.entries(data.content?.proficiencies)) {
-      if (a.startsWith('SKILL_LORE_') && a.charAt(11) != '_') {
+      if (a.startsWith(LORES) && a.charAt(LORES.length) != '_') {
         const entry: any = e;
-        this.lore[capitalize(a.substring(11).replaceAll('_', ' ')) + ' Lore'] =
-          {
-            proficiency: entry?.parts?.profValue as Proficiency,
-            total: parseInt(entry?.total ?? '0'),
-            itemBonus: entry.parts.breakdown.bonusValue ?? 0,
-            score: Util.getScore(
-              data.content.raw_data_dump.variables[a].value.attribute.substring(
-                'ATTRIBUTE_'.length,
-              ),
+        this.lore[
+          capitalize(
+            a.substring(LORES.length).replaceAll('_', ' ').toLowerCase(),
+          ) + ' Lore'
+        ] = {
+          proficiency: entry?.parts?.profValue as Proficiency,
+          total: parseInt(entry?.total ?? '0'),
+          itemBonus: entry.parts.breakdown.bonusValue ?? 0,
+          score: Util.getScore(
+            data.content.raw_data_dump.variables[a].value.attribute.substring(
+              'ATTRIBUTE_'.length,
             ),
-            level: entry.parts.level ?? 0,
-          };
+          ),
+          level: entry.parts.level ?? 0,
+        };
+      } else if (
+        a.startsWith(WEAPON_GROUPS) &&
+        a.charAt(WEAPON_GROUPS.length) != '_'
+      ) {
+        const entry: any = e;
+        this.combat.weapon_groups[
+          capitalize(
+            a
+              .substring(WEAPON_GROUPS.length)
+              .replaceAll('_', ' ')
+              .toLowerCase(),
+          ) + ' Weapons'
+        ] = {
+          proficiency: entry?.parts?.profValue as Proficiency,
+          total: parseInt(entry?.total ?? '0'),
+          itemBonus: entry.parts.breakdown.bonusValue ?? 0,
+          score: Util.getScore(
+            data.content.raw_data_dump.variables[a].value.attribute?.substring(
+              'ATTRIBUTE_'.length,
+            ) ?? '',
+          ),
+          level: entry.parts.level ?? 0,
+        };
+      } else if (
+        a.startsWith(ARMOR_GROUPS) &&
+        a.charAt(ARMOR_GROUPS.length) != '_'
+      ) {
+        const entry: any = e;
+        this.combat.armor_groups[
+          capitalize(
+            a.substring(ARMOR_GROUPS.length).replaceAll('_', ' ').toLowerCase(),
+          ) + ' Armors'
+        ] = {
+          proficiency: entry?.parts?.profValue as Proficiency,
+          total: parseInt(entry?.total ?? '0'),
+          itemBonus: entry.parts.breakdown.bonusValue ?? 0,
+          score: Util.getScore(
+            data.content.raw_data_dump.variables[a].value.attribute?.substring(
+              'ATTRIBUTE_'.length,
+            ) ?? '',
+          ),
+          level: entry.parts.level ?? 0,
+        };
       }
     }
 
@@ -289,6 +340,7 @@ export default class Character {
         reload: entry.item.meta_data.reload ?? undefined,
         potency: entry.item.meta_data.runes.potency ?? 0,
         attribute: attribute,
+        group: entry.item.meta_data.group,
       };
       b.partial.damage = new DamageInstance(
         entry.stats.damage.bonus.total,

@@ -1,5 +1,6 @@
 <template>
-  <Clickable :label="label ?? name" :popup-class="popupClass">
+  <Clickable :popup-class="popupClass">
+    <template #label><span :class="noBuffTint ? '' : buffClass">{{ label ?? name }}</span></template>
     <template v-if="dc">
       10 from base
       <br />
@@ -46,6 +47,7 @@ const props = defineProps<{
   dc?: boolean;
   weapon?: Weapon;
   label?: string;
+  noBuffTint?: boolean;
 }>();
 
 let attribute = props.attribute;
@@ -80,13 +82,16 @@ const c = computed(() => {
   return { bonuses, penalties };
 });
 
-let displayedTotal =
-  abilityMod + (attrEntry?.proficiency ?? 0) + (attrEntry?.level ?? 0);
+const displayedTotal = computed(() => {
+  let displayedTotal =
+    abilityMod + (attrEntry?.proficiency ?? 0) + (attrEntry?.level ?? 0);
 
-Object.entries(c.value).forEach(([_s, m]) => {
-  Object.entries(m).forEach(([_ss, n]) => {
-    displayedTotal += n;
+  Object.entries(c.value).forEach(([_s, m]) => {
+    Object.entries(m).forEach(([_ss, n]) => {
+      displayedTotal += n;
+    });
   });
+  return displayedTotal;
 });
 
 const actualTotal = applyMods(
@@ -95,9 +100,18 @@ const actualTotal = applyMods(
   attrEntry
 );
 
-if (actualTotal !== displayedTotal) {
+if (actualTotal !== displayedTotal.value) {
   alert(
     `${isLore ? props.lore : Attribute[props.attribute]} breakdown is incorrect! Your total is ${actualTotal} but they add up to ${displayedTotal}. Let Dylan know!`,
   );
 }
+
+const buffClass = computed(() => {
+  return (displayedTotal.value < attrEntry.total
+    ? 'de'
+    : '') +
+    (displayedTotal.value != attrEntry.total
+      ? 'buffed'
+      : '');
+});
 </script>

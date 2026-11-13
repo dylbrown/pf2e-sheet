@@ -238,7 +238,7 @@ export type Attributes = {
   [attribute in Attribute]: AttributeEntry;
 };
 
-export type Lores = {
+export type ArbitraryAttributes = {
   [lore: string]: AttributeEntry;
 };
 
@@ -333,6 +333,7 @@ export class Weapon extends Item {
   readonly potency: number;
   readonly runes: Rune[];
   readonly attribute: Attribute;
+  readonly group: string;
 
   protected constructor(w: Mutable<Weapon>) {
     super(w);
@@ -346,6 +347,7 @@ export class Weapon extends Item {
     this.runes = w.runes ?? [];
     this.potency = w.potency ?? 0;
     this.attribute = w.attribute ?? Attribute.UnarmedAttacks;
+    this.group = w.group ?? '';
   }
 
   public static WBuilder = class extends ABuilder<Weapon> {

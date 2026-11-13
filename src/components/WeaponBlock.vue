@@ -6,9 +6,7 @@
     <div class="flex-column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
-          <div class="underlined weapon-info" :class="(modifiedAttack < weapon.attack ? 'de' : '') +
-            (modifiedAttack != weapon.attack ? 'buffed' : '')
-            ">
+          <div class="underlined weapon-info">
             {{ signed(modifiedAttack) }}
           </div>
           <div class="labello compact">Attack</div>
@@ -65,7 +63,7 @@
             </span>
             <template v-else>{{
               weapon.runes.map((r) => r.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Runes</div>
         </div>
@@ -79,7 +77,7 @@
             </span>
             <template v-else>{{
               weapon.traits.map((t) => t.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Traits</div>
         </div>

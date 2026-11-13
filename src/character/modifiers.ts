@@ -1,3 +1,4 @@
+import { capitalize } from 'vue';
 import Character from './character';
 import {
   ac,
@@ -428,13 +429,26 @@ export function getAttackMods(
   }
 
   const attrEntry = character.attributes[weapon.attribute];
+  const weaponGroup =
+    character.combat.weapon_groups[capitalize(weapon.group) + ' Weapons'];
+
+  const maxItem = Math.max(
+    weapon.potency,
+    attrEntry.itemBonus,
+    weaponGroup?.itemBonus ?? 0,
+  );
+  const maxNotMaxItem = Math.max(
+    Math.min(weapon.potency, attrEntry.itemBonus),
+    Math.min(weapon.potency, weaponGroup?.itemBonus ?? 0),
+    Math.min(weaponGroup?.itemBonus ?? 0, attrEntry.itemBonus),
+  );
 
   return {
-    total: weapon.attack,
+    total: weapon.attack - maxNotMaxItem,
     score: score,
-    itemBonus: Math.max(weapon.potency, attrEntry.itemBonus),
+    itemBonus: maxItem,
     level: character.level,
-    proficiency: attrEntry.proficiency,
+    proficiency: Math.max(attrEntry.proficiency, weaponGroup?.proficiency ?? 0),
   };
 }
 
@@ -448,7 +462,7 @@ export function applyAttackMods(character: Character, weapon: Weapon) {
   );
 
   return (
-    weapon.attack -
+    attrEntry.total -
     attrEntry.itemBonus +
     Object.values(bonuses).reduce((a, b) => a + b, 0) +
     Object.values(penalties).reduce((a, b) => a + b, 0)

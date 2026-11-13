@@ -14,13 +14,7 @@
         </q-td>
         <q-td class="weapon-table">
           <div>
-            <div class="weapon-info" :class="(modifiedAttack(props.row as Weapon) < props.row.attack
-              ? 'de'
-              : '') +
-              (modifiedAttack(props.row as Weapon) != props.row.attack
-                ? 'buffed'
-                : '')
-              ">
+            <div class="weapon-info">
               <ClickableAttribute :label="attacks(props.row as Weapon)" :attribute="Attribute.Attacks"
                 :weapon="props.row as Weapon" :character="character" />
             </div>

@@ -189,7 +189,7 @@
               Attribute.Will,
             ]" :key="attr">
               <div class="center-right rollLabel">
-                <ClickableAttribute :attribute="attr" :character="character" />
+                <ClickableAttribute :attribute="attr" :character="character" noBuffTint />
               </div>
               <div class="line">
                 <div class="underlined-roll" :class="(moddedAttr(attr) < character.attributes[attr].total
