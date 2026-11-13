@@ -12,23 +12,19 @@
         </span>
         <template v-else>{{
           item.traits.map((t) => t.name).join(', ')
-        }}</template>
+          }}</template>
       </div>
       <div class="labello">Traits</div>
     </div>
     <line-part label="Bulk" :content="item.weight" />
-    <div
-      class="ability-description"
-      ref="description"
-      v-html="interactive ? item.description : ''"
-    />
+    <div class="ability-description" ref="description" v-html="interactive ? item.description : ''" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 import type { Item } from '@/character/model';
 import * as Positioning from './paper/positioning';
 const props = defineProps<{

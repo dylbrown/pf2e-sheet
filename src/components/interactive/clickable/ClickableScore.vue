@@ -1,15 +1,15 @@
 <template>
-  <span ref="clickableName" class="clickable-trait">{{ Score[score]?.substring(0, 3).toUpperCase() }}</span>
-  <q-popup-proxy :class="popupClass + ' clickable-popup'" :target="$refs.clickableName as Element">
+  <Clickable :label="Score[score]?.substring(0, 3).toUpperCase()" :popup-class="popupClass">
     <template v-for="(entry, i) of character.scores.history[score]">
-      <br v-if="i > 0" />{{ entry }}</template>
+      <br v-if="i > 0" />{{ entry }}
+    </template>
     <template v-if="character.scores.history[score].length == 0"><i>No modifiers</i></template>
-  </q-popup-proxy>
+  </Clickable>
 </template>
 <script setup lang="ts">
-import { QPopupProxy } from 'quasar';
 import type Character from '@/character/character';
 import { Score } from '@/character/model';
+import Clickable from './Clickable.vue';
 
 const props = defineProps<{
   score: Score;

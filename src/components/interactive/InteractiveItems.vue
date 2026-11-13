@@ -1,29 +1,20 @@
 <template>
   <div class="flex-column tab items" style="justify-content: stretch">
-    <q-table
-      flat
-      bordered
-      dense
-      :rows="character.items"
-      :columns="COLUMNS"
-      row-key="name"
-      class="no-scroll"
-      hide-bottom
-      :rows-per-page-options="[0]"
-    >
+    <q-table flat bordered dense :rows="character.items" :columns="COLUMNS" row-key="name" class="no-scroll" hide-bottom
+      :rows-per-page-options="[0]">
       <template v-slot:body="props">
         <q-tr :props="props" ref="row">
           <q-td key="name" :props="props">
-            <ClickableItem :item="props.row" />
+            <Clickable :label="props.row.name">
+              <ItemBlock :item="props.row" interactive />
+            </Clickable>
           </q-td>
           <q-td key="count" :props="props">
             <q-popup-proxy self="top middle" anchor="bottom middle">
               <q-btn-group>
                 <q-btn label="-" @click="changeQuantity(props.row, -1)" />
                 <q-btn label="+" @click="changeQuantity(props.row, 1)" />
-              </q-btn-group> </q-popup-proxy
-            >{{ props.row.count + extraCount[props.row.instanceID] }}</q-td
-          >
+              </q-btn-group> </q-popup-proxy>{{ props.row.count + extraCount[props.row.instanceID] }}</q-td>
         </q-tr>
       </template>
     </q-table>
@@ -34,9 +25,10 @@
 import type { QTableColumn } from 'quasar';
 import type Character from '@/character/character';
 import { Item } from '@/character/model';
-import ClickableItem from '@/components/interactive/ClickableItem.vue';
 import * as LS from '@/pages/localStorage';
 import { ref } from 'vue';
+import Clickable from './clickable/Clickable.vue';
+import ItemBlock from '../ItemBlock.vue';
 
 const COLUMNS: QTableColumn[] = [
   { name: 'name', label: 'Name', field: 'name', align: 'left', sortable: true },

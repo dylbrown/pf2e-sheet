@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import ClickableAttribute from '@/components/interactive/clickable/ClickableAttribute.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
 import type Character from '@/character/character';
 import * as Util from '@/character/util';

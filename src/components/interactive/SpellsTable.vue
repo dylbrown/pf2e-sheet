@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import { QRange, QTableColumn, SliderMarkerLabels } from 'quasar';
 import { Action, Rarity, Spell, SpellList } from '@/character/model';
-import ClickableSpell from './ClickableSpell.vue';
+import ClickableSpell from './clickable/ClickableSpell.vue';
 import PipCounter from '../PipCounter.vue';
 import { reactive, ref } from 'vue';
 

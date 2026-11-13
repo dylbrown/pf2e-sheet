@@ -144,8 +144,8 @@ import Character from '@/character/character';
 import { QTableColumn } from 'quasar';
 import { applyAttackMods, applyDamageMods, applyMods } from '@/character/modifiers';
 import { signed } from '@/character/util';
-import ClickableRune from './ClickableRune.vue';
-import ClickableTrait from './ClickableTrait.vue';
+import ClickableRune from './clickable/ClickableRune.vue';
+import ClickableTrait from './clickable/ClickableTrait.vue';
 
 const COLUMNS: QTableColumn[] = [
   { name: 'info', label: '', field: 'name', align: 'left' },

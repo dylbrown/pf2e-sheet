@@ -7,17 +7,11 @@
     <div class="column-wrap action-details">
       <div class="line" v-if="action.traits.length > 0">
         <div class="underlined bounded-line" data-max="1.6">
-          <span
-            ><template v-for="(trait, index) in action.traits">
-              <ClickableTrait
-                v-if="interactive"
-                :trait="trait"
-                :key="trait.name"
-              />
-              <template v-else>{{ trait.name }}</template
-              ><template v-if="action.traits.length - 1 > index">, </template>
-            </template></span
-          >
+          <span><template v-for="(trait, index) in action.traits">
+              <ClickableTrait v-if="interactive" :trait="trait" :key="trait.name" />
+              <template v-else>{{ trait.name }}</template><template v-if="action.traits.length - 1 > index">,
+              </template>
+            </template></span>
         </div>
         <div class="labello">Traits</div>
       </div>
@@ -44,27 +38,14 @@
       <div class="line">
         <div class="underlined bounded-line" data-max="3">
           <p>
-            <template v-if="action.traits.length > 0"
-              >(<i
-                ><template v-for="(trait, index) in action.traits">
-                  <ClickableTrait
-                    v-if="interactive"
-                    :trait="trait"
-                    :key="trait.name"
-                  />
+            <template v-if="action.traits.length > 0">(<i><template v-for="(trait, index) in action.traits">
+                  <ClickableTrait v-if="interactive" :trait="trait" :key="trait.name" />
                   <template v-else>{{ trait.name }}</template>
-                  <template v-if="action.traits.length - 1 > index"
-                    >,
+                  <template v-if="action.traits.length - 1 > index">,
                   </template>
-                </template></i
-              >)</template
-            ><template v-if="action.frequency"
-              >&emsp;<b>Frequency</b> {{ action.frequency }}</template
-            ><template v-if="action.trigger"
-              >&emsp;<b>Trigger</b> {{ action.trigger }}</template
-            ><template v-if="action.requirements"
-              >&emsp;<b>Requirements</b> {{ action.requirements }}</template
-            >
+                </template></i>)</template><template v-if="action.frequency">&emsp;<b>Frequency</b> {{ action.frequency
+              }}</template><template v-if="action.trigger">&emsp;<b>Trigger</b> {{ action.trigger }}</template><template
+              v-if="action.requirements">&emsp;<b>Requirements</b> {{ action.requirements }}</template>
           </p>
         </div>
         <div class="labello">Details</div>
@@ -76,7 +57,7 @@
 <script setup lang="ts">
 import type { Ability } from '@/character/model';
 import { Action } from '@/character/model';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 
 defineProps<{
   action: Ability;

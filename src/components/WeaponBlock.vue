@@ -90,8 +90,8 @@
 
 <script setup lang="ts">
 import type { Weapon } from '@/character/model';
-import ClickableRune from './interactive/ClickableRune.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableRune from './interactive/clickable/ClickableRune.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 import Character from '@/character/character';
 import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
 import { signed } from '@/character/util';

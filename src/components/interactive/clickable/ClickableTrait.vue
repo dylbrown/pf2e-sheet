@@ -1,17 +1,16 @@
 <template>
-  <span class="clickable-trait">
-    {{ name
-    }}<q-popup-proxy :class="popupClass + ' clickable-popup'">
+  <span class="display-inline">
+    <Clickable :label="name">
       {{ trait.name }}
       <div style="max-width: 25vw">
         <span v-html="trait.description" />
       </div>
-    </q-popup-proxy>
+    </Clickable>
   </span>
 </template>
 <script setup lang="ts">
-import { QPopupProxy } from 'quasar';
 import type { Trait } from '@/character/model';
+import Clickable from './Clickable.vue';
 
 const { trait } = defineProps<{
   trait: Trait;

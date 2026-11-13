@@ -22,14 +22,14 @@
           <span>♦</span>
         </div>
         <div :class="Number(spell.cost) < 2
-            ? 'spell-cost-yes spell-cost-optional'
-            : 'spell-cost-yes'
+          ? 'spell-cost-yes spell-cost-optional'
+          : 'spell-cost-yes'
           ">
           <span>♦</span>
         </div>
         <div :class="Number(spell.cost) < 3
-            ? 'spell-cost-yes spell-cost-optional'
-            : 'spell-cost-yes'
+          ? 'spell-cost-yes spell-cost-optional'
+          : 'spell-cost-yes'
           ">
           <span>♦</span>
         </div>
@@ -49,7 +49,7 @@
           </span>
           <template v-else>{{
             spell.traits.map((t) => t.name).join(', ')
-            }}</template>
+          }}</template>
         </div>
         <div class="labello">Traits</div>
       </div>
@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { Rarity, type Spell } from '@/character/model';
 import LinePart from './LinePart.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 import { ref } from 'vue';
 import * as Positioning from './paper/positioning';
 

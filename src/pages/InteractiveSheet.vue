@@ -99,7 +99,7 @@
           <div class="sectionLabel">Health</div>
           <div class="row-between">
             <div class="line">
-              <ClickableHealth :character="character" :curr-hp="currHP"
+              <InteractiveHealth :character="character" :curr-hp="currHP"
                 :update-curr-hp="(hp: number) => (currHP = hp)" />
               <div class="labello">Current</div>
             </div>
@@ -382,12 +382,12 @@ import * as LS from '@/pages/localStorage';
 import type Character from '@/character/character';
 import RightThird from '@/components/interactive/RightThird.vue';
 import { AbilityType, Attribute, Proficiency, Score } from '@/character/model';
-import ClickableHealth from '@/components/interactive/ClickableHealth.vue';
-import ClickableTrait from '@/components/interactive/ClickableTrait.vue';
+import InteractiveHealth from '@/components/interactive/InteractiveHealth.vue';
+import ClickableTrait from '@/components/interactive/clickable/ClickableTrait.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
 import { capitalize, computed, onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
-import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import ClickableAttribute from '@/components/interactive/clickable/ClickableAttribute.vue';
 import AbilitiesTable from '@/components/interactive/AbilitiesTable.vue';
 import PipCounter from '@/components/PipCounter.vue';
 import StatModsButton from '@/components/interactive/StatModsButton.vue';
@@ -399,7 +399,7 @@ import {
   StatModType,
 } from '@/character/modifiers';
 import ConditionsButton from '@/components/interactive/ConditionsButton.vue';
-import ClickableScore from '@/components/interactive/ClickableScore.vue';
+import ClickableScore from '@/components/interactive/clickable/ClickableScore.vue';
 
 document.documentElement.classList.add('interactive');
 

@@ -1,6 +1,5 @@
 <template>
-  <span ref="clickableName" class="clickable-trait">{{ name }}</span>
-  <q-popup-proxy :class="popupClass + ' clickable-popup'" :target="$refs.clickableName as Element">
+  <Clickable :label="name" :popup-class="popupClass">
     {{ Util.signed(abilityMod) }} from {{ scoreName }}
     <br />
     {{ Util.signed(attrEntry?.proficiency ?? 0) }} from being
@@ -25,15 +24,15 @@
           bonus + c.penalties[type as StatModType] > 0 ? 'bonus' : 'penalty'
         }}</span>
     </template>
-  </q-popup-proxy>
+  </Clickable>
 </template>
 <script setup lang="ts">
-import { QPopupProxy } from 'quasar';
 import type Character from '@/character/character';
 import { Attribute, Proficiency, Score } from '@/character/model';
 import { applyMods, calculateMods, StatModType } from '@/character/modifiers';
 import * as Util from '@/character/util';
 import { computed } from 'vue';
+import Clickable from './Clickable.vue';
 
 const props = defineProps<{
   attribute: Attribute;
