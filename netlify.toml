@@ -6,7 +6,7 @@
   to = "/index.html"
   status = 200
 [dev]
-  command = "pnpm quasar dev -T chrome"
-  targetPort = 9000
+  command = "pnpm quasar dev -T chrome -m pwa"
+  targetPort = 9200
   port = 8888
-  publish = "dist/spa"
+  publish = "dist/pwa"
