@@ -20,7 +20,7 @@
       </template>
       <template v-for="[name, lore] of filteredLores" :key="name">
         <div class="skill-label lore-label">
-          <ClickableAttribute :lore="name" :character="character" />
+          <ClickableAttribute :attribute="Attribute.LoreChecks" :lore="name" :character="character" />
         </div>
         <div class="line">
           <div class="underlined-roll" :class="(modifiedLore(lore) < lore.total

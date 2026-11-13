@@ -33,17 +33,17 @@
             <template v-for="score of [0, 1, 2, 3, 4, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
-                  {{ Score[score]?.substring(0, 3).toUpperCase() }}
+                  <ClickableScore :score="score as Score" :character="character" />
                 </div>
                 <div class="labello invisible">A</div>
               </div>
               <div class="line">
                 <div :class="'underlined-roll' +
-                  (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  (character.scores.value[score as Score] % 2 == 1 ? ' odd' : '')
                   ">
                   {{
                     Util.signed(
-                      Util.abilityMod(character.scores[score as Score]),
+                      Util.abilityMod(character.scores.value[score as Score]),
                     )
                   }}
                 </div>
@@ -116,7 +116,7 @@
                 <br />
                 {{
                   Util.signed(
-                    Util.abilityMod(character.scores[Score.Dexterity]),
+                    Util.abilityMod(character.scores.value[Score.Dexterity]),
                   )
                 }}
                 from Dexterity
@@ -399,6 +399,7 @@ import {
   StatModType,
 } from '@/character/modifiers';
 import ConditionsButton from '@/components/interactive/ConditionsButton.vue';
+import ClickableScore from '@/components/interactive/ClickableScore.vue';
 
 document.documentElement.classList.add('interactive');
 
@@ -460,7 +461,7 @@ const rest = () => {
       props.character.level *
       Math.max(
         1,
-        Util.abilityMod(props.character.scores[Score.Constitution]),
+        Util.abilityMod(props.character.scores.value[Score.Constitution]),
       ),
       props.character.hp,
     );

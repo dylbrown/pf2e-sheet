@@ -24,7 +24,7 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { abilityMod, getProficiency, getScore, parseDescription } from './util';
+import * as Util from './util';
 import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
@@ -73,9 +73,10 @@ export default class Character {
   conditions: Reactive<{ [key in Condition]?: ConditionData }>;
 
   constructor() {
-    this.scores = {} as Scores;
+    this.scores = { value: {}, history: {} } as Scores;
     this.attributes = {} as Attributes;
-    Object.values(Score).forEach((s) => (this.scores[s as Score] = 10));
+    Object.values(Score).forEach((s) => (this.scores.history[s as Score] = []));
+    Object.values(Score).forEach((s) => (this.scores.value[s as Score] = 10));
     Object.values(Attribute).forEach((a) => {
       if (isNaN(a as number)) return;
       this.attributes[a as Attribute] = {
@@ -146,9 +147,14 @@ export default class Character {
       const key = 'ATTRIBUTE_' + Score[score].substring(0, 3).toUpperCase();
       const entry = data.content?.attributes[key];
       if (!entry) continue;
-      this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
-      context[key] = abilityMod(this.scores[score]);
-      context[key.toLowerCase()] = abilityMod(this.scores[score]);
+      this.scores.value[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
+      for (const entry of data.content.raw_data_dump.history[key] ?? []) {
+        this.scores.history[score].push(
+          `${Util.signed(entry.to.value)}${entry.to.partial ? '.5' : ''} from ${entry.source}`,
+        );
+      }
+      context[key] = Util.abilityMod(this.scores.value[score]);
+      context[key.toLowerCase()] = Util.abilityMod(this.scores.value[score]);
     }
 
     // Senses
@@ -197,7 +203,7 @@ export default class Character {
     );
 
     this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
-    this.attributes[Attribute.ClassDC].score = getScore(
+    this.attributes[Attribute.ClassDC].score = Util.getScore(
       data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
         'ATTRIBUTE_'.length,
       ),
@@ -234,7 +240,7 @@ export default class Character {
             proficiency: entry?.parts?.profValue as Proficiency,
             total: parseInt(entry?.total ?? '0'),
             itemBonus: entry.parts.breakdown.bonusValue ?? 0,
-            score: getScore(
+            score: Util.getScore(
               data.content.raw_data_dump.variables[a].value.attribute.substring(
                 'ATTRIBUTE_'.length,
               ),
@@ -282,7 +288,7 @@ export default class Character {
               otherDamage.source.indexOf('<') + 1,
               otherDamage.source.indexOf('>'),
             ),
-            parseDescription(
+            Util.parseDescription(
               otherDamage.source.substring(otherDamage.source.indexOf('>') + 1),
             ),
           ),
@@ -326,7 +332,7 @@ export default class Character {
           weight: entry.item.bulk ?? '',
           traits: Trait.bank.map(entry.item.traits),
           weapon: false,
-          description: parseDescription(entry.item.description),
+          description: Util.parseDescription(entry.item.description),
           source: Source.bank.get(entry.item.content_source_id),
         };
         this.items.push(b.build());
@@ -365,7 +371,7 @@ export default class Character {
       data.content,
       this.class,
       context,
-      abilityMod(this.scores[Score.Charisma]),
+      Util.abilityMod(this.scores.value[Score.Charisma]),
       this.abilities,
     );
 
@@ -410,7 +416,8 @@ export default class Character {
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',
-      (k, v) => (this.scores[Object.values(Score).indexOf(k) as Score] = v),
+      (k, v) =>
+        (this.scores.value[Object.values(Score).indexOf(k) as Score] = v),
     );
 
     if (data.build?.senses instanceof Array) {
@@ -448,7 +455,7 @@ export default class Character {
     parseAndSet(data.stats?.totalSaves, 'Bonus', setAttribute);
 
     for (const [a, prof] of Object.entries(data.profs)) {
-      const proficiency: Proficiency = getProficiency(
+      const proficiency: Proficiency = Util.getProficiency(
         prof ? prof.toString() : '',
       );
       if (a.includes('Lore')) {
@@ -460,7 +467,7 @@ export default class Character {
             total:
               Number(proficiency) +
               this.level +
-              Math.floor((this.scores[Score.Intelligence] - 10) / 2),
+              Math.floor((this.scores.value[Score.Intelligence] - 10) / 2),
             itemBonus: 0,
             score: Score.Intelligence,
             level: proficiency != Proficiency.Untrained ? this.level : 0,
@@ -477,7 +484,7 @@ export default class Character {
         this.attributes[attr].total -
         this.level -
         proficiency -
-        Math.floor((this.scores[this.attributes[attr].score] - 10) / 2);
+        Math.floor((this.scores.value[this.attributes[attr].score] - 10) / 2);
     }
     const attackMap = new Map<string, Builder<Weapon>>();
     const itemBuilders: Array<Builder<Item>> = [];
@@ -527,7 +534,7 @@ export default class Character {
             weight: entry.bulk > 0 ? entry.bulk : 0,
             traits: [],
             weapon: false,
-            description: parseDescription(entry.description),
+            description: Util.parseDescription(entry.description),
             source: Source.None,
           };
         }
@@ -580,13 +587,13 @@ export default class Character {
       const attack_prof = this.attributes[list.attack_attr].proficiency;
       if (attack_prof != Proficiency.Untrained) list.attack += this.level;
       list.attack += attack_prof;
-      list.attack += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+      list.attack += Math.floor((this.scores.value[list.score] - 10) / 2) ?? 0;
       // DC
       if (!list.dc_attr || list.dc_attr.valueOf() == -1) continue;
       const dc_prof = this.attributes[list.dc_attr].proficiency;
       if (dc_prof != Proficiency.Untrained) list.dc += this.level;
       list.dc += dc_prof;
-      list.dc += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+      list.dc += Math.floor((this.scores.value[list.score] - 10) / 2) ?? 0;
     }
 
     return promises;

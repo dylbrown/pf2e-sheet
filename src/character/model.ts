@@ -218,7 +218,12 @@ export const weaponsAndArmor: { [s: string]: Attribute } = {
 };
 
 export type Scores = {
-  [score in Score]: number;
+  value: {
+    [score in Score]: number;
+  };
+  history: {
+    [score in Score]: string[];
+  };
 };
 
 export type AttributeEntry = {

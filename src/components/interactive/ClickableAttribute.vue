@@ -1,7 +1,7 @@
 <template>
   <span ref="clickableName" class="clickable-trait">{{ name }}</span>
   <q-popup-proxy :class="popupClass + ' clickable-popup'" :target="$refs.clickableName as Element">
-    {{ abilityMod }} from {{ scoreName }}
+    {{ Util.signed(abilityMod) }} from {{ scoreName }}
     <br />
     {{ Util.signed(attrEntry?.proficiency ?? 0) }} from being
     {{
@@ -31,42 +31,40 @@
 import { QPopupProxy } from 'quasar';
 import type Character from '@/character/character';
 import { Attribute, Proficiency, Score } from '@/character/model';
-import { calculateMods, StatModType } from '@/character/modifiers';
+import { applyMods, calculateMods, StatModType } from '@/character/modifiers';
 import * as Util from '@/character/util';
 import { computed } from 'vue';
 
 const props = defineProps<{
-  attribute?: Attribute;
+  attribute: Attribute;
   lore?: string;
   character: Character;
   popupClass?: string;
 }>();
 
-const isAt = props.attribute != undefined;
+const isLore = props.attribute == Attribute.LoreChecks && props.lore;
 
-const name = isAt ? Attribute[props.attribute] : (props.lore ?? '');
+const name = !isLore ? Attribute[props.attribute] : (props.lore ?? '');
 
-const attrEntry = isAt
+const attrEntry = !isLore
   ? props.character.attributes[props.attribute]
   : props.lore
     ? props.character.lore[props.lore]
     : undefined;
 
-const abilityMod = Util.signed(
-  Util.abilityMod(
-    props.character.scores[
-    isAt
-      ? props.character.attributes[props.attribute].score
-      : attrEntry?.score ?? Score.Intelligence
-    ],
-  ),
+const abilityMod = Util.abilityMod(
+  props.character.scores.value[
+  !isLore
+    ? props.character.attributes[props.attribute].score
+    : (attrEntry?.score ?? Score.Intelligence)
+  ],
 );
 
-const scoreName = isAt
+const scoreName = !isLore
   ? Score[props.character.attributes[props.attribute].score]
   : Score[attrEntry?.score ?? Score.Intelligence];
 
-const item = props.attribute
+const item = !isLore
   ? props.character.attributes[props.attribute].itemBonus
   : props.lore
     ? (props.character.lore[props.lore]?.itemBonus ?? 0)
@@ -75,10 +73,30 @@ const item = props.attribute
 const c = computed(() => {
   const [bonuses, penalties] = calculateMods(
     props.character,
-    props.attribute || Attribute.LoreChecks,
-    props.character.attributes[props.attribute || Attribute.LoreChecks]
-      .itemBonus ?? 0,
+    props.attribute,
+    item,
   );
   return { bonuses, penalties };
 });
+
+let displayedTotal =
+  abilityMod + (attrEntry?.proficiency ?? 0) + (attrEntry?.level ?? 0);
+
+Object.entries(c.value).forEach(([_s, m]) => {
+  Object.entries(m).forEach(([_ss, n]) => {
+    displayedTotal += n;
+  });
+});
+
+const actualTotal = applyMods(
+  props.character,
+  props.attribute,
+  isLore ? props.character.lore[props.lore] : undefined,
+);
+
+if (actualTotal !== displayedTotal) {
+  alert(
+    `${isLore ? props.lore : Attribute[props.attribute]} breakdown is incorrect! Your total is ${actualTotal} but they add up to ${displayedTotal}. Let Dylan know!`,
+  );
+}
 </script>

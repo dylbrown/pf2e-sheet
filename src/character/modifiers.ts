@@ -414,7 +414,8 @@ export function applyMods(
 export function applyAttackMods(character: Character, weapon: Weapon) {
   let score: Score = Score.Strength;
   if (
-    (character.scores[Score.Dexterity] > character.scores[Score.Strength] &&
+    (character.scores.value[Score.Dexterity] >
+      character.scores.value[Score.Strength] &&
       weapon.traits.some((t) => t.name.startsWith('Finesse'))) ||
     (weapon.range !== undefined &&
       !weapon.traits.some((t) => t.name.startsWith('Thrown')))
