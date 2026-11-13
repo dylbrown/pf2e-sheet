@@ -284,10 +284,10 @@ export default class Spells {
     list.known[spell.level]?.push(spell);
     if (spell.level == 0) return;
     list.heightenedKnown[spell.level]?.push(spell);
-    for (const level of spell.heightening.fixed) {
+    for (const [level] of spell.heightening.fixed) {
       list.heightenedKnown[level]?.push(spell);
     }
-    for (const interval of spell.heightening.intervals) {
+    for (const [interval] of spell.heightening.intervals) {
       for (let i = spell.level + interval; i <= 10; i += interval) {
         list.heightenedKnown[i]?.push(spell);
       }
@@ -310,15 +310,22 @@ export default class Spells {
       cost = entry.cast != null ? Util.getActions(entry.cast) : Action.None;
     }
     let description = Util.parseDescription(entry.description, context);
+    const descriptionNoHeightening = description;
     const h = new Heightening(entry.rank ?? 1);
     for (const heightening of entry.heightened.text || []) {
       const heightenText = `<b>${heightening.amount}</b> ${heightening.text}`;
       description += Util.parseDescription(heightenText);
       const amount = heightening.amount.replaceAll(/[A-z()]/gi, '');
       if (amount.startsWith('+')) {
-        h.intervals.push(parseInt(amount));
+        h.intervals.push([
+          parseInt(amount),
+          Util.parseDescription(heightening.text),
+        ]);
       } else {
-        h.fixed.push(parseInt(amount));
+        h.fixed.push([
+          parseInt(amount),
+          Util.parseDescription(heightening.text),
+        ]);
       }
     }
     const builder = new Spell.SBuilder();
@@ -327,6 +334,7 @@ export default class Spells {
       id: entry.id,
       level: entry.rank ?? 1,
       description: description,
+      descriptionNoHeightening: descriptionNoHeightening,
       source: Source.bank.get(entry.content_source_id),
       traits: Trait.bank
         .map(entry.traits)

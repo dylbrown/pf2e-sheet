@@ -596,6 +596,7 @@ export class Spell {
   readonly id: number;
   readonly level = 0;
   readonly description: string = '';
+  readonly descriptionNoHeightening: string = '';
   readonly cost: Action = Action.Free;
   readonly maxCost?: Action;
   readonly castTime = '';
@@ -655,16 +656,16 @@ export class Spell {
 }
 
 export class Heightening {
-  intervals = Array<number>();
-  fixed = Array<number>();
+  intervals = Array<[number, string]>();
+  fixed = Array<[number, string]>();
   readonly base: number;
   constructor(base: number) {
     this.base = base;
   }
 
   includes(level: number): boolean {
-    if (this.fixed.includes(level)) return true;
-    for (const increment of this.intervals) {
+    if (this.fixed.some(([n]) => n == level)) return true;
+    for (const [increment] of this.intervals) {
       for (let l = this.base; l <= 10; l += increment) {
         if (level == l) return true;
       }

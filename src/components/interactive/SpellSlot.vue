@@ -31,7 +31,7 @@
     </q-card>
   </q-dialog>
   <q-dialog v-model="viewing">
-    <SpellBlock v-if="contents" :spell="contents" interactive />
+    <SpellBlock v-if="contents" :spell="contents" :level="level" interactive />
   </q-dialog>
 </template>
 
