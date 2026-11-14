@@ -21,7 +21,7 @@
                     (instance.bonus != weapon.damage.bonus ? 'buffed' : '')
                     ">{{ instance.damageString }}</span>&nbsp;{{ instance.typeString.trim() }}
               </template>
-              <template v-for="rune of weapon.runes ?? []" :key="rune.name">
+              <template v-for="rune of weapon.runes?.filter(r => r.dice) ?? []" :key="rune.name">
                 <ClickableRune :rune="rune" v-if="interactive">
                   + {{ rune.toString() }}</ClickableRune><template v-else>
                   + {{ rune.dice }}{{ rune.die
@@ -63,7 +63,7 @@
             </span>
             <template v-else>{{
               weapon.runes.map((r) => r.name).join(', ')
-              }}</template>
+            }}</template>
           </div>
           <div class="labello compact">Runes</div>
         </div>
@@ -77,7 +77,7 @@
             </span>
             <template v-else>{{
               weapon.traits.map((t) => t.name).join(', ')
-              }}</template>
+            }}</template>
           </div>
           <div class="labello compact">Traits</div>
         </div>
@@ -106,8 +106,5 @@ const modifiedAttack = computed(() => {
 });
 const modifiedDamage = computed(() => {
   return interactive ? applyDamageMods(character, weapon) : weapon.damage;
-});
-const damageSplitString = computed(() => {
-  return modifiedDamage.value.splitString();
 });
 </script>

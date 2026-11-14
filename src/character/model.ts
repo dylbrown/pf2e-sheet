@@ -331,6 +331,7 @@ export class Weapon extends Item {
   readonly capacity?: number;
   readonly usage?: number;
   readonly potency: number;
+  readonly striking: number;
   readonly runes: Rune[];
   readonly attribute: Attribute;
   readonly group: string;
@@ -346,6 +347,7 @@ export class Weapon extends Item {
     if (w.usage) this.usage = w.usage;
     this.runes = w.runes ?? [];
     this.potency = w.potency ?? 0;
+    this.striking = w.striking ?? 0;
     this.attribute = w.attribute ?? Attribute.UnarmedAttacks;
     this.group = w.group ?? '';
   }
@@ -536,7 +538,7 @@ export class Rune extends DamageInstance {
     name: string,
     description: string,
   ) {
-    super(bonus, damageType, dice, die);
+    super(bonus, damageType, die ? dice : 0, die);
     this.name = name;
     this.description = description;
   }
@@ -551,6 +553,12 @@ export class Rune extends DamageInstance {
       this.description,
     );
   }
+}
+
+export enum WeaponSpecialization {
+  None,
+  Yes,
+  Greater,
 }
 
 export class Ability {
