@@ -145,7 +145,7 @@ import {
 } from '@/character/model';
 import { applySpellAttackMods, applySpellDCMods } from '@/character/modifiers';
 import type PCharacter from '@/character/character';
-import ApparitionSpells from './ApparitionSpells.vue';
+import ApparitionSpells from './class-specific/ApparitionSpells.vue';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';
 import SpellSlot from './SpellSlot.vue';

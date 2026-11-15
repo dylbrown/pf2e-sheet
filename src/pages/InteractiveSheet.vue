@@ -287,6 +287,15 @@
               <div class="sectionDivider">
                 <hr />
               </div>
+              <template v-if="character.abilities.some(a => a.name == 'Elemental Blast')">
+                <q-expansion-item label="Elemental Blast" header-class="sectionLabel" default-opened dense dense-toggle
+                  expand-separator ref="expBlast">
+                  <ElementalBlast :character="character" />
+                </q-expansion-item>
+                <div class="sectionDivider">
+                  <hr />
+                </div>
+              </template>
               <q-expansion-item group="middle" label="Actions + Activities" header-class="sectionLabel" default-opened
                 dense dense-toggle expand-separator ref="expAct">
                 <AbilitiesTable :abilities="character.abilities.filter((a) => a.activity)" />
@@ -401,6 +410,7 @@ import {
 } from '@/character/modifiers';
 import ConditionsButton from '@/components/interactive/ConditionsButton.vue';
 import ClickableScore from '@/components/interactive/clickable/ClickableScore.vue';
+import ElementalBlast from '@/components/interactive/class-specific/ElementalBlast.vue';
 
 document.documentElement.classList.add('interactive');
 
@@ -434,10 +444,11 @@ const moddedAC = computed(() => {
 });
 
 const acEffects = computed(() => {
+  const extras = [{ type: StatModType.Item, attrs: [Attribute.AC], amount: props.character.combat.armor.ac }]
   const [bonuses, penalties] = calculateMods(
     props.character,
     Attribute.AC,
-    props.character.combat.armor.ac,
+    extras,
   );
   return { bonuses, penalties };
 });

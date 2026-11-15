@@ -76,7 +76,11 @@ const c = computed(() => {
   const [bonuses, penalties] = calculateMods(
     props.character,
     attribute,
-    attrEntry.itemBonus,
+    [{
+      type: StatModType.Item,
+      attrs: [attribute],
+      amount: attrEntry.itemBonus,
+    }],
     attrEntry.score
   );
   return { bonuses, penalties };

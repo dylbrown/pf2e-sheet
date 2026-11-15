@@ -14,7 +14,7 @@
         </q-td>
         <q-td key="traits" :props="props" class="table-traits">
           <span>
-            <template v-for="(trait, index) in props.row.traits" :key="trait.name">
+            <template v-for="(trait, index) in (props.row as Ability).traits" :key="trait.name">
               <template v-if="index > 0">, </template>
               <ClickableTrait :trait="trait" />
             </template>

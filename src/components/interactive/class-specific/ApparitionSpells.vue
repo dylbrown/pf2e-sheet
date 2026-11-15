@@ -35,8 +35,8 @@
 <script setup lang="ts">
 import PCharacter from '@/character/character';
 import { ApparitionList, Spell } from '@/character/model';
-import SpellsTable from './SpellsTable.vue';
-import PipCounter from '../PipCounter.vue';
+import SpellsTable from '../SpellsTable.vue';
+import PipCounter from '../../PipCounter.vue';
 import { reactive, ref } from 'vue';
 
 const props = defineProps<{

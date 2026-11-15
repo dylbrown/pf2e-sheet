@@ -57,7 +57,7 @@
               </span>
             </div>
             <div class="row">
-              <LinePart box style="flex-grow: 0" :content="companion.ac" :label="'AC'" />
+              <LinePart box style="flex-grow: 0" :content="companion.ac.toString()" :label="'AC'" />
               <div class="line">
                 <InteractiveHealth :character="companion" :curr-hp="currHP[companion.id]!"
                   :update-curr-hp="(hp: number) => (currHP[companion.id] = hp)" />
