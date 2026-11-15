@@ -826,10 +826,22 @@ export class Trait extends AbstractDataEntry {
 }
 export class Source extends AbstractDataEntry {
   public static readonly bank = new StaticBank<Source>(
-    (e) => new Source(makeSource(e.name), e.id, e.description),
+    (e) => new Source(makeSource(e.name), e.id, e.description, e.name),
   );
 
-  public static readonly None = new Source('', -1, '');
+  public readonly fullName: string;
+
+  protected constructor(
+    name: string,
+    id: number,
+    description: string,
+    fullName?: string,
+  ) {
+    super(name, id, description);
+    this.fullName = fullName ?? name;
+  }
+
+  public static readonly None = new Source('None', -1, 'No source provided');
 }
 
 export type CharacterContext = {

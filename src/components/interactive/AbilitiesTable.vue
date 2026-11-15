@@ -20,7 +20,9 @@
             </template>
           </span>
         </q-td>
-        <q-td key="source" :props="props">{{ props.row.source.name }}</q-td>
+        <q-td key="source" :props="props">
+          <ClickableSource :source="props.row.source as Source" />
+        </q-td>
         <q-td key="level" :props="props">{{ props.row.level }}</q-td>
       </q-tr>
     </template>
@@ -31,9 +33,10 @@
 </template>
 <script setup lang="ts">
 import AbilityBlock from '@/components/AbilityBlock.vue';
+import ClickableSource from '@/components/interactive/clickable/ClickableSource.vue';
 import ClickableTrait from '@/components/interactive/clickable/ClickableTrait.vue';
 import type { QTableColumn } from 'quasar';
-import type { Ability } from '@/character/model';
+import type { Ability, Source } from '@/character/model';
 import { ref } from 'vue';
 
 defineProps<{
