@@ -280,16 +280,16 @@
               <div class="sectionDivider">
                 <hr />
               </div>
-              <q-expansion-item label="Strikes" header-class="sectionLabel" default-opened dense dense-toggle
-                expand-separator ref="expStrike">
+              <q-expansion-item label="Strikes" header-class="sectionLabel" :default-opened="!defaultElementalBlast"
+                dense dense-toggle expand-separator ref="expStrike">
                 <WeaponsList :character="character" :weapons="character.combat.attacks" />
               </q-expansion-item>
               <div class="sectionDivider">
                 <hr />
               </div>
-              <template v-if="character.abilities.some(a => a.name == 'Elemental Blast')">
-                <q-expansion-item label="Elemental Blast" header-class="sectionLabel" default-opened dense dense-toggle
-                  expand-separator ref="expBlast">
+              <template v-if="showElementalBlast">
+                <q-expansion-item label="Elemental Blast" header-class="sectionLabel"
+                  :default-opened="defaultElementalBlast" dense dense-toggle expand-separator ref="expBlast">
                   <ElementalBlast :character="character" />
                 </q-expansion-item>
                 <div class="sectionDivider">
@@ -456,8 +456,8 @@ const acEffects = computed(() => {
 const root = ref<HTMLDivElement | null>(null);
 const abilityBlock = ref<HTMLDivElement | null>(null);
 const middleScroll = ref<QScrollArea | null>(null);
-const expInfo = ref<QExpansionItem | null>(null);
-const expStrike = ref<QExpansionItem | null>(null);
+const showElementalBlast = props.character.abilities.some(a => a.name == 'Elemental Blast');
+const defaultElementalBlast = showElementalBlast && props.character.class == 'Kineticist';
 const expAct = ref<QExpansionItem | null>(null);
 const currHP = ref<number>(
   LS.load(props.character.name, 'hp') ?? props.character.hp,
