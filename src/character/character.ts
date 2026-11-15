@@ -69,6 +69,7 @@ export class Character {
   totalBulk = 0;
   bulkLimitBonus = 0;
   money = 0;
+  abilities = new Abilities();
   spells = new Spells();
   modifiers: Reactive<ModEffect[]>;
   conditions: Reactive<{ [key in Condition]?: ConditionData }>;
@@ -116,6 +117,9 @@ export class Character {
       ? parent.starfinder
       : data.character.content_sources.enabled.includes(276);
     Source.bank.build(data.content.all_sources);
+    Source.bank.build([
+      { name: 'None', id: -1, description: 'No source provided' },
+    ]);
     Trait.bank.build(data.content.all_traits);
     this.id = data.id ?? -1;
     this.name = data.character?.name ?? data.name ?? '';
@@ -394,6 +398,21 @@ export class Character {
       if (entry && entry.value && entry.type == 'num')
         this.context[key] = Number(entry.value);
     }
+
+    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
+    if (data.content.raw_data_dump.variables.CLASS_DC?.value?.attribute) {
+      this.attributes[Attribute.ClassDC].score = Util.getScore(
+        data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
+          'ATTRIBUTE_'.length,
+        ),
+      );
+    }
+    this.context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
+    this.abilities.loadRemaster(
+      data.content.feats_features,
+      data.character?.operation_data?.selections ?? {},
+      this.context,
+    );
     return Array<Promise<void>>();
   }
 
@@ -428,7 +447,6 @@ export default class PCharacter extends Character {
   class = 'Tuber';
   deity = '';
   alignment = 'LN';
-  abilities = new Abilities();
   companions = Array<Character>();
 
   constructor() {
@@ -455,19 +473,6 @@ export default class PCharacter extends Character {
 
     this.background = data.character?.details?.background?.name ?? '';
     this.class = data.character?.details?.class?.name ?? '';
-
-    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
-    this.attributes[Attribute.ClassDC].score = Util.getScore(
-      data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
-        'ATTRIBUTE_'.length,
-      ),
-    );
-    this.context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
-    this.abilities.loadRemaster(
-      data.content.feats_features,
-      data.character.operation_data.selections,
-      this.context,
-    );
     this.spells.loadRemaster(
       data.content,
       this.class,

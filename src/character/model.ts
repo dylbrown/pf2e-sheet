@@ -8,6 +8,8 @@ export enum AbilityType {
   GeneralFeat,
   SkillFeat,
   AncestryFeat,
+  BaseAbility,
+  OtherFeat,
   Unknown,
 }
 

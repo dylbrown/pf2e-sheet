@@ -51,10 +51,21 @@
                     .join(', ')
                 }}</span>
               </span>
+              <span class="column" v-if="!isFamiliar(companion)">
+                <span>Companion Type</span>
+                <span>{{ companionType(companion) }}</span>
+              </span>
             </div>
-            <div>
-              <InteractiveHealth :character="companion" :curr-hp="currHP[companion.id]!"
-                :update-curr-hp="(hp: number) => (currHP[companion.id] = hp)" />
+            <div class="row">
+              <div class="line" style="flex-grow: 0" v-if="!isFamiliar(companion)">
+                <div class="numBox rounded">{{ companion.ac }}</div>
+                <div class="labello" style="font-size: .5rem">AC</div>
+              </div>
+              <div class="line">
+                <InteractiveHealth :character="companion" :curr-hp="currHP[companion.id]!"
+                  :update-curr-hp="(hp: number) => (currHP[companion.id] = hp)" />
+                <div class="labello" style="font-size: .5rem">Health</div>
+              </div>
             </div>
             <div class="companion-saves">
               <template v-for="attr of [
@@ -69,7 +80,7 @@
                 <span class="rounded numBox">{{ Util.signed(character.attributes[attr].total) }}</span>
               </template>
             </div>
-            <div class="companion-skills">
+            <div class="companion-skills" v-if="!isFamiliar(companion)">
               <template v-for="skill of companion.starfinder ? sfSkills : skills">
                 <template v-if="companion.attributes[skill].proficiency != Proficiency.Untrained">
                   <span>{{ Attribute[skill] }}</span>
@@ -77,7 +88,7 @@
                 </template>
               </template>
             </div>
-            <div class="companion-attacks">
+            <div class="companion-attacks" v-if="companion.combat.attacks.length">
               <template v-for="weapon of companion.combat.attacks">
                 <span>{{ weapon.name.replaceAll('Animal ', '') }} {{ Util.signed(weapon.attack) }} (<i><template
                       v-for="(trait, index) in weapon.traits" :key="trait.name">
@@ -86,6 +97,24 @@
                     </template></i>)</span>
                 <span>{{
                   weapon.damage.toString() }}</span>
+              </template>
+            </div>
+            <div class="column" style="padding: .5em;" v-if="companion.abilities.filter(a => a.activity).length">
+              <template v-for="action of companion.abilities.filter(a => a.activity)">
+                <span><span style="font-size: 1.2em">
+                    <div class="action-icon inline">
+                      {{ action.cost }}
+                    </div> {{ action.name }}
+                  </span> <span v-html="action.description" />
+                </span>
+              </template>
+            </div>
+            <div class="column" style="padding: .5em;" v-if="companion.abilities.filter(a => !a.activity).length">
+              <template v-for="action of companion.abilities.filter(a => !a.activity)">
+                <span><span style="font-size: 1.2em">
+                    {{ action.name }}
+                  </span> <span v-html="action.description" />
+                </span>
               </template>
             </div>
           </div>
@@ -122,4 +151,12 @@ watch(currHP, (value) => {
     LS.save(character.name, value[companion.id], 'companions', companion.id.toString(), 'hp');
   }
 });
+
+const TYPES = ['Specialized', 'Savage', 'Nimble', 'Mature', 'Young'];
+const companionType = (c: Character) => {
+  for (const T of TYPES) {
+    if (c.abilities.excluded.some(a => a.name.startsWith(T))) return T;
+  }
+  return TYPES[TYPES.length - 1];
+}
 </script>
