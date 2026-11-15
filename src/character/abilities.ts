@@ -8,6 +8,7 @@ const MANUAL_EXCLUSIONS = [
   'Spell Repertoire',
   'Signature Spells',
   'Domains',
+  'Elemental Blast',
   'Next Advancement',
   'Additional Abilities',
 ];
