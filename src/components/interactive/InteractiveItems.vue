@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import type { QTableColumn } from 'quasar';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import { Item } from '@/character/model';
 import * as LS from '@/pages/localStorage';
 import { ref } from 'vue';
@@ -36,7 +36,7 @@ const COLUMNS: QTableColumn[] = [
 ];
 
 const { character } = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const extraCount = ref<{ [instanceID: string]: number }>({});

@@ -380,7 +380,7 @@
 <script setup lang="ts">
 import * as Util from '@/character/util';
 import * as LS from '@/pages/localStorage';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import RightThird from '@/components/interactive/RightThird.vue';
 import { AbilityType, Attribute, Proficiency, Score } from '@/character/model';
 import InteractiveHealth from '@/components/interactive/InteractiveHealth.vue';
@@ -405,7 +405,7 @@ import ClickableScore from '@/components/interactive/clickable/ClickableScore.vu
 document.documentElement.classList.add('interactive');
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const moddedAttr = (attr: Attribute) => {

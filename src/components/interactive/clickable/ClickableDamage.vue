@@ -63,13 +63,13 @@
 <script setup lang="ts">
 import { Attribute, Proficiency, Score, WeaponSpecialization, type Weapon } from '@/character/model';
 import Clickable from './Clickable.vue';
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { applyDamageMods, calculateMods, getAttackMods, StatModType } from '@/character/modifiers';
 import { computed } from 'vue';
 import * as Util from '@/character/util';
 
 const { weapon, character, crit } = defineProps<{
-  character: Character;
+  character: PCharacter;
   weapon: Weapon;
   crit: boolean;
   popupClass?: string;

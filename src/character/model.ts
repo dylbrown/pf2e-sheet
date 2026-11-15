@@ -732,6 +732,22 @@ export enum SpellListSubType {
   Apparition = 'Apparition',
 }
 
+export class Companion {
+  name: string = '';
+  protected constructor(w: Mutable<Companion>) {
+    const record = this as unknown as Record<string, unknown>;
+    for (const [k, v] of Object.entries(w as Record<string, unknown>)) {
+      record[k] = v;
+    }
+  }
+
+  static CBuilder = class extends ABuilder<Companion> {
+    constructor() {
+      super((c: Mutable<Companion>) => new Companion(c));
+    }
+  };
+}
+
 interface DataEntry {
   id: number;
   name: string;

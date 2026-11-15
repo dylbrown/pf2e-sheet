@@ -32,7 +32,7 @@
   </Clickable>
 </template>
 <script setup lang="ts">
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import { Attribute, Proficiency, Score, Weapon } from '@/character/model';
 import { applyMods, calculateMods, getAttackMods, StatModType } from '@/character/modifiers';
 import * as Util from '@/character/util';
@@ -42,7 +42,7 @@ import Clickable from './Clickable.vue';
 const props = defineProps<{
   attribute: Attribute;
   lore?: string;
-  character: Character;
+  character: PCharacter;
   popupClass?: string;
   dc?: boolean;
   weapon?: Weapon;

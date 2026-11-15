@@ -63,7 +63,7 @@
             </span>
             <template v-else>{{
               weapon.runes.map((r) => r.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Runes</div>
         </div>
@@ -77,7 +77,7 @@
             </span>
             <template v-else>{{
               weapon.traits.map((t) => t.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Traits</div>
         </div>
@@ -90,13 +90,13 @@
 import type { Weapon } from '@/character/model';
 import ClickableRune from './interactive/clickable/ClickableRune.vue';
 import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
 import { signed } from '@/character/util';
 import { computed } from 'vue';
 
 const { character, weapon, interactive } = defineProps<{
-  character: Character;
+  character: PCharacter;
   weapon: Weapon;
   interactive: boolean;
 }>();

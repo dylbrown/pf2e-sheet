@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { Attribute, saves, sfSkills, skills } from '@/character/model';
 import { signed } from '@/character/util';
 import { reactive, ref, watch } from 'vue';
@@ -89,7 +89,7 @@ import * as LS from '@/pages/localStorage';
 import { ModEffect, StatMod, StatModType } from '@/character/modifiers';
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const options_temp = [

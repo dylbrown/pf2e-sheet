@@ -42,7 +42,7 @@
       5 +
       abilityMod(character.scores.value[Score.Strength]) +
       character.bulkLimitBonus
-    }}({{
+      }}({{
         10 +
         abilityMod(character.scores.value[Score.Strength]) +
         character.bulkLimitBonus
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { ref, watch } from 'vue';
 import { signed, abilityMod } from '@/character/util';
 import { Score } from '@/character/model';
@@ -59,7 +59,7 @@ import * as TS from '@/pages/localStorage';
 import InteractiveItems from './InteractiveItems.vue';
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
   itemsPane?: InstanceType<typeof InteractiveItems> | null;
 }>();
 

@@ -389,7 +389,7 @@
                 <div class="numBox">
                   <template v-if="character.attributes[skill].itemBonus != 0">{{
                     nonzero(character.attributes[skill].itemBonus)
-                    }}</template>
+                  }}</template>
                 </div>
               </div>
             </template>
@@ -408,7 +408,7 @@
                 <div class="numBox">
                   <template v-if="lore.itemBonus != 0">{{
                     lore.itemBonus
-                    }}</template>
+                  }}</template>
                 </div>
               </div>
             </template>
@@ -426,7 +426,7 @@
 
 <script setup lang="ts">
 import { abilityMod, nonzero, signed } from '@/character/util';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import { Attribute, skills, sfSkills, Score } from '@/character/model';
 import ActionBlock from '@/components/ActionBlock.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
@@ -438,7 +438,7 @@ import makeSheet from './pdf-sheet';
 document.documentElement.classList.add('paper');
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const root = ref<HTMLDivElement | null>(null);

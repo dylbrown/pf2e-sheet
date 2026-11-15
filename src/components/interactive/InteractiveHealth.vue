@@ -1,42 +1,23 @@
 <template>
   <div class="numBox rounded" style="position: relative">
-    <q-linear-progress
-      :value="(currHp - character.hp) / (character.hp + hpMod)"
-      color="yellow-4"
-      track-color="white"
-      class="rounded"
-      style="position: absolute; z-index: 10; width: 100%; height: 100%"
-    >
-      <div
-        class="absolute-full flex flex-center health"
-        :class="hpMod > 0 ? 'buffed' : hpMod < 0 ? 'debuffed' : ''"
-      >
+    <q-linear-progress :value="(currHp - character.hp) / (character.hp + hpMod)" color="yellow-4" track-color="white"
+      class="rounded" style="position: absolute; z-index: 10; width: 100%; height: 100%">
+      <div class="absolute-full flex flex-center health" :class="hpMod > 0 ? 'buffed' : hpMod < 0 ? 'debuffed' : ''">
         {{ currHp + hpMod }} / {{ character.hp + hpMod }}
       </div>
       <q-popup-proxy @show="workingHP = currHp" @hide="updateCurrHp(workingHP)">
         <div class="column">
-          <q-linear-progress
-            :value="(workingHP - character.hp) / (character.hp + hpMod)"
-            color="yellow-4"
-            track-color="white"
-            style="height: 2rem; width: 20rem; position: absolute; z-index: 10"
-          >
-            <div
-              class="absolute-full flex flex-center"
-              style="color: black; font-size: 1rem"
-            >
+          <q-linear-progress :value="(workingHP - character.hp) / (character.hp + hpMod)" color="yellow-4"
+            track-color="white" style="height: 2rem; width: 20rem; position: absolute; z-index: 10">
+            <div class="absolute-full flex flex-center" style="color: black; font-size: 1rem">
               {{ workingHP + hpMod }}
               <span style="color: gray">
                 &nbsp;({{ signed(workingHP - currHp) }})
               </span>
             </div>
           </q-linear-progress>
-          <q-linear-progress
-            :value="workingHP / (character.hp + hpMod)"
-            color="blue-2"
-            track-color="white"
-            style="height: 2rem"
-          />
+          <q-linear-progress :value="workingHP / (character.hp + hpMod)" color="blue-2" track-color="white"
+            style="height: 2rem" />
           <q-btn-group style="width: 20rem" spread stretch>
             <q-btn label="-10" @click="workingHP -= 10" />
             <q-btn label="-5" @click="workingHP -= 5" />
@@ -72,19 +53,15 @@
         </div>
       </q-popup-proxy>
     </q-linear-progress>
-    <q-linear-progress
-      :value="(currHp + hpMod) / (character.hp + hpMod)"
-      color="blue-2"
-      track-color="white"
-      class="rounded"
-    />
+    <q-linear-progress :value="(currHp + hpMod) / (character.hp + hpMod)" color="blue-2" track-color="white"
+      class="rounded" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { capitalize, computed, ref } from 'vue';
 import { signed } from '@/character/util';
-import Character from '@/character/character';
+import { Character } from '@/character/character';
 import { Attribute } from '@/character/model';
 import { applyMods } from '@/character/modifiers';
 

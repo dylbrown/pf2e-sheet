@@ -101,7 +101,7 @@
 
 <script setup lang="ts">
 import { Attribute, type Weapon } from '@/character/model';
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { QTableColumn } from 'quasar';
 import { applyAttackMods, applyDamageMods, applyMods } from '@/character/modifiers';
 import { signed } from '@/character/util';
@@ -119,7 +119,7 @@ const COLUMNS: QTableColumn[] = [
 ];
 
 const { character } = defineProps<{
-  character: Character;
+  character: PCharacter;
   weapons: Weapon[];
 }>();
 

@@ -12,6 +12,7 @@ import {
   CharacterContext,
   attacks,
   WeaponSpecialization,
+  Companion,
 } from './model';
 import {
   Proficiency,
@@ -30,17 +31,13 @@ import * as Util from './util';
 import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
-export default class Character {
+
+export class Character {
   remaster = false;
   starfinder = false;
+  id = -1;
   name = 'Dave';
-  player = '';
   level = 0;
-  ancestry = 'Stickytongue Tomato';
-  background = 'Potato';
-  class = 'Tuber';
-  deity = '';
-  alignment = 'LN';
   size = 'Medium';
   traits = Array<Trait>();
   senses = Array<string>();
@@ -66,7 +63,6 @@ export default class Character {
     armor_groups: {} as ArbitraryAttributes,
     weapon_specialization: WeaponSpecialization.None,
   };
-  abilities = new Abilities();
   attributes: Attributes;
   lore: ArbitraryAttributes = {};
   items = Array<Item>();
@@ -98,7 +94,10 @@ export default class Character {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
 
-  load(data: any): Array<Promise<void>> {
+  load(data: any, parent?: Character): Array<Promise<void>> {
+    if (parent?.remaster) {
+      return this.loadRemaster(data, parent);
+    }
     switch (data.version) {
       case 3:
         return this.loadLegacy(data);
@@ -110,16 +109,19 @@ export default class Character {
     return [];
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-
-  private loadRemaster(data: any) {
+  protected context?: CharacterContext;
+  protected loadRemaster(data: any, parent?: Character) {
     this.remaster = true;
-    this.starfinder = data.character.content_sources.enabled.includes(276);
+    this.starfinder = parent
+      ? parent.starfinder
+      : data.character.content_sources.enabled.includes(276);
     Source.bank.build(data.content.all_sources);
     Trait.bank.build(data.content.all_traits);
-    this.name = data.character?.name ?? '';
+    this.id = data.id ?? -1;
+    this.name = data.character?.name ?? data.name ?? '';
     this.level = data.character?.level ?? 0;
-    const context: CharacterContext = {
+
+    this.context = {
       ceil: Math.ceil,
       floor: Math.floor,
       max: Math.max,
@@ -127,20 +129,6 @@ export default class Character {
       level: this.level,
     };
 
-    // Ancestry & Heritage name
-    this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
-      ' (Playtest)',
-      '',
-    );
-    const heritages = data.content?.feats_features?.heritages;
-    if (heritages && heritages[0] && heritages[0].name) {
-      this.ancestry = heritages[0].name.includes(this.ancestry)
-        ? heritages[0].name
-        : heritages[0].name + ' ' + this.ancestry;
-    }
-
-    this.background = data.character?.details?.background?.name ?? '';
-    this.class = data.character?.details?.class?.name ?? '';
     this.size = data.content?.size ?? '';
     this.traits = (data.content?.character_traits ?? []).map(
       (e: { id: number }) => Trait.bank.get(e.id),
@@ -158,8 +146,10 @@ export default class Character {
           `${Util.signed(entry.to.value)}${entry.to.partial ? '.5' : ''} from ${entry.source}`,
         );
       }
-      context[key] = Util.abilityMod(this.scores.value[score]);
-      context[key.toLowerCase()] = Util.abilityMod(this.scores.value[score]);
+      this.context[key] = Util.abilityMod(this.scores.value[score]);
+      this.context[key.toLowerCase()] = Util.abilityMod(
+        this.scores.value[score],
+      );
     }
 
     // Senses
@@ -207,13 +197,6 @@ export default class Character {
       addDamageEffect(s, this.weaknesses),
     );
 
-    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
-    this.attributes[Attribute.ClassDC].score = Util.getScore(
-      data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
-        'ATTRIBUTE_'.length,
-      ),
-    );
-    context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
     this.setProficiency(data, Attribute.Perception);
     this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
@@ -398,33 +381,23 @@ export default class Character {
       data.content.raw_data_dump.variables.BULK_LIMIT_BONUS?.value ?? 0;
 
     // Money
-    const coins = data.character.inventory.coins;
-    this.money = coins.pp * 100 + coins.gp * 10 + coins.sp + coins.cp / 10.0;
+    const coins = data.character?.inventory?.coins ?? undefined;
+    this.money = coins
+      ? coins.pp * 100 + coins.gp * 10 + coins.sp + coins.cp / 10.0
+      : 0;
 
+    // Variables for context
     for (const [key, e] of Object.entries(
       data.content.raw_data_dump.variables,
     )) {
       const entry = e as any;
       if (entry && entry.value && entry.type == 'num')
-        context[key] = Number(entry.value);
+        this.context[key] = Number(entry.value);
     }
-    this.abilities.loadRemaster(
-      data.content.feats_features,
-      data.character.operation_data.selections,
-      context,
-    );
-    this.spells.loadRemaster(
-      data.content,
-      this.class,
-      context,
-      Util.abilityMod(this.scores.value[Score.Charisma]),
-      this.abilities,
-    );
-
-    return [];
+    return Array<Promise<void>>();
   }
 
-  private setProficiency(
+  protected setProficiency(
     data: any,
     attribute: Attribute,
     prefix = '',
@@ -443,8 +416,77 @@ export default class Character {
       ?.profValue ?? 0) as Proficiency;
   }
 
+  protected loadLegacy(data: any) {
+    return Array<Promise<void>>();
+  }
+}
+
+export default class PCharacter extends Character {
+  player = '';
+  ancestry = 'Stickytongue Tomato';
+  background = 'Potato';
+  class = 'Tuber';
+  deity = '';
+  alignment = 'LN';
+  abilities = new Abilities();
+  companions = Array<Character>();
+
+  constructor() {
+    super();
+  }
+
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private loadLegacy(data: any) {
+
+  protected override loadRemaster(data: any) {
+    super.loadRemaster(data);
+    if (!this.context) return [];
+
+    // Ancestry & Heritage name
+    this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
+      ' (Playtest)',
+      '',
+    );
+    const heritages = data.content?.feats_features?.heritages;
+    if (heritages && heritages[0] && heritages[0].name) {
+      this.ancestry = heritages[0].name.includes(this.ancestry)
+        ? heritages[0].name
+        : heritages[0].name + ' ' + this.ancestry;
+    }
+
+    this.background = data.character?.details?.background?.name ?? '';
+    this.class = data.character?.details?.class?.name ?? '';
+
+    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
+    this.attributes[Attribute.ClassDC].score = Util.getScore(
+      data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
+        'ATTRIBUTE_'.length,
+      ),
+    );
+    this.context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
+    this.abilities.loadRemaster(
+      data.content.feats_features,
+      data.character.operation_data.selections,
+      this.context,
+    );
+    this.spells.loadRemaster(
+      data.content,
+      this.class,
+      this.context,
+      Util.abilityMod(this.scores.value[Score.Charisma]),
+      this.abilities,
+    );
+
+    for (const e of data.content.companions ?? []) {
+      const c = new Character();
+      c.load(e, this);
+      this.companions.push(c);
+    }
+
+    return [];
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  protected override loadLegacy(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;

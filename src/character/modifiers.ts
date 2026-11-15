@@ -1,5 +1,5 @@
 import { capitalize } from 'vue';
-import Character from './character';
+import { Character, default as PCharacter } from './character';
 import {
   ac,
   attacks,
@@ -220,7 +220,7 @@ export class ConditionData extends ModEffect {
     return c;
   }
 
-  static add(condition: Condition, character: Character) {
+  static add(condition: Condition, character: PCharacter) {
     if (
       !conditionEffects[condition].has_value &&
       character.conditions[condition]
@@ -245,7 +245,7 @@ export class ConditionData extends ModEffect {
     character.conditions[condition].value += 1;
   }
 
-  static remove(condition: Condition, character: Character) {
+  static remove(condition: Condition, character: PCharacter) {
     if (
       !character.conditions[condition] ||
       (character.conditions[condition].locked &&
@@ -414,7 +414,7 @@ export function applyMods(
 }
 
 export function getAttackMods(
-  character: Character,
+  character: PCharacter,
   weapon: Weapon,
 ): AttributeEntry {
   let score: Score = Score.Strength;
@@ -452,7 +452,7 @@ export function getAttackMods(
   };
 }
 
-export function applyAttackMods(character: Character, weapon: Weapon) {
+export function applyAttackMods(character: PCharacter, weapon: Weapon) {
   const attrEntry = getAttackMods(character, weapon);
   const [bonuses, penalties] = calculateMods(
     character,
@@ -470,7 +470,7 @@ export function applyAttackMods(character: Character, weapon: Weapon) {
 }
 
 export function applyDamageMods(
-  character: Character,
+  character: PCharacter,
   weapon: Weapon,
   critical: boolean = false,
 ): PrintableDamage {
@@ -513,7 +513,7 @@ export function applyDamageMods(
   ]);
 }
 
-export function applyACMods(character: Character): number {
+export function applyACMods(character: PCharacter): number {
   const [bonuses, penalties] = calculateMods(
     character,
     Attribute.AC,
@@ -529,7 +529,7 @@ export function applyACMods(character: Character): number {
 }
 
 export function applySpellAttackMods(
-  character: Character,
+  character: PCharacter,
   list: SpellList,
 ): number {
   const [bonuses, penalties] = calculateMods(
@@ -546,7 +546,7 @@ export function applySpellAttackMods(
 }
 
 export function applySpellDCMods(
-  character: Character,
+  character: PCharacter,
   list: SpellList,
 ): number {
   const [bonuses, penalties] = calculateMods(
