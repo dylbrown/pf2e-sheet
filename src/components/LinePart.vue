@@ -1,6 +1,6 @@
 <template>
   <div class="line" v-if="content">
-    <div class="underlined" style="flex-direction: row">{{ content }}</div>
+    <div :class="box ? 'numBox rounded' : 'underlined'" :style="box ? '' : 'flex-direction: row'">{{ content }}</div>
     <div class="labello">{{ label }}</div>
   </div>
 </template>
@@ -9,5 +9,6 @@
 defineProps<{
   label: string;
   content: string;
+  box?: boolean;
 }>();
 </script>

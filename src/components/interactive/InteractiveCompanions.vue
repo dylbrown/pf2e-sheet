@@ -57,10 +57,7 @@
               </span>
             </div>
             <div class="row">
-              <div class="line" style="flex-grow: 0" v-if="!isFamiliar(companion)">
-                <div class="numBox rounded">{{ companion.ac }}</div>
-                <div class="labello" style="font-size: .5rem">AC</div>
-              </div>
+              <LinePart box style="flex-grow: 0" :content="companion.ac" :label="'AC'" />
               <div class="line">
                 <InteractiveHealth :character="companion" :curr-hp="currHP[companion.id]!"
                   :update-curr-hp="(hp: number) => (currHP[companion.id] = hp)" />
@@ -133,6 +130,7 @@ import { Character } from '@/character/character';
 import ClickableAttribute from './clickable/ClickableAttribute.vue';
 import ClickableTrait from './clickable/ClickableTrait.vue';
 import InteractiveHealth from './InteractiveHealth.vue';
+import LinePart from '@/components/LinePart.vue';
 import { ref, watch, capitalize } from 'vue';
 
 const { character } = defineProps<{
