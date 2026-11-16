@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!ready" id="load-box">
+  <div id="load-box" v-if="!ready">
     <h5>Pathfinder Second Edition Character Sheet<br />for Wanderer's Guide</h5>
     <div style="flex-grow: 1; width: 100%">
       <div style="position: relative; height: 6vh; flex-grow: 1">
@@ -48,6 +48,43 @@
         </q-card-section>
       </q-card>
     </div>
+    <q-card class="self-center" style="margin-top: 8px">
+      <q-card-section> (Experimental) Dark Mode
+        <q-btn-toggle v-model="darkMode" text-color="primary" :options="[
+          { icon: 'brightness_5', value: 'light' },
+          { icon: 'brightness_2', value: 'dark' },
+        ]" /></q-card-section>
+    </q-card>
+    <div id="update-hints">
+      <q-card style="overflow-y: auto;" class="bg-info">
+        <h6 style="text-align: center; margin: .5em 0 0 0;">Changelog</h6>
+        <q-card-section>
+          <b>16/11/26</b>
+          <ul style="margin: .5em 0;">
+            <li><b>Dark Mode (WIP)!</b></li>
+            <li><b>Added Stats Breakdowns</b>
+              <ul>
+                <li>Ability Scores</li>
+                <li>Attack Rolls</li>
+                <li>Class DC</li>
+                <li>Sources</li>
+                <li>Weapon Damage</li>
+              </ul>
+            </li>
+            <li><b>Improved Spell Preparing</b>
+              <ul>
+                <li>Fixed Uncommon + Rare spells not showing as such when prepping</li>
+                <li>Added more complex spell filtering for prepared casters</li>
+                <li>Prepared spells now auto-calculate their heightening for you below</li>
+              </ul>
+            </li>
+            <li><b>New weapons layout</b> with pre-calculated crit damage</li>
+            <li>Added Bespoke <b>Kineticist</b> Menus (Impulse Roll + Elemental Blast)</li>
+            <li>Added v1 support for <b>Companions</b>! Familiars baseline supported, more to come</li>
+          </ul>
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
   <InteractiveSheet v-if="ready && interactiveMode" :character="character" />
   <PaperSheet v-if="ready && !interactiveMode" :character="character" />
@@ -79,6 +116,17 @@
   flex-direction: column;
   align-items: stretch;
   text-align: center;
+  font-size: .7rem;
+}
+
+#update-hints {
+  position: absolute;
+  left: calc(100% + 20px);
+  top: 50%;
+  transform: translate(0, -50%);
+  max-height: 75vh;
+  width: calc((100vw - 100%) / 2 - 60px);
+  text-align: left;
 }
 
 #load-box .q-toggle__label {
@@ -96,7 +144,7 @@ import InteractiveSheet from '@/pages/InteractiveSheet.vue';
 import PaperSheet from '@/pages/PaperSheet.vue';
 import { Ref, ref, watch } from 'vue';
 import * as LS from '@/pages/localStorage';
-import { QTableColumn } from 'quasar';
+import { QTableColumn, useQuasar } from 'quasar';
 import CharacterWorker from '@/character/character-fs?worker';
 const file = ref<File | null>(null);
 const ready = ref(false);
@@ -173,4 +221,16 @@ const loadJSON = (text: string) => {
     });
   }
 };
+
+const $q = useQuasar();
+
+const darkMode = ref<string>(localStorage['2e-sheet:dark-mode'] || 'light');
+$q.dark.set(darkMode.value == 'dark');
+
+watch(darkMode, (v) => {
+  const isDark = v == 'dark';
+  localStorage['2e-sheet:dark-mode'] = v;
+  $q.dark.set(isDark);
+})
+
 </script>

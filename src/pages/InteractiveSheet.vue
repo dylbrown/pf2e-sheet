@@ -413,6 +413,7 @@ import ClickableScore from '@/components/interactive/clickable/ClickableScore.vu
 import ElementalBlast from '@/components/interactive/class-specific/ElementalBlast.vue';
 
 document.documentElement.classList.add('interactive');
+document.getElementById('q-app')?.classList.add('interactive');
 
 const props = defineProps<{
   character: PCharacter;

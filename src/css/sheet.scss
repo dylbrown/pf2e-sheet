@@ -2,6 +2,16 @@ html,
 body {
   font-family: 'Roboto Mono', monospace;
   line-height: 1.5;
+  --faded-text: #333;
+  --solid-border: black;
+  --solid-fill: black;
+  --inverted-text: white;
+  &.body--dark {
+    --faded-text: #bbb;
+    --solid-border: white;
+    --solid-fill: #a0a0a0;
+    --inverted-text: black;
+  }
 }
 .height_measure {
   position: fixed;
@@ -126,7 +136,7 @@ body {
     white 10px,
     white 20px
   );
-  border: 1px dashed black;
+  border: 1px dashed var(--solid-border);
 }
 #notice .notice-header {
   width: 100%;
@@ -152,7 +162,7 @@ body {
 }
 
 #leftThird {
-  border-right: 1px dashed black;
+  border-right: 1px dashed var(--solid-border);
   padding-right: 5px;
 
   .paper & {
@@ -178,7 +188,7 @@ body {
 }
 
 #rightThird {
-  border-left: 1px dashed black;
+  border-left: 1px dashed var(--solid-border);
   .paper & {
     padding-left: 5px;
     position: absolute;
@@ -329,7 +339,7 @@ body {
   align-self: stretch;
   justify-self: stretch;
   vertical-align: bottom;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--solid-border);
 }
 .underlined-roll {
   flex-flow: column nowrap;
@@ -341,7 +351,7 @@ body {
   flex-grow: 1;
   align-self: stretch;
   justify-self: stretch;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--solid-border);
   vertical-align: bottom;
   text-align: center;
   font-size: 1.25em;
@@ -356,7 +366,7 @@ body {
 }
 
 .box {
-  border: 1px solid black;
+  border: 1px solid var(--solid-border);
 }
 
 .numBox,
@@ -370,7 +380,7 @@ body {
 }
 
 .numBox {
-  border: 2px solid black;
+  border: 2px solid var(--solid-border);
   min-width: 1.8em;
   min-height: 1.8em;
 }
@@ -409,13 +419,13 @@ body {
   }
 }
 .prof-box {
-  border: 2px solid black;
+  border: 2px solid var(--solid-fill);
   width: 0.8em;
   height: 0.8em;
   border-radius: 100%;
 }
 .hero-box {
-  border: 2px solid black;
+  border: 2px solid var(--solid-fill);
   width: 1.8em;
   height: 1.8em;
   border-radius: 100%;
@@ -442,15 +452,16 @@ body {
   border-radius: 0.4em;
 }
 .filled {
-  background-color: black;
+  background-color: var(--solid-fill);
 }
 .dashed {
   border-style: dashed;
 }
+
 div.labello {
   font-size: 0.5em;
   min-height: 0.5em;
-  color: #333;
+  color: var(--faded-text);
   flex-grow: 0;
   padding-left: 3px;
   border: none;
@@ -458,7 +469,7 @@ div.labello {
   align-self: flex-end;
 }
 div.labello.invisible {
-  color: white;
+  color: transparent;
 }
 .underlined.character-name {
   font-size: 0.75em;
@@ -471,7 +482,7 @@ div.labello.invisible {
 }
 .box-label {
   font-size: 0.5em;
-  color: #333;
+  color: var(--faded-text);
   flex-grow: 0;
   text-align: center;
   align-self: center;
@@ -490,7 +501,7 @@ div.sectionDivider {
 
 div.sectionLabel {
   font-size: 0.7em;
-  color: #333;
+  color: var(--faded-text);
   font-weight: bold;
   text-transform: uppercase;
   .paper & {
@@ -654,9 +665,9 @@ div.action-label {
   justify-self: center;
   align-self: center;
   font-weight: bold;
-  color: white;
-  background-color: black;
-  border: 1px solid black;
+  color: var(--inverted-text);
+  background-color: var(--solid-fill);
+  border: 1px solid var(--solid-fill);
   border-radius: 0.6em;
   height: 1.2em;
   min-width: 1.2em;
@@ -750,9 +761,9 @@ div.action-label {
 }
 
 .inverted {
-  background-color: black;
-  border: 1px solid black;
-  color: white;
+  background-color: var(--solid-fill);
+  border: 1px solid var(--solid-border);
+  color: var(--inverted-text);
   padding: 0.21rem;
   font-weight: bold;
   text-align: center;
@@ -761,9 +772,9 @@ div.action-label {
   align-items: center;
 }
 .rollLabel {
-  background-color: black;
-  border: 1px solid black;
-  color: white;
+  background-color: var(--solid-fill);
+  border: 1px solid var(--solid-border);
+  color: var(--inverted-text);
   padding: 0.4em;
   font-weight: bold;
   border-radius: 0.4em;
@@ -825,10 +836,10 @@ div.action-label {
   padding-bottom: 5px;
 }
 #prof-grid > :not(:nth-child(4n), .labello) {
-  border-right: 1px solid black;
+  border-right: 1px solid var(--solid-border);
 }
 #prof-grid > :not(:nth-child(4n + 1), .labello) {
-  border-left: 1px solid black;
+  border-left: 1px solid var(--solid-border);
 }
 #info-grid {
   display: grid;
@@ -848,7 +859,7 @@ div.action-label {
   grid-template-columns: 1fr 1fr;
   gap: 5px;
   font-size: 1.2em;
-  background-color: white;
+  background-color: var(--inverted-text);
   border-radius: 10%;
   & :first-child:last-child {
     grid-column: span 2;
@@ -896,7 +907,7 @@ div.action-label {
     border: 1px dashed grey;
   }
   .interactive & {
-    background-color: white;
+    background-color: var(--inverted-text);
     max-width: 50vw;
   }
   padding: 0.43rem 0.21rem;
@@ -913,9 +924,9 @@ div.action-label {
 div.ability-section {
   align-items: center;
   justify-content: center;
-  background-color: black;
+  background-color: var(--solid-border);
   border-radius: 0.36rem;
-  color: white;
+  color: var(--inverted-text);
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -942,10 +953,10 @@ div.ability-section {
 }
 .ability-title,
 .spell-title {
-  background-color: black;
-  border: 1px solid black;
+  background-color: var(--solid-border);
+  border: 1px solid var(--solid-border);
   border-radius: 0.36rem;
-  color: white;
+  color: var(--inverted-text);
   font-weight: bolder;
   text-transform: uppercase;
   font-size: 1.15em;
@@ -996,10 +1007,10 @@ ol + br {
   display: none;
 }
 .description-header {
-  background-color: black;
-  border: 1px solid black;
+  background-color: var(--solid-border);
+  border: 1px solid var(--solid-border);
   border-radius: 0.36rem;
-  color: white;
+  color: var(--inverted-text);
   font-weight: bolder;
   text-transform: uppercase;
   font-size: 1em;
@@ -1040,10 +1051,10 @@ ol + br {
 div.col-section-title {
   font-size: 1.5em;
   text-align: center;
-  border: 1px solid black;
-  background-color: black;
+  border: 1px solid var(--solid-border);
+  background-color: var(--solid-border);
   border-radius: 0.36rem;
-  color: white;
+  color: var(--inverted-text);
   font-weight: bolder;
   text-transform: uppercase;
   padding: 0.14rem;
@@ -1061,26 +1072,26 @@ div.col-section-title {
 }
 div.col-section-label {
   font-size: 0.75em;
-  border-bottom: 1px solid black;
-  border-top: 1px solid black;
+  border-bottom: 1px solid var(--solid-border);
+  border-top: 1px solid var(--solid-border);
 }
 .inventory-grid > .grid-chunk.first-chunk > div:nth-child(3n + 2),
 .inventory-grid > .grid-chunk:not(.first-chunk) > div:nth-child(3n + 1) {
   text-align: right;
   justify-content: flex-end;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
+  border-left: 1px solid var(--solid-border);
+  border-right: 1px solid var(--solid-border);
 }
 .inventory-grid > .grid-chunk.first-chunk > div:nth-child(3n + 4),
 .inventory-grid > .grid-chunk:not(.first-chunk) > div:nth-child(3n) {
   text-align: center;
   justify-content: center;
-  border-right: 1px solid black;
+  border-right: 1px solid var(--solid-border);
 }
 .inventory-grid > .grid-chunk > div:nth-last-child(1),
 .inventory-grid > .grid-chunk > div:nth-last-child(2),
 .inventory-grid > .grid-chunk > div:nth-last-child(3) {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--solid-border);
 }
 
 .spells-prepared,
@@ -1136,7 +1147,7 @@ div.col-section-label {
   display: grid;
   grid-auto-rows: auto;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid black;
+  border: 1px solid var(--solid-border);
   box-sizing: border-box;
   padding-bottom: 2px;
 }
@@ -1185,7 +1196,7 @@ div.col-section-label {
 }
 .spells-prepared:not(.no-bottom) > div:nth-last-child(1),
 .spells-prepared:not(.no-bottom) > div:nth-last-child(2) {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--solid-border);
   padding-bottom: 2px;
 }
 .spells-level {
@@ -1195,18 +1206,18 @@ div.col-section-label {
   padding-bottom: 2px;
 }
 .spells-prepared .spells-level:nth-child(2n + 1) {
-  border-left: 1px solid black;
+  border-left: 1px solid var(--solid-border);
 }
 .spells-prepared .spells-level:nth-child(2n) {
-  border-right: 1px solid black;
+  border-right: 1px solid var(--solid-border);
 }
 .spells-spontaneous .spells-level {
   margin: 2px 0;
 }
 .spells-level-label {
-  background-color: black;
-  border: 1px solid black;
-  color: white;
+  background-color: var(--solid-border);
+  border: 1px solid var(--solid-border);
+  color: var(--inverted-text);
   padding: 0.21rem 0.36rem;
   border-radius: 0.36rem;
   flex-grow: 0;
@@ -1219,8 +1230,8 @@ div.col-section-label {
 }
 .spells-line,
 .spells-line-set {
-  background-color: black;
-  border: 1px solid black;
+  background-color: var(--solid-border);
+  border: 1px solid var(--solid-border);
   content: '';
   display: inline-block;
   height: 4px;
@@ -1234,10 +1245,10 @@ div.col-section-label {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  border-right: 1px solid black;
+  border-right: 1px solid var(--solid-border);
 }
 .spells-slot {
-  border: 1px solid black;
+  border: 1px solid var(--solid-border);
   height: 0.8em;
   width: 0.8em;
   align-self: center;
@@ -1251,7 +1262,7 @@ div.col-center {
 }
 .spells-prepared div.spells-name {
   padding-left: 2px;
-  border-left: 1px solid black;
+  border-left: 1px solid var(--solid-border);
 }
 .spells-spontaneous-grid div.spells-name {
   flex-grow: 0;
@@ -1263,10 +1274,10 @@ div.col-center {
   align-items: center;
 }
 div.spells-name.left {
-  border-right: calc(1px / 2) solid black;
+  border-right: calc(1px / 2) solid var(--solid-border);
 }
 div.spells-name.right {
-  border-left: calc(1px / 2) solid black;
+  border-left: calc(1px / 2) solid var(--solid-border);
 }
 .spell-header {
   flex-basis: 100%;
@@ -1285,23 +1296,27 @@ div.spells-name.right {
   width: 25%;
 }
 .spell-cost div {
-  color: white;
+  color: var(--inverted-text);
   height: 1.8em;
   width: 1.8em;
   box-sizing: border-box;
   border-radius: 0.36rem;
   flex-grow: 0;
-  border: 1px solid black;
+  border: 1px solid var(--solid-border);
 }
 div.spell-cost-yes {
-  background-color: black;
-  color: black;
+  background-color: var(--solid-border);
+  color: var(--solid-border);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 div.spell-cost-optional.spell-cost-yes {
-  background: linear-gradient(135deg, black 50%, white 50%);
+  background: linear-gradient(
+    135deg,
+    var(--solid-border) 50%,
+    var(--inverted-text) 50%
+  );
   color: transparent;
 }
 div.spell-cost-optional > span {
@@ -1384,7 +1399,7 @@ div.spell-cost-optional > span {
     justify-content: center;
     align-items: center;
     background-color: grey;
-    color: white;
+    color: var(--inverted-text);
     font-size: 1em;
   }
 
@@ -1403,7 +1418,7 @@ div.spell-cost-optional > span {
   }
 
   .prep-slot {
-    border: 2px solid black;
+    border: 2px solid var(--solid-border);
     border-radius: 0.36rem;
     height: 3em;
     min-width: 10em;
@@ -1435,6 +1450,16 @@ div.spell-cost-optional > span {
         #ddd 8px
       );
       border-color: grey;
+
+      body.body--dark & {
+        background: repeating-linear-gradient(
+          135deg,
+          #111,
+          #111 5px,
+          #444 5px,
+          #444 8px
+        );
+      }
     }
     & > span {
       max-width: 100%;
@@ -1612,7 +1637,7 @@ div.spell-cost-optional > span {
 
   & > * {
     padding: 0.5em 0;
-    border-top: 1px solid black;
+    border-top: 1px solid var(--solid-border);
   }
 }
 
