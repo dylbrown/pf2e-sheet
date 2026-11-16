@@ -81,6 +81,7 @@
             <li><b>New weapons layout</b> with pre-calculated crit damage</li>
             <li>Added Bespoke <b>Kineticist</b> Menus (Impulse Roll + Elemental Blast)</li>
             <li>Added v1 support for <b>Companions</b>! Familiars baseline supported, more to come</li>
+            <li>Going forward, force a reload when an update is available</li>
           </ul>
         </q-card-section>
       </q-card>
