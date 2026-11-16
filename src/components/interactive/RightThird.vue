@@ -1,56 +1,23 @@
 <template>
   <div id="rightThird">
-    <div
-      class="flex-column"
-      style="justify-content: stretch; align-items: end"
-      ref="rightThird"
-    >
-      <q-tabs
-        v-model="currentRightTab"
-        dense
-        class="text-grey right-tabs"
-        active-color="primary"
-        indicator-color="primary"
-        align="justify"
-        narrow-indicator
-        style="flex-grow: 0"
-        ref="tabButtons"
-        v-if="character.items.length > 0 || character.spells.lists.length > 0"
-      >
+    <div class="flex-column" style="justify-content: stretch; align-items: end" ref="rightThird">
+      <q-tabs v-model="currentRightTab" dense class="text-grey right-tabs" active-color="primary"
+        indicator-color="primary" align="justify" narrow-indicator style="flex-grow: 0" ref="tabButtons"
+        v-if="character.items.length > 0 || character.spells.lists.length > 0">
         <q-tab name="skills" icon="ra-circle-of-circles" />
-        <q-tab
-          name="spells"
-          icon="ra-incense"
-          v-if="character.spells.lists.length > 0"
-        />
-        <q-tab
-          name="items"
-          icon="fa-solid fa-suitcase"
-          v-if="character.items.length > 0"
-        />
+        <q-tab name="spells" icon="ra-incense" v-if="character.spells.lists.length > 0" />
+        <q-tab name="items" icon="fa-solid fa-suitcase" v-if="character.items.length > 0" />
+        <q-tab name="companions" icon="ra-cat" v-if="character.companions.length > 0" />
       </q-tabs>
 
-      <div
-        class="flex-column"
-        style="justify-content: stretch; align-items: stretch; width: 100%"
-      >
-        <q-scroll-area
-          class="full-height full-width"
-          horizontal-bar-style="opacity: 0"
-          :horizontal-thumb-style="{ opacity: '0' }"
-        >
+      <div class="flex-column" style="justify-content: stretch; align-items: stretch; width: 100%">
+        <q-scroll-area class="full-height full-width" horizontal-bar-style="opacity: 0"
+          :horizontal-thumb-style="{ opacity: '0' }">
           <span id="rightTabHolder" ref="rightTabHolder">
             <q-resize-observer @resize="tabsResize" />
-            <q-tab-panels
-              v-model="currentRightTab"
-              keep-alive
-              animated
-              transition-duration="200"
-              transition-next="slide-right"
-              transition-prev="slide-left"
-              @transition="afterTransition"
-              @vue:mounted="afterTransition"
-            >
+            <q-tab-panels v-model="currentRightTab" keep-alive animated transition-duration="200"
+              transition-next="slide-right" transition-prev="slide-left" @transition="afterTransition"
+              @vue:mounted="afterTransition">
               <q-tab-panel name="items" style="padding: 0">
                 <InteractiveItems :character="character" ref="itemsPane" />
               </q-tab-panel>
@@ -58,36 +25,24 @@
                 <InteractiveSkills :character="character" />
               </q-tab-panel>
               <q-tab-panel name="spells" style="padding: 0">
-                <InteractiveSpells
-                  :character="character"
-                  :notifier="notifier"
-                />
+                <InteractiveSpells :character="character" :notifier="notifier" />
+              </q-tab-panel>
+              <q-tab-panel name="companions" style="padding: 0">
+                <InteractiveCompanions :character="character" :notifier="notifier" />
               </q-tab-panel>
             </q-tab-panels>
           </span>
         </q-scroll-area>
-        <q-tab-panels
-          v-model="currentRightTab"
-          keep-alive
-          animated
-          transition-duration="200"
-          transition-next="slide-right"
-          transition-prev="slide-left"
-          @transition="afterTransition"
-          @vue:mounted="afterTransition"
-        >
-          <q-tab-panel
-            name="items"
-            style="
+        <q-tab-panels v-model="currentRightTab" keep-alive animated transition-duration="200"
+          transition-next="slide-right" transition-prev="slide-left" @transition="afterTransition"
+          @vue:mounted="afterTransition">
+          <q-tab-panel name="items" style="
               border: 1px solid rgba(0, 0, 0, 0.1);
               box-sizing: border-box;
               border-radius: 4px;
-            "
-          >
-            <InteractiveItemsFooter
-              :character="character"
-              :items-pane="$refs.itemsPane"
-            />
+            ">
+            <InteractiveItemsFooter :character="character"
+              :items-pane="$refs.itemsPane as InstanceType<typeof InteractiveItems>" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -96,14 +51,15 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
+import InteractiveCompanions from '@/components/interactive/InteractiveCompanions.vue';
 import InteractiveSkills from '@/components/interactive/InteractiveSkills.vue';
 import InteractiveItems from '@/components/interactive/InteractiveItems.vue';
 import InteractiveItemsFooter from './InteractiveItemsFooter.vue';
 import InteractiveSpells from '@/components/interactive/InteractiveSpells.vue';
 import { QTabs } from 'quasar';
 defineProps<{
-  character: Character;
+  character: PCharacter;
   notifier: number;
 }>();
 

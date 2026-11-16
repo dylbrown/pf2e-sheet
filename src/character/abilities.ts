@@ -4,7 +4,14 @@ import * as Wanderer from './wanderers-requests';
 import * as Util from './util';
 import { capitalize } from 'vue';
 
-const MANUAL_EXCLUSIONS = ['Spell Repertoire', 'Signature Spells', 'Domains'];
+const MANUAL_EXCLUSIONS = [
+  'Spell Repertoire',
+  'Signature Spells',
+  'Domains',
+  'Elemental Blast',
+  'Next Advancement',
+  'Additional Abilities',
+];
 
 export default class Abilities extends Array<Ability> {
   conditionals: string[] = [];
@@ -45,6 +52,12 @@ export default class Abilities extends Array<Ability> {
     feats_features.classFeatures.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.ClassFeature, context),
     );
+    feats_features.baseAbilities.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.BaseAbility, context),
+    );
+    feats_features.otherFeats.forEach((feature: any) =>
+      this.loadFeat(feature, AbilityType.OtherFeat, context),
+    );
     this.sort((a, b) => b.level - a.level);
   }
   loadFeat(feature: any, type: AbilityType, context: CharacterContext) {
@@ -56,7 +69,8 @@ export default class Abilities extends Array<Ability> {
       feature.actions != null,
       Source.bank.get(feature.content_source_id),
       Trait.bank.map(feature.traits),
-      feature.description,
+      feature.description +
+        (feature.special ? '<br>**Special** ' + feature.special : ''),
       Util.getRarity(feature.rarity),
       context,
     );

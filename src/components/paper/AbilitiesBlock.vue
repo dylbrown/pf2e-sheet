@@ -4,49 +4,31 @@
       <div class="ability-box ability-section do-not-break" ref="classLabel">
         Class Feats & Features
       </div>
-      <AbilityBlock
-        v-for="[index, ability] in types(
-          character.abilities,
-          [AbilityType.ClassFeat, AbilityType.ClassFeature],
-          [],
-        ).entries()"
-        :key="index"
-        ref="classAbilities"
-        :ability="ability"
-        :interactive="false"
-      />
+      <AbilityBlock v-for="[index, ability] in types(
+        character.abilities,
+        [AbilityType.ClassFeat, AbilityType.ClassFeature],
+        [],
+      ).entries()" :key="index" ref="classAbilities" :ability="ability" :interactive="false" />
       <div class="ability-box ability-section do-not-break" ref="generalLabel">
         General & Skill Feats
       </div>
-      <AbilityBlock
-        v-for="[index, ability] in types(
-          character.abilities,
-          [],
-          [
-            AbilityType.ClassFeat,
-            AbilityType.ClassFeature,
-            AbilityType.AncestryFeat,
-          ],
-        ).entries()"
-        :key="index"
-        ref="generalAbilities"
-        :ability="ability"
-        :interactive="false"
-      />
+      <AbilityBlock v-for="[index, ability] in types(
+        character.abilities,
+        [],
+        [
+          AbilityType.ClassFeat,
+          AbilityType.ClassFeature,
+          AbilityType.AncestryFeat,
+        ],
+      ).entries()" :key="index" ref="generalAbilities" :ability="ability" :interactive="false" />
       <div class="ability-box ability-section do-not-break" ref="ancestryLabel">
         Ancestry Feats
       </div>
-      <AbilityBlock
-        v-for="[index, ability] in types(
-          character.abilities,
-          [AbilityType.AncestryFeat],
-          [],
-        ).entries()"
-        :key="index"
-        ref="ancestryAbilities"
-        :ability="ability"
-        :interactive="false"
-      />
+      <AbilityBlock v-for="[index, ability] in types(
+        character.abilities,
+        [AbilityType.AncestryFeat],
+        [],
+      ).entries()" :key="index" ref="ancestryAbilities" :ability="ability" :interactive="false" />
       <div class="inventory-grid" ref="inventoryGrid">
         <div class="grid-chunk first-chunk">
           <div class="inventory-title col-section-title">Inventory</div>
@@ -56,51 +38,26 @@
           <template v-for="item of character.items" :key="item">
             <div class="fixed-item">{{ item.count }}</div>
             <div class="fixed-item">{{ item.name }}</div>
-            <div class="fixed-item">{{ item.weight }}</div></template
-          >
+            <div class="fixed-item">{{ item.weight }}</div>
+          </template>
         </div>
       </div>
       <template v-for="list of character.spells.lists" :key="list.name">
-        <PreparedList
-          v-if="list.type == 'Prepared'"
-          :list="list"
-          :character="character"
-        />
-        <SpontaneousList
-          v-if="list.type == 'Spontaneous'"
-          :list="list"
-          :character="character"
-        />
-        <InnateList
-          v-if="list.type == 'Innate'"
-          :list="list"
-          :character="character"
-        />
+        <PreparedList v-if="list.type == 'Prepared'" :list="list" :character="character" />
+        <SpontaneousList v-if="list.type == 'Spontaneous'" :list="list" :character="character" />
+        <InnateList v-if="list.type == 'Innate'" :list="list" :character="character" />
         <template v-for="level of list.known.slice().reverse()">
-          <SpellBlock
-            v-for="spell of level"
-            :key="spell.name"
-            :spell="spell"
-            ref="spells"
-            :data-list="list.name"
-            :interactive="false"
-          />
+          <SpellBlock v-for="spell of level" :key="spell.name" :spell="spell" ref="spells" :data-list="list.name"
+            :interactive="false" />
         </template>
       </template>
       <template v-if="character.spells.focusPoints > 0">
-        <div
-          style="position: absolute; width: calc(100% / 3)"
-          class="do-not-break"
-          ref="focusLabel"
-        >
+        <div style="position: absolute; width: calc(100% / 3)" class="do-not-break" ref="focusLabel">
           <div class="spells-title col-section-title">Focus Spells</div>
         </div>
-        <template
-          v-for="list of character.spells.lists.filter(
-            (l) => l.focus.length > 0,
-          )"
-          :key="list.name"
-        >
+        <template v-for="list of character.spells.lists.filter(
+          (l) => l.focus.length > 0,
+        )" :key="list.name">
           <div class="focus-rolls do-not-break" :data-focus="list.name">
             <div class="spells-title col-section-title">
               {{ list.name }}
@@ -116,14 +73,8 @@
               </div>
             </div>
           </div>
-          <SpellBlock
-            v-for="spell of list.focus"
-            :key="spell.name"
-            :spell="spell"
-            ref="focusSpells"
-            :data-focus="list.name"
-            :interactive="false"
-          />
+          <SpellBlock v-for="spell of list.focus" :key="spell.name" :spell="spell" ref="focusSpells"
+            :data-focus="list.name" :interactive="false" />
         </template>
       </template>
     </div>
@@ -137,14 +88,14 @@ import InnateList from '@/components/InnateList.vue';
 import PreparedList from '@/components/PreparedList.vue';
 import SpontaneousList from '@/components/SpontaneousList.vue';
 import { signed, types } from '@/character/util';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import { AbilityType, SpellListType } from '@/character/model';
 
 import { ref, onMounted } from 'vue';
 import * as Positioning from './positioning';
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
   heightMeasure: HTMLDivElement | null;
 }>();
 

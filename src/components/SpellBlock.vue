@@ -22,14 +22,14 @@
           <span>♦</span>
         </div>
         <div :class="Number(spell.cost) < 2
-            ? 'spell-cost-yes spell-cost-optional'
-            : 'spell-cost-yes'
+          ? 'spell-cost-yes spell-cost-optional'
+          : 'spell-cost-yes'
           ">
           <span>♦</span>
         </div>
         <div :class="Number(spell.cost) < 3
-            ? 'spell-cost-yes spell-cost-optional'
-            : 'spell-cost-yes'
+          ? 'spell-cost-yes spell-cost-optional'
+          : 'spell-cost-yes'
           ">
           <span>♦</span>
         </div>
@@ -60,23 +60,58 @@
       <LinePart label="Duration" :content="spell.duration" />
       <LinePart label="Save" :content="spell.save" />
     </div>
-    <div class="ability-description" ref="description" v-html="interactive ? spell.description : ''" />
+    <div class="ability-description" ref="description" v-html="interactive ? descriptionText : ''" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Rarity, type Spell } from '@/character/model';
 import LinePart from './LinePart.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 import { ref } from 'vue';
 import * as Positioning from './paper/positioning';
+import * as Util from '../character/util';
 
 const props = defineProps<{
   spell: Spell;
   interactive: boolean;
+  level?: number;
 }>();
 const box = ref<HTMLDivElement | null>(null);
 const description = ref<HTMLDivElement | null>(null);
+
+let descriptionText = props.spell.description;
+if (props.interactive && props.level) {
+  descriptionText = props.spell.descriptionNoHeightening;
+
+  const VALUE = / \d+(d\d+)?[ ,.:;]/gi;
+
+  for (const [interval, desc] of props.spell.heightening.intervals) {
+    const multiplier = Math.floor((props.level - props.spell.level) / interval);
+    if (multiplier == 0) continue;
+    let finalDescription = '';
+    let j = 3;
+    for (let i = desc.substring(j).search(VALUE); i != -1; i = desc.substring(j).search(VALUE)) {
+      i += j + 1; // 1 for the leading space
+      finalDescription += desc.substring(j, i);
+      const isDice = desc.substring(i).match(/^\d+d/gi);
+      j = isDice ? desc.indexOf('d', i) : desc.substring(i).search(/[^\d]/gi) + i;
+      finalDescription += '<b>' + parseInt(desc.substring(i, j)) * multiplier;
+      if (isDice) {
+        const newJ = desc.substring(j).search(/[^d\d]/gi) + j;
+        finalDescription += desc.substring(j, newJ);
+        j = newJ;
+      }
+      finalDescription += '</b>';
+    }
+    finalDescription += desc.substring(j);
+    descriptionText += `<p><b>(${multiplier}x ${Util.signed(interval)})</b> ${finalDescription}`;
+  }
+  for (const [n, desc] of props.spell.heightening.fixed) {
+    if (n > props.level) continue;
+    descriptionText += `<p><b>(&ge;${n})</b> ${desc.substring(3)}`;
+  }
+}
 
 const position = (pos: Positioning.Positioning) => {
   if (!box.value || !description.value) return;
@@ -84,7 +119,7 @@ const position = (pos: Positioning.Positioning) => {
     pos,
     box.value,
     description.value,
-    props.spell.description,
+    descriptionText,
   );
 };
 

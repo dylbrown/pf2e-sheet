@@ -1,10 +1,10 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Loading, QSpinnerHourglass } from 'quasar';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 
 export default function makeSheet(
-  character: Character,
+  character: PCharacter,
   pages: HTMLCollectionOf<HTMLElement>,
 ) {
   Loading.show({

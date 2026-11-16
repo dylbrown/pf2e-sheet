@@ -14,14 +14,9 @@
         </q-td>
         <q-td class="weapon-table">
           <div>
-            <div class="weapon-info" :class="(modifiedAttack(props.row as Weapon) < props.row.attack
-              ? 'de'
-              : '') +
-              (modifiedAttack(props.row as Weapon) != props.row.attack
-                ? 'buffed'
-                : '')
-              ">
-              {{ attacks(props.row as Weapon) }}
+            <div class="weapon-info">
+              <ClickableAttribute :label="attacks(props.row as Weapon)" :attribute="Attribute.Attacks"
+                :weapon="props.row as Weapon" :character="character" />
             </div>
           </div>
         </q-td>
@@ -29,25 +24,10 @@
           <div>
             <div class="weapon-info bounded-line" data-max="1.6">
               <span class="list-flow">
-                <template v-for="instance of modifiedDamage(props.row as Weapon).getDamageInstances()"
-                  :key="instance.toString()">
-                  <template v-if="instance.dice > 0">{{ instance.diceString }}</template><span
-                    v-if="instance.bonus != 0" :class="(instance.bonus <
-                      props.row.damage.bonus
-                      ? 'de'
-                      : '') +
-                      (instance.bonus !=
-                        props.row.damage.bonus
-                        ? 'buffed'
-                        : '')
-                      ">{{
-                        instance.damageString
-                      }}</span>&nbsp;{{
-                      instance.typeString.trim()
-                    }}<template v-for="rune of props.row.runes ?? []" :key="rune.name">
-                    <ClickableRune :rune="rune">
-                      &nbsp;+ {{ rune.toString() }}</ClickableRune>
-                  </template>
+                <ClickableDamage :weapon="props.row as Weapon" :crit="false" :character="character" />
+                <template v-for="rune of (props.row as Weapon).runes?.filter(r => r.dice) ?? []" :key="rune.name">
+                  <ClickableRune :rune="rune">
+                    &nbsp;+ {{ rune.toString() }}</ClickableRune>
                 </template>
               </span>
             </div>
@@ -57,28 +37,8 @@
           <div>
             <div class="weapon-info bounded-line" :data-pass="2" data-max="1.6">
               <span class="list-flow">
-                <template v-for="(instance, index) of modifiedDamage(props.row as Weapon, true).getDamageInstances()"
-                  :key="instance.toString()">
-                  <template v-if="index > 0"><template
-                      v-if="modifiedDamage(props.row as Weapon, true).getDamageInstances()[index - 1]?.typeString != instance.typeString">&nbsp;+
-                    </template><template v-else>+</template></template>
-                  <template v-if="instance.dice > 0">{{ instance.diceString }}</template><span
-                    v-if="instance.bonus != 0" :class="(instance.bonus <
-                      props.row.damage.bonus * 2
-                      ? 'de'
-                      : '') +
-                      (instance.bonus !=
-                        props.row.damage.bonus * 2
-                        ? 'buffed'
-                        : '')
-                      ">{{
-                        instance.damageString
-                      }}</span><template
-                    v-if="damageCount(props.row as Weapon, true) == index + 1 || modifiedDamage(props.row as Weapon, true).getDamageInstances()[index + 1]?.typeString != instance.typeString">&nbsp;{{
-                      instance.typeString.trim()
-                    }}</template>
-                </template>
-                <template v-for="rune of props.row.runes ?? []" :key="rune.name">
+                <ClickableDamage :weapon="props.row as Weapon" :crit="true" :character="character" />
+                <template v-for="rune of (props.row as Weapon).runes?.filter(r => r.dice) ?? []" :key="rune.name">
                   <ClickableRune :rune="rune">
                     &nbsp;+ {{ rune.double().toString() }}</ClickableRune>
                 </template>
@@ -138,14 +98,17 @@
     </template>
   </q-table>
 </template>
+
 <script setup lang="ts">
 import { Attribute, type Weapon } from '@/character/model';
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { QTableColumn } from 'quasar';
 import { applyAttackMods, applyDamageMods, applyMods } from '@/character/modifiers';
 import { signed } from '@/character/util';
-import ClickableRune from './ClickableRune.vue';
-import ClickableTrait from './ClickableTrait.vue';
+import ClickableRune from './clickable/ClickableRune.vue';
+import ClickableTrait from './clickable/ClickableTrait.vue';
+import ClickableAttribute from './clickable/ClickableAttribute.vue';
+import ClickableDamage from './clickable/ClickableDamage.vue';
 
 const COLUMNS: QTableColumn[] = [
   { name: 'info', label: '', field: 'name', align: 'left' },
@@ -156,7 +119,7 @@ const COLUMNS: QTableColumn[] = [
 ];
 
 const { character } = defineProps<{
-  character: Character;
+  character: PCharacter;
   weapons: Weapon[];
 }>();
 
@@ -172,9 +135,6 @@ const attacks = (weapon: Weapon) => {
 };
 const modifiedDamage = (weapon: Weapon, critical: boolean = false) => {
   return applyDamageMods(character, weapon, critical);
-};
-const damageCount = (weapon: Weapon, critical: boolean = false) => {
-  return modifiedDamage(weapon, critical).getDamageInstances().length;
 };
 const remotelyInteresting = (weapon: Weapon) => {
   return (

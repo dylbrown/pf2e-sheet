@@ -33,17 +33,17 @@
             <template v-for="score of [0, 1, 2, 3, 4, 5]" :key="score">
               <div class="line">
                 <div class="inverted numBox rounded" style="font-weight: bold">
-                  {{ Score[score]?.substring(0, 3).toUpperCase() }}
+                  <ClickableScore :score="score as Score" :character="character" />
                 </div>
                 <div class="labello invisible">A</div>
               </div>
               <div class="line">
                 <div :class="'underlined-roll' +
-                  (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  (character.scores.value[score as Score] % 2 == 1 ? ' odd' : '')
                   ">
                   {{
                     Util.signed(
-                      Util.abilityMod(character.scores[score as Score]),
+                      Util.abilityMod(character.scores.value[score as Score]),
                     )
                   }}
                 </div>
@@ -78,7 +78,8 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ character.attributes[Attribute.ClassDC].total + 10 }}
+                <ClickableAttribute :label="(moddedAttr(Attribute.ClassDC) + 10).toString()"
+                  :attribute="Attribute.ClassDC" :character="character" dc />
               </div>
               <div class="labello">Class DC</div>
             </div>
@@ -99,7 +100,7 @@
           <div class="sectionLabel">Health</div>
           <div class="row-between">
             <div class="line">
-              <ClickableHealth :character="character" :curr-hp="currHP"
+              <InteractiveHealth :character="character" :curr-hp="currHP"
                 :update-curr-hp="(hp: number) => (currHP = hp)" />
               <div class="labello">Current</div>
             </div>
@@ -116,7 +117,7 @@
                 <br />
                 {{
                   Util.signed(
-                    Util.abilityMod(character.scores[Score.Dexterity]),
+                    Util.abilityMod(character.scores.value[Score.Dexterity]),
                   )
                 }}
                 from Dexterity
@@ -188,7 +189,7 @@
               Attribute.Will,
             ]" :key="attr">
               <div class="center-right rollLabel">
-                <ClickableAttribute :attribute="attr" :character="character" />
+                <ClickableAttribute :attribute="attr" :character="character" noBuffTint />
               </div>
               <div class="line">
                 <div class="underlined-roll" :class="(moddedAttr(attr) < character.attributes[attr].total
@@ -279,13 +280,22 @@
               <div class="sectionDivider">
                 <hr />
               </div>
-              <q-expansion-item label="Strikes" header-class="sectionLabel" default-opened dense dense-toggle
-                expand-separator ref="expStrike">
+              <q-expansion-item label="Strikes" header-class="sectionLabel" :default-opened="!defaultElementalBlast"
+                dense dense-toggle expand-separator ref="expStrike">
                 <WeaponsList :character="character" :weapons="character.combat.attacks" />
               </q-expansion-item>
               <div class="sectionDivider">
                 <hr />
               </div>
+              <template v-if="showElementalBlast">
+                <q-expansion-item label="Elemental Blast" header-class="sectionLabel"
+                  :default-opened="defaultElementalBlast" dense dense-toggle expand-separator ref="expBlast">
+                  <ElementalBlast :character="character" />
+                </q-expansion-item>
+                <div class="sectionDivider">
+                  <hr />
+                </div>
+              </template>
               <q-expansion-item group="middle" label="Actions + Activities" header-class="sectionLabel" default-opened
                 dense dense-toggle expand-separator ref="expAct">
                 <AbilitiesTable :abilities="character.abilities.filter((a) => a.activity)" />
@@ -379,15 +389,15 @@
 <script setup lang="ts">
 import * as Util from '@/character/util';
 import * as LS from '@/pages/localStorage';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import RightThird from '@/components/interactive/RightThird.vue';
 import { AbilityType, Attribute, Proficiency, Score } from '@/character/model';
-import ClickableHealth from '@/components/interactive/ClickableHealth.vue';
-import ClickableTrait from '@/components/interactive/ClickableTrait.vue';
+import InteractiveHealth from '@/components/interactive/InteractiveHealth.vue';
+import ClickableTrait from '@/components/interactive/clickable/ClickableTrait.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
 import { capitalize, computed, onMounted, ref, watch } from 'vue';
 import { QExpansionItem, QPopupProxy, QScrollArea } from 'quasar';
-import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import ClickableAttribute from '@/components/interactive/clickable/ClickableAttribute.vue';
 import AbilitiesTable from '@/components/interactive/AbilitiesTable.vue';
 import PipCounter from '@/components/PipCounter.vue';
 import StatModsButton from '@/components/interactive/StatModsButton.vue';
@@ -399,11 +409,13 @@ import {
   StatModType,
 } from '@/character/modifiers';
 import ConditionsButton from '@/components/interactive/ConditionsButton.vue';
+import ClickableScore from '@/components/interactive/clickable/ClickableScore.vue';
+import ElementalBlast from '@/components/interactive/class-specific/ElementalBlast.vue';
 
 document.documentElement.classList.add('interactive');
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const moddedAttr = (attr: Attribute) => {
@@ -432,10 +444,11 @@ const moddedAC = computed(() => {
 });
 
 const acEffects = computed(() => {
+  const extras = [{ type: StatModType.Item, attrs: [Attribute.AC], amount: props.character.combat.armor.ac }]
   const [bonuses, penalties] = calculateMods(
     props.character,
     Attribute.AC,
-    props.character.combat.armor.ac,
+    extras,
   );
   return { bonuses, penalties };
 });
@@ -443,8 +456,8 @@ const acEffects = computed(() => {
 const root = ref<HTMLDivElement | null>(null);
 const abilityBlock = ref<HTMLDivElement | null>(null);
 const middleScroll = ref<QScrollArea | null>(null);
-const expInfo = ref<QExpansionItem | null>(null);
-const expStrike = ref<QExpansionItem | null>(null);
+const showElementalBlast = props.character.abilities.some(a => a.name == 'Elemental Blast');
+const defaultElementalBlast = showElementalBlast && props.character.class == 'Kineticist';
 const expAct = ref<QExpansionItem | null>(null);
 const currHP = ref<number>(
   LS.load(props.character.name, 'hp') ?? props.character.hp,
@@ -460,7 +473,7 @@ const rest = () => {
       props.character.level *
       Math.max(
         1,
-        Util.abilityMod(props.character.scores[Score.Constitution]),
+        Util.abilityMod(props.character.scores.value[Score.Constitution]),
       ),
       props.character.hp,
     );

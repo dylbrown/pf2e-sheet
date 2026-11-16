@@ -8,6 +8,8 @@ export enum AbilityType {
   GeneralFeat,
   SkillFeat,
   AncestryFeat,
+  BaseAbility,
+  OtherFeat,
   Unknown,
 }
 
@@ -218,7 +220,12 @@ export const weaponsAndArmor: { [s: string]: Attribute } = {
 };
 
 export type Scores = {
-  [score in Score]: number;
+  value: {
+    [score in Score]: number;
+  };
+  history: {
+    [score in Score]: string[];
+  };
 };
 
 export type AttributeEntry = {
@@ -233,7 +240,7 @@ export type Attributes = {
   [attribute in Attribute]: AttributeEntry;
 };
 
-export type Lores = {
+export type ArbitraryAttributes = {
   [lore: string]: AttributeEntry;
 };
 
@@ -326,7 +333,10 @@ export class Weapon extends Item {
   readonly capacity?: number;
   readonly usage?: number;
   readonly potency: number;
+  readonly striking: number;
   readonly runes: Rune[];
+  readonly attribute: Attribute;
+  readonly group: string;
 
   protected constructor(w: Mutable<Weapon>) {
     super(w);
@@ -339,6 +349,9 @@ export class Weapon extends Item {
     if (w.usage) this.usage = w.usage;
     this.runes = w.runes ?? [];
     this.potency = w.potency ?? 0;
+    this.striking = w.striking ?? 0;
+    this.attribute = w.attribute ?? Attribute.UnarmedAttacks;
+    this.group = w.group ?? '';
   }
 
   public static WBuilder = class extends ABuilder<Weapon> {
@@ -527,7 +540,7 @@ export class Rune extends DamageInstance {
     name: string,
     description: string,
   ) {
-    super(bonus, damageType, dice, die);
+    super(bonus, damageType, die ? dice : 0, die);
     this.name = name;
     this.description = description;
   }
@@ -542,6 +555,12 @@ export class Rune extends DamageInstance {
       this.description,
     );
   }
+}
+
+export enum WeaponSpecialization {
+  None,
+  Yes,
+  Greater,
 }
 
 export class Ability {
@@ -591,6 +610,7 @@ export class Spell {
   readonly id: number;
   readonly level = 0;
   readonly description: string = '';
+  readonly descriptionNoHeightening: string = '';
   readonly cost: Action = Action.Free;
   readonly maxCost?: Action;
   readonly castTime = '';
@@ -650,16 +670,16 @@ export class Spell {
 }
 
 export class Heightening {
-  intervals = Array<number>();
-  fixed = Array<number>();
+  intervals = Array<[number, string]>();
+  fixed = Array<[number, string]>();
   readonly base: number;
   constructor(base: number) {
     this.base = base;
   }
 
   includes(level: number): boolean {
-    if (this.fixed.includes(level)) return true;
-    for (const increment of this.intervals) {
+    if (this.fixed.some(([n]) => n == level)) return true;
+    for (const [increment] of this.intervals) {
       for (let l = this.base; l <= 10; l += increment) {
         if (level == l) return true;
       }
@@ -712,6 +732,22 @@ export enum SpellListSubType {
   List = 'List',
   Tradition = 'Tradition',
   Apparition = 'Apparition',
+}
+
+export class Companion {
+  name: string = '';
+  protected constructor(w: Mutable<Companion>) {
+    const record = this as unknown as Record<string, unknown>;
+    for (const [k, v] of Object.entries(w as Record<string, unknown>)) {
+      record[k] = v;
+    }
+  }
+
+  static CBuilder = class extends ABuilder<Companion> {
+    constructor() {
+      super((c: Mutable<Companion>) => new Companion(c));
+    }
+  };
 }
 
 interface DataEntry {
@@ -790,10 +826,22 @@ export class Trait extends AbstractDataEntry {
 }
 export class Source extends AbstractDataEntry {
   public static readonly bank = new StaticBank<Source>(
-    (e) => new Source(makeSource(e.name), e.id, e.description),
+    (e) => new Source(makeSource(e.name), e.id, e.description, e.name),
   );
 
-  public static readonly None = new Source('', -1, '');
+  public readonly fullName: string;
+
+  protected constructor(
+    name: string,
+    id: number,
+    description: string,
+    fullName?: string,
+  ) {
+    super(name, id, description);
+    this.fullName = fullName ?? name;
+  }
+
+  public static readonly None = new Source('None', -1, 'No source provided');
 }
 
 export type CharacterContext = {

@@ -30,9 +30,9 @@
               </div>
               <div class="line">
                 <div :class="'underlined-roll' +
-                  (character.scores[score as Score] % 2 == 1 ? ' odd' : '')
+                  (character.scores.value[score as Score] % 2 == 1 ? ' odd' : '')
                   ">
-                  {{ signed(abilityMod(character.scores[score as Score])) }}
+                  {{ signed(abilityMod(character.scores.value[score as Score])) }}
                 </div>
                 <div class="labello">Mod</div>
               </div>
@@ -102,7 +102,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
+                {{ signed(abilityMod(character.scores.value[Score.Dexterity])) }}
               </div>
               <div class="box-label">DEX</div>
             </div>
@@ -138,7 +138,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
+                {{ signed(abilityMod(character.scores.value[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -165,7 +165,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ signed(abilityMod(character.scores[Score.Constitution])) }}
+                {{ signed(abilityMod(character.scores.value[Score.Constitution])) }}
               </div>
               <div class="labello">CON</div>
             </div>
@@ -192,7 +192,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ signed(abilityMod(character.scores[Score.Dexterity])) }}
+                {{ signed(abilityMod(character.scores.value[Score.Dexterity])) }}
               </div>
               <div class="labello">DEX</div>
             </div>
@@ -216,7 +216,7 @@
             </div>
             <div class="line">
               <div class="numBox rounded">
-                {{ signed(abilityMod(character.scores[Score.Wisdom])) }}
+                {{ signed(abilityMod(character.scores.value[Score.Wisdom])) }}
               </div>
               <div class="labello">WIS</div>
             </div>
@@ -426,7 +426,7 @@
 
 <script setup lang="ts">
 import { abilityMod, nonzero, signed } from '@/character/util';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import { Attribute, skills, sfSkills, Score } from '@/character/model';
 import ActionBlock from '@/components/ActionBlock.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
@@ -438,7 +438,7 @@ import makeSheet from './pdf-sheet';
 document.documentElement.classList.add('paper');
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const root = ref<HTMLDivElement | null>(null);

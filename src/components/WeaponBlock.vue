@@ -6,9 +6,7 @@
     <div class="flex-column">
       <div class="row-stretch">
         <div class="line" style="flex-grow: 0.5">
-          <div class="underlined weapon-info" :class="(modifiedAttack < weapon.attack ? 'de' : '') +
-            (modifiedAttack != weapon.attack ? 'buffed' : '')
-            ">
+          <div class="underlined weapon-info">
             {{ signed(modifiedAttack) }}
           </div>
           <div class="labello compact">Attack</div>
@@ -23,7 +21,7 @@
                     (instance.bonus != weapon.damage.bonus ? 'buffed' : '')
                     ">{{ instance.damageString }}</span>&nbsp;{{ instance.typeString.trim() }}
               </template>
-              <template v-for="rune of weapon.runes ?? []" :key="rune.name">
+              <template v-for="rune of weapon.runes?.filter(r => r.dice) ?? []" :key="rune.name">
                 <ClickableRune :rune="rune" v-if="interactive">
                   + {{ rune.toString() }}</ClickableRune><template v-else>
                   + {{ rune.dice }}{{ rune.die
@@ -65,7 +63,7 @@
             </span>
             <template v-else>{{
               weapon.runes.map((r) => r.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Runes</div>
         </div>
@@ -79,7 +77,7 @@
             </span>
             <template v-else>{{
               weapon.traits.map((t) => t.name).join(', ')
-            }}</template>
+              }}</template>
           </div>
           <div class="labello compact">Traits</div>
         </div>
@@ -90,15 +88,15 @@
 
 <script setup lang="ts">
 import type { Weapon } from '@/character/model';
-import ClickableRune from './interactive/ClickableRune.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
-import Character from '@/character/character';
+import ClickableRune from './interactive/clickable/ClickableRune.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
+import PCharacter from '@/character/character';
 import { applyAttackMods, applyDamageMods } from '@/character/modifiers';
 import { signed } from '@/character/util';
 import { computed } from 'vue';
 
 const { character, weapon, interactive } = defineProps<{
-  character: Character;
+  character: PCharacter;
   weapon: Weapon;
   interactive: boolean;
 }>();
@@ -108,8 +106,5 @@ const modifiedAttack = computed(() => {
 });
 const modifiedDamage = computed(() => {
   return interactive ? applyDamageMods(character, weapon) : weapon.damage;
-});
-const damageSplitString = computed(() => {
-  return modifiedDamage.value.splitString();
 });
 </script>

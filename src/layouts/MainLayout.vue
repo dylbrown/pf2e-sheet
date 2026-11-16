@@ -91,7 +91,7 @@
 </style>
 
 <script setup lang="ts">
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import InteractiveSheet from '@/pages/InteractiveSheet.vue';
 import PaperSheet from '@/pages/PaperSheet.vue';
 import { Ref, ref, watch } from 'vue';
@@ -126,7 +126,7 @@ navigator.storage.getDirectory().then(async (dir) => {
 });
 
 const progress = ref(0);
-const character = new Character();
+const character = new PCharacter();
 
 const loadCached = (filename: string) => {
   saveWorker.postMessage({ command: 'load', file: filename });

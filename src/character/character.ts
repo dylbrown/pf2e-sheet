@@ -7,9 +7,12 @@ import {
   Rune,
   Scores,
   Attributes,
-  Lores,
+  ArbitraryAttributes,
   DamageInstance,
   CharacterContext,
+  attacks,
+  WeaponSpecialization,
+  Companion,
 } from './model';
 import {
   Proficiency,
@@ -24,21 +27,17 @@ import {
 } from './model';
 import Spells from './spells';
 import * as Wanderer from './wanderers-requests';
-import { abilityMod, getProficiency, getScore, parseDescription } from './util';
+import * as Util from './util';
 import { Condition, ConditionData, ModEffect } from './modifiers';
 
 type NumbersOfType = { [type: string]: number };
-export default class Character {
+
+export class Character {
   remaster = false;
   starfinder = false;
+  id = -1;
   name = 'Dave';
-  player = '';
   level = 0;
-  ancestry = 'Stickytongue Tomato';
-  background = 'Potato';
-  class = 'Tuber';
-  deity = '';
-  alignment = 'LN';
   size = 'Medium';
   traits = Array<Trait>();
   senses = Array<string>();
@@ -60,22 +59,26 @@ export default class Character {
       ac: 0,
     },
     attacks: Array<Weapon>(),
+    weapon_groups: {} as ArbitraryAttributes,
+    armor_groups: {} as ArbitraryAttributes,
+    weapon_specialization: WeaponSpecialization.None,
   };
-  abilities = new Abilities();
   attributes: Attributes;
-  lore: Lores = {};
+  lore: ArbitraryAttributes = {};
   items = Array<Item>();
   totalBulk = 0;
   bulkLimitBonus = 0;
   money = 0;
+  abilities = new Abilities();
   spells = new Spells();
   modifiers: Reactive<ModEffect[]>;
   conditions: Reactive<{ [key in Condition]?: ConditionData }>;
 
   constructor() {
-    this.scores = {} as Scores;
+    this.scores = { value: {}, history: {} } as Scores;
     this.attributes = {} as Attributes;
-    Object.values(Score).forEach((s) => (this.scores[s as Score] = 10));
+    Object.values(Score).forEach((s) => (this.scores.history[s as Score] = []));
+    Object.values(Score).forEach((s) => (this.scores.value[s as Score] = 10));
     Object.values(Attribute).forEach((a) => {
       if (isNaN(a as number)) return;
       this.attributes[a as Attribute] = {
@@ -92,7 +95,10 @@ export default class Character {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
 
-  load(data: any): Array<Promise<void>> {
+  load(data: any, parent?: Character): Array<Promise<void>> {
+    if (parent?.remaster) {
+      return this.loadRemaster(data, parent);
+    }
     switch (data.version) {
       case 3:
         return this.loadLegacy(data);
@@ -104,16 +110,22 @@ export default class Character {
     return [];
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-
-  private loadRemaster(data: any) {
+  protected context?: CharacterContext;
+  protected loadRemaster(data: any, parent?: Character) {
     this.remaster = true;
-    this.starfinder = data.character.content_sources.enabled.includes(276);
+    this.starfinder = parent
+      ? parent.starfinder
+      : data.character.content_sources.enabled.includes(276);
     Source.bank.build(data.content.all_sources);
+    Source.bank.build([
+      { name: 'None', id: -1, description: 'No source provided' },
+    ]);
     Trait.bank.build(data.content.all_traits);
-    this.name = data.character?.name ?? '';
+    this.id = data.id ?? -1;
+    this.name = data.character?.name ?? data.name ?? '';
     this.level = data.character?.level ?? 0;
-    const context: CharacterContext = {
+
+    this.context = {
       ceil: Math.ceil,
       floor: Math.floor,
       max: Math.max,
@@ -121,20 +133,6 @@ export default class Character {
       level: this.level,
     };
 
-    // Ancestry & Heritage name
-    this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
-      ' (Playtest)',
-      '',
-    );
-    const heritages = data.content?.feats_features?.heritages;
-    if (heritages && heritages[0] && heritages[0].name) {
-      this.ancestry = heritages[0].name.includes(this.ancestry)
-        ? heritages[0].name
-        : heritages[0].name + ' ' + this.ancestry;
-    }
-
-    this.background = data.character?.details?.background?.name ?? '';
-    this.class = data.character?.details?.class?.name ?? '';
     this.size = data.content?.size ?? '';
     this.traits = (data.content?.character_traits ?? []).map(
       (e: { id: number }) => Trait.bank.get(e.id),
@@ -146,9 +144,16 @@ export default class Character {
       const key = 'ATTRIBUTE_' + Score[score].substring(0, 3).toUpperCase();
       const entry = data.content?.attributes[key];
       if (!entry) continue;
-      this.scores[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
-      context[key] = abilityMod(this.scores[score]);
-      context[key.toLowerCase()] = abilityMod(this.scores[score]);
+      this.scores.value[score] = 10 + 2 * entry.value + (entry.partial ? 1 : 0);
+      for (const entry of data.content.raw_data_dump.history[key] ?? []) {
+        this.scores.history[score].push(
+          `${Util.signed(entry.to.value)}${entry.to.partial ? '.5' : ''} from ${entry.source}`,
+        );
+      }
+      this.context[key] = Util.abilityMod(this.scores.value[score]);
+      this.context[key.toLowerCase()] = Util.abilityMod(
+        this.scores.value[score],
+      );
     }
 
     // Senses
@@ -196,13 +201,6 @@ export default class Character {
       addDamageEffect(s, this.weaknesses),
     );
 
-    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
-    this.attributes[Attribute.ClassDC].score = getScore(
-      data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
-        'ATTRIBUTE_'.length,
-      ),
-    );
-    context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
     this.setProficiency(data, Attribute.Perception);
     this.setProficiency(data, Attribute.Fortitude, 'SAVE_FORT', true);
     this.setProficiency(data, Attribute.Reflex, 'SAVE_');
@@ -210,8 +208,19 @@ export default class Character {
     (this.starfinder ? sfSkills : skills).forEach((s) =>
       this.setProficiency(data, s, 'SKILL_'),
     );
+    this.attributes[Attribute.Attacks].itemBonus = parseInt(
+      (data.content?.raw_data_dump?.bonuses?.NON_SPELL_ATTACK_ROLLS_BONUS ??
+        [])[0]?.value ?? '0',
+    );
     Object.entries(weaponsAndArmor).forEach(([k, v]) =>
       this.setProficiency(data, v, k, true),
+    );
+    Object.entries(attacks).forEach(
+      ([_k, v]) =>
+        (this.attributes[v].itemBonus = Math.max(
+          this.attributes[v].itemBonus,
+          this.attributes[Attribute.Attacks].itemBonus,
+        )),
     );
     const armorCategory = data.content?.armor_item?.item?.meta_data?.category;
     if (armorCategory) {
@@ -225,29 +234,60 @@ export default class Character {
           ].proficiency;
     }
 
-    // Lores
+    // Lores + Weapon Groups
+    const GROUPS: [string, string, ArbitraryAttributes][] = [
+      ['SKILL_LORE_', ' Lore', this.lore],
+      ['ARMOR_GROUP_', ' Armors', this.combat.armor_groups],
+      ['WEAPON_GROUP_', ' Weapons', this.combat.weapon_groups],
+    ];
+    const LORES = 'SKILL_LORE_';
+    const ARMOR_GROUPS = 'ARMOR_GROUP_';
+    const WEAPON_GROUPS = 'WEAPON_GROUP_';
     for (const [a, e] of Object.entries(data.content?.proficiencies)) {
-      if (a.startsWith('SKILL_LORE_') && a.charAt(11) != '_') {
-        const entry: any = e;
-        this.lore[capitalize(a.substring(11).replaceAll('_', ' ')) + ' Lore'] =
-          {
+      for (const [prefix, suffix, storage] of GROUPS) {
+        if (a.startsWith(prefix) && a.charAt(prefix.length) != '_') {
+          const entry: any = e;
+          storage[
+            capitalize(
+              a.substring(prefix.length).replaceAll('_', ' ').toLowerCase(),
+            ) + suffix
+          ] = {
             proficiency: entry?.parts?.profValue as Proficiency,
             total: parseInt(entry?.total ?? '0'),
             itemBonus: entry.parts.breakdown.bonusValue ?? 0,
-            score: getScore(
-              data.content.raw_data_dump.variables[a].value.attribute.substring(
-                'ATTRIBUTE_'.length,
-              ),
+            score: Util.getScore(
+              data.content.raw_data_dump.variables[
+                a
+              ].value.attribute?.substring('ATTRIBUTE_'.length) ?? '',
             ),
             level: entry.parts.level ?? 0,
           };
+        }
       }
+    }
+
+    // Weapon Specialization
+    if (
+      data.content.raw_data_dump.variables.WEAPON_SPECIALIZATION_GREATER.value
+    ) {
+      this.combat.weapon_specialization = WeaponSpecialization.Greater;
+    } else if (
+      data.content.raw_data_dump.variables.WEAPON_SPECIALIZATION.value
+    ) {
+      this.combat.weapon_specialization = WeaponSpecialization.Yes;
     }
 
     // Weapons
     const attackMap = new Map<string, Builder<Weapon>>();
     for (const entry of data?.content?.weapons ?? []) {
       const b = new Weapon.WBuilder();
+      let attribute = Attribute.UnarmedAttacks;
+      for (const [k, v] of Object.entries(weaponsAndArmor)) {
+        if (k.startsWith(entry.item.meta_data.category)) {
+          attribute = v;
+          break;
+        }
+      }
       b.partial = {
         name: entry.item.name,
         id: entry.item.id,
@@ -263,6 +303,9 @@ export default class Character {
         range: entry.item.meta_data.range ?? undefined,
         reload: entry.item.meta_data.reload ?? undefined,
         potency: entry.item.meta_data.runes.potency ?? 0,
+        striking: entry.item.meta_data.runes.striking ?? 0,
+        attribute: attribute,
+        group: entry.item.meta_data.group,
       };
       b.partial.damage = new DamageInstance(
         entry.stats.damage.bonus.total,
@@ -271,20 +314,16 @@ export default class Character {
         entry.stats.damage.die,
       );
       const runes: Array<Rune> = [];
-      for (const otherDamage of entry.stats.damage.other ?? []) {
+      for (const propRune of entry.item?.meta_data?.runes?.property ?? []) {
+        const dmg = propRune.rune.meta_data.damage;
         runes.push(
           new Rune(
-            otherDamage.bonus,
-            otherDamage.damageType,
-            otherDamage.dice,
-            otherDamage.die,
-            otherDamage.source.substring(
-              otherDamage.source.indexOf('<') + 1,
-              otherDamage.source.indexOf('>'),
-            ),
-            parseDescription(
-              otherDamage.source.substring(otherDamage.source.indexOf('>') + 1),
-            ),
+            0,
+            dmg.damageType,
+            dmg.dice,
+            dmg.die,
+            propRune.rune.name,
+            Util.parseDescription(propRune.rune.description),
           ),
         );
       }
@@ -326,7 +365,7 @@ export default class Character {
           weight: entry.item.bulk ?? '',
           traits: Trait.bank.map(entry.item.traits),
           weapon: false,
-          description: parseDescription(entry.item.description),
+          description: Util.parseDescription(entry.item.description),
           source: Source.bank.get(entry.item.content_source_id),
         };
         this.items.push(b.build());
@@ -346,33 +385,38 @@ export default class Character {
       data.content.raw_data_dump.variables.BULK_LIMIT_BONUS?.value ?? 0;
 
     // Money
-    const coins = data.character.inventory.coins;
-    this.money = coins.pp * 100 + coins.gp * 10 + coins.sp + coins.cp / 10.0;
+    const coins = data.character?.inventory?.coins ?? undefined;
+    this.money = coins
+      ? coins.pp * 100 + coins.gp * 10 + coins.sp + coins.cp / 10.0
+      : 0;
 
+    // Variables for context
     for (const [key, e] of Object.entries(
       data.content.raw_data_dump.variables,
     )) {
       const entry = e as any;
       if (entry && entry.value && entry.type == 'num')
-        context[key] = Number(entry.value);
+        this.context[key] = Number(entry.value);
     }
+
+    this.setProficiency(data, Attribute.ClassDC, 'CLASS_DC', true);
+    if (data.content.raw_data_dump.variables.CLASS_DC?.value?.attribute) {
+      this.attributes[Attribute.ClassDC].score = Util.getScore(
+        data.content.raw_data_dump.variables.CLASS_DC.value.attribute.substring(
+          'ATTRIBUTE_'.length,
+        ),
+      );
+    }
+    this.context.CLASS_DC = this.attributes[Attribute.ClassDC].total;
     this.abilities.loadRemaster(
       data.content.feats_features,
-      data.character.operation_data.selections,
-      context,
+      data.character?.operation_data?.selections ?? {},
+      this.context,
     );
-    this.spells.loadRemaster(
-      data.content,
-      this.class,
-      context,
-      abilityMod(this.scores[Score.Charisma]),
-      this.abilities,
-    );
-
-    return [];
+    return Array<Promise<void>>();
   }
 
-  private setProficiency(
+  protected setProficiency(
     data: any,
     attribute: Attribute,
     prefix = '',
@@ -391,8 +435,63 @@ export default class Character {
       ?.profValue ?? 0) as Proficiency;
   }
 
+  protected loadLegacy(data: any) {
+    return Array<Promise<void>>();
+  }
+}
+
+export default class PCharacter extends Character {
+  player = '';
+  ancestry = 'Stickytongue Tomato';
+  background = 'Potato';
+  class = 'Tuber';
+  deity = '';
+  alignment = 'LN';
+  companions = Array<Character>();
+
+  constructor() {
+    super();
+  }
+
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private loadLegacy(data: any) {
+
+  protected override loadRemaster(data: any) {
+    super.loadRemaster(data);
+    if (!this.context) return [];
+
+    // Ancestry & Heritage name
+    this.ancestry = data.character?.details?.ancestry?.name.replaceAll(
+      ' (Playtest)',
+      '',
+    );
+    const heritages = data.content?.feats_features?.heritages;
+    if (heritages && heritages[0] && heritages[0].name) {
+      this.ancestry = heritages[0].name.includes(this.ancestry)
+        ? heritages[0].name
+        : heritages[0].name + ' ' + this.ancestry;
+    }
+
+    this.background = data.character?.details?.background?.name ?? '';
+    this.class = data.character?.details?.class?.name ?? '';
+    this.spells.loadRemaster(
+      data.content,
+      this.class,
+      this.context,
+      Util.abilityMod(this.scores.value[Score.Charisma]),
+      this.abilities,
+    );
+
+    for (const e of data.content.companions ?? []) {
+      const c = new Character();
+      c.load(e, this);
+      this.companions.push(c);
+    }
+
+    return [];
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  protected override loadLegacy(data: any) {
     const promises: Array<Promise<void>> = [];
     this.name = data.character?.name ?? '';
     this.level = data.character?.level ?? 0;
@@ -410,7 +509,8 @@ export default class Character {
     parseAndSet(
       data.stats?.totalAbilityScores,
       'Score',
-      (k, v) => (this.scores[Object.values(Score).indexOf(k) as Score] = v),
+      (k, v) =>
+        (this.scores.value[Object.values(Score).indexOf(k) as Score] = v),
     );
 
     if (data.build?.senses instanceof Array) {
@@ -448,7 +548,7 @@ export default class Character {
     parseAndSet(data.stats?.totalSaves, 'Bonus', setAttribute);
 
     for (const [a, prof] of Object.entries(data.profs)) {
-      const proficiency: Proficiency = getProficiency(
+      const proficiency: Proficiency = Util.getProficiency(
         prof ? prof.toString() : '',
       );
       if (a.includes('Lore')) {
@@ -460,7 +560,7 @@ export default class Character {
             total:
               Number(proficiency) +
               this.level +
-              Math.floor((this.scores[Score.Intelligence] - 10) / 2),
+              Math.floor((this.scores.value[Score.Intelligence] - 10) / 2),
             itemBonus: 0,
             score: Score.Intelligence,
             level: proficiency != Proficiency.Untrained ? this.level : 0,
@@ -477,7 +577,7 @@ export default class Character {
         this.attributes[attr].total -
         this.level -
         proficiency -
-        Math.floor((this.scores[this.attributes[attr].score] - 10) / 2);
+        Math.floor((this.scores.value[this.attributes[attr].score] - 10) / 2);
     }
     const attackMap = new Map<string, Builder<Weapon>>();
     const itemBuilders: Array<Builder<Item>> = [];
@@ -527,7 +627,7 @@ export default class Character {
             weight: entry.bulk > 0 ? entry.bulk : 0,
             traits: [],
             weapon: false,
-            description: parseDescription(entry.description),
+            description: Util.parseDescription(entry.description),
             source: Source.None,
           };
         }
@@ -580,13 +680,13 @@ export default class Character {
       const attack_prof = this.attributes[list.attack_attr].proficiency;
       if (attack_prof != Proficiency.Untrained) list.attack += this.level;
       list.attack += attack_prof;
-      list.attack += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+      list.attack += Math.floor((this.scores.value[list.score] - 10) / 2) ?? 0;
       // DC
       if (!list.dc_attr || list.dc_attr.valueOf() == -1) continue;
       const dc_prof = this.attributes[list.dc_attr].proficiency;
       if (dc_prof != Proficiency.Untrained) list.dc += this.level;
       list.dc += dc_prof;
-      list.dc += Math.floor((this.scores[list.score] - 10) / 2) ?? 0;
+      list.dc += Math.floor((this.scores.value[list.score] - 10) / 2) ?? 0;
     }
 
     return promises;

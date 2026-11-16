@@ -15,28 +15,20 @@
         </span>
         <template v-else>{{
           ability.traits.map((t) => t.name).join(', ')
-        }}</template>
+          }}</template>
       </div>
       <div class="labello">Traits</div>
     </div>
     <line-part label="Requirements" :content="ability.requirements || ''" />
-    <line-part
-      v-if="ability.activity && ability.trigger"
-      label="Trigger"
-      :content="ability.trigger || ''"
-    />
-    <div
-      class="ability-description"
-      ref="description"
-      v-html="interactive ? ability.description : ''"
-    />
+    <line-part v-if="ability.activity && ability.trigger" label="Trigger" :content="ability.trigger || ''" />
+    <div class="ability-description" ref="description" v-html="interactive ? ability.description : ''" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import LinePart from './LinePart.vue';
-import ClickableTrait from './interactive/ClickableTrait.vue';
+import ClickableTrait from './interactive/clickable/ClickableTrait.vue';
 import type { Ability } from '@/character/model';
 import * as Positioning from './paper/positioning';
 const props = defineProps<{

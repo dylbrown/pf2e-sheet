@@ -20,7 +20,7 @@
       </template>
       <template v-for="[name, lore] of filteredLores" :key="name">
         <div class="skill-label lore-label">
-          <ClickableAttribute :lore="name" :character="character" />
+          <ClickableAttribute :attribute="Attribute.LoreChecks" :lore="name" :character="character" />
         </div>
         <div class="line">
           <div class="underlined-roll" :class="(modifiedLore(lore) < lore.total
@@ -43,9 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import ClickableAttribute from '@/components/interactive/ClickableAttribute.vue';
+import ClickableAttribute from '@/components/interactive/clickable/ClickableAttribute.vue';
 import ProficiencyDisplay from '@/components/ProficiencyDisplay.vue';
-import type Character from '@/character/character';
+import type PCharacter from '@/character/character';
 import * as Util from '@/character/util';
 import {
   skills,
@@ -59,7 +59,7 @@ import { applyMods } from '@/character/modifiers';
 import { computed, reactive } from 'vue';
 
 const props = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const modifiedSkill = (skill: Attribute) => {

@@ -12,19 +12,19 @@
           <div class="spells-stats" v-if="list.type != ''">
             <div class="rollLabel">Attack</div>
             <div class="numBox rounded" :class="moddedSpellAttack(list) > list.attack
-                ? 'buffed'
-                : moddedSpellAttack(list) < list.attack
-                  ? 'debuffed'
-                  : ''
+              ? 'buffed'
+              : moddedSpellAttack(list) < list.attack
+                ? 'debuffed'
+                : ''
               ">
               {{ Util.signed(moddedSpellAttack(list)) }}
             </div>
             <div class="rollLabel">DC</div>
             <div class="numBox rounded" :class="moddedSpellDC(list) > list.dc
-                ? 'buffed'
-                : moddedSpellDC(list) < list.dc
-                  ? 'debuffed'
-                  : ''
+              ? 'buffed'
+              : moddedSpellDC(list) < list.dc
+                ? 'debuffed'
+                : ''
               ">
               {{ moddedSpellDC(list) }}
             </div>
@@ -144,14 +144,14 @@ import {
   SpellListType,
 } from '@/character/model';
 import { applySpellAttackMods, applySpellDCMods } from '@/character/modifiers';
-import type Character from '@/character/character';
-import ApparitionSpells from './ApparitionSpells.vue';
+import type PCharacter from '@/character/character';
+import ApparitionSpells from './class-specific/ApparitionSpells.vue';
 import SpellsTable from './SpellsTable.vue';
 import PipCounter from '../PipCounter.vue';
 import SpellSlot from './SpellSlot.vue';
 
 const { character } = defineProps<{
-  character: Character;
+  character: PCharacter;
   notifier: number;
 }>();
 

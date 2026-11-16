@@ -1,26 +1,12 @@
 <template>
-  <q-table
-    flat
-    bordered
-    dense
-    :rows="abilities"
-    :rows-per-page-options="[0]"
-    :columns="ABILITY_COLUMNS"
-    row-key="name"
-    hide-header
-    hide-title
-    hide-bottom
-  >
+  <q-table flat bordered dense :rows="abilities" :rows-per-page-options="[0]" :columns="ABILITY_COLUMNS" row-key="name"
+    hide-header hide-title hide-bottom>
     <template v-slot:body="props">
       <q-tr :props="props" ref="row">
-        <q-td
-          key="name"
-          :props="props"
-          @click="
-            currentAbility = props.row;
-            showAbility = true;
-          "
-        >
+        <q-td key="name" :props="props" @click="
+          currentAbility = props.row;
+        showAbility = true;
+        ">
           <div class="action-icon inline" v-if="props.row.activity">
             {{ props.row.cost }}
           </div>
@@ -28,34 +14,29 @@
         </q-td>
         <q-td key="traits" :props="props" class="table-traits">
           <span>
-            <template
-              v-for="(trait, index) in props.row.traits"
-              :key="trait.name"
-            >
-              <template v-if="index > 0">, </template
-              ><ClickableTrait :trait="trait" />
+            <template v-for="(trait, index) in (props.row as Ability).traits" :key="trait.name">
+              <template v-if="index > 0">, </template>
+              <ClickableTrait :trait="trait" />
             </template>
           </span>
         </q-td>
-        <q-td key="source" :props="props">{{ props.row.source.name }}</q-td>
+        <q-td key="source" :props="props">
+          <ClickableSource :source="props.row.source as Source" />
+        </q-td>
         <q-td key="level" :props="props">{{ props.row.level }}</q-td>
       </q-tr>
     </template>
   </q-table>
   <q-dialog v-model="showAbility">
-    <AbilityBlock
-      ref="classAbilities"
-      :ability="currentAbility"
-      :interactive="true"
-      v-if="currentAbility"
-    />
+    <AbilityBlock ref="classAbilities" :ability="currentAbility" :interactive="true" v-if="currentAbility" />
   </q-dialog>
 </template>
 <script setup lang="ts">
 import AbilityBlock from '@/components/AbilityBlock.vue';
-import ClickableTrait from '@/components/interactive/ClickableTrait.vue';
+import ClickableSource from '@/components/interactive/clickable/ClickableSource.vue';
+import ClickableTrait from '@/components/interactive/clickable/ClickableTrait.vue';
 import type { QTableColumn } from 'quasar';
-import type { Ability } from '@/character/model';
+import type { Ability, Source } from '@/character/model';
 import { ref } from 'vue';
 
 defineProps<{

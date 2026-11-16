@@ -617,8 +617,7 @@ div.weapon-label {
 .interactive .weapon-traits {
   font-style: italic;
 }
-
-.clickable-trait {
+.display-inline {
   display: inline;
 }
 .clickable-popup {
@@ -1516,7 +1515,7 @@ div.spell-cost-optional > span {
 
   .health {
     color: black;
-    font-size: calc(1rem + 0.5px);
+    font-size: calc(1em + 0.5px);
   }
 
   .buff-button {
@@ -1606,4 +1605,56 @@ div.spell-cost-optional > span {
   100% {
     transform: translateX(calc(-100% + 4px));
   }
+}
+
+.companion {
+  font-size: 0.75em;
+
+  & > * {
+    padding: 0.5em 0;
+    border-top: 1px solid black;
+  }
+}
+
+.companion-skills,
+.companion-saves,
+.companion-info {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  justify-items: end;
+  align-items: center;
+
+  & > span:not(.numBox) {
+    justify-self: flex-start;
+    padding: 0 1em 0 0.5em;
+  }
+  & > span.numBox {
+    margin: 0em 0.5em;
+    padding: 0.25em;
+  }
+}
+
+.companion-info {
+  grid-template-columns: auto auto;
+  align-items: start;
+
+  & > .column > :first-child {
+    font-weight: bold;
+  }
+}
+
+.companion-attacks {
+  padding: 0.5em;
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  & > :nth-child(2n + 1) {
+    justify-self: flex-start;
+  }
+  & > :nth-child(2n) {
+    justify-self: flex-end;
+  }
+}
+.companion .labello {
+  font-size: 0.5rem;
 }

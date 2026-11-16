@@ -2,87 +2,52 @@
   <div class="numBox rounded" style="min-height: 3.6em">
     <q-btn class="buff-button">
       <div class="row buffs">
-        <div
-          class="column"
-          v-for="condition of Object.values(conditions)"
-          :key="condition.name"
-        >
-          <q-icon :name="condition.icon" /><template
-            v-if="condition.has_value"
-            >{{ condition.value }}</template
-          >
+        <div class="column" v-for="condition of Object.values(conditions)" :key="condition.name">
+          <q-icon :name="condition.icon" /><template v-if="condition.has_value">{{ condition.value }}</template>
         </div>
       </div>
-      <q-popup-proxy
-        self="top left"
-        anchor="bottom left"
-        v-model="viewConditions"
-      >
+      <q-popup-proxy self="top left" anchor="bottom left" v-model="viewConditions">
         <div class="condition-list">
-          <div
-            class="condition"
-            v-for="[i, effect] of Object.values(conditionEffects).entries()"
-            :key="i"
-          >
+          <div class="condition" v-for="[i, effect] of Object.values(conditionEffects).entries()" :key="i">
             <div class="condition-header">
               <div class="row center-content">
-                <span
-                  ><q-icon icon :name="effect.icon" /> {{ effect.name }}</span
-                >
+                <span><q-icon icon :name="effect.icon" /> {{ effect.name }}</span>
               </div>
               <div class="condition-desc">
-                <template
-                  v-for="[i, statMod] of Object.values(
-                    effect.statMods,
-                  ).entries()"
-                  :key="i"
-                >
+                <template v-for="[i, statMod] of Object.values(
+                  effect.statMods,
+                ).entries()" :key="i">
                   <template v-if="i > 0">; </template>
                   {{
                     effect.has_value
                       ? conditions[effect.condition]
                         ? signed(
-                            -1 * (conditions[effect.condition]?.value ?? 0),
-                          )
+                          -1 * (conditions[effect.condition]?.value ?? 0),
+                        )
                         : '-X'
                       : statMod.amount
                   }}
                   {{ statMod.type }} to
                   {{ statMod.attrs.map(AttrLabel).join(', ') }}
                 </template>
-                <template
-                  v-for="[c, value] of Object.entries(effect.child_conditions)"
-                  :key="c"
-                  >; {{ c
-                  }}<template v-if="typeof value === 'number'">{{
+                <template v-for="[c, value] of Object.entries(effect.child_conditions)" :key="c">; {{ c
+                }}<template v-if="typeof value === 'number'">{{
                     ' ' + value
-                  }}</template>
+                    }}</template>
                 </template>
               </div>
             </div>
-            <q-toggle
-              v-if="!effect.has_value"
-              :disable="isLocked(effect.condition)"
-              v-model="conditionEnabled[i]"
+            <q-toggle v-if="!effect.has_value" :disable="isLocked(effect.condition)" v-model="conditionEnabled[i]"
               @update:model-value="
                 (value) => updateCondition(effect.condition, value)
-              "
-            />
+              " />
             <div v-if="effect.has_value" class="value-condition">
-              <q-btn
-                dense
-                icon="remove"
-                :disable="isLocked(effect.condition)"
-                @click="ConditionData.remove(effect.condition, character)"
-              />
+              <q-btn dense icon="remove" :disable="isLocked(effect.condition)"
+                @click="ConditionData.remove(effect.condition, character)" />
               <div style="padding: 0 10px">
                 {{ conditions[effect.condition]?.value ?? 0 }}
               </div>
-              <q-btn
-                dense
-                icon="add"
-                @click="ConditionData.add(effect.condition, character)"
-              />
+              <q-btn dense icon="add" @click="ConditionData.add(effect.condition, character)" />
             </div>
           </div>
         </div>
@@ -92,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import Character from '@/character/character';
+import PCharacter from '@/character/character';
 import { Attribute } from '@/character/model';
 import { signed } from '@/character/util';
 import { ref, watch } from 'vue';
@@ -104,7 +69,7 @@ import {
 } from '@/character/modifiers';
 
 const { character } = defineProps<{
-  character: Character;
+  character: PCharacter;
 }>();
 
 const AttrLabel = (a: Attribute) =>
