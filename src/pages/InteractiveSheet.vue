@@ -117,7 +117,7 @@
                 <br />
                 {{
                   Util.signed(
-                    Util.abilityMod(character.scores.value[Score.Dexterity]),
+                    Math.min(Util.abilityMod(character.scores.value[Score.Dexterity]), character.combat.armor.dexCap),
                   )
                 }}
                 from Dexterity

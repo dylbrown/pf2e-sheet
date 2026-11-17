@@ -54,6 +54,7 @@ export class Character {
     armor: {
       proficiency: Proficiency.Trained,
       ac: 0,
+      dexCap: 0,
     },
     shield: {
       proficiency: Proficiency.Trained,
@@ -184,10 +185,16 @@ export class Character {
       this.speed[name] = speed.value.total;
     });
     this.ac = data.content?.ac ?? 0;
+
+    // Armor
     this.combat.armor.ac =
       data.content?.armor_item?.item?.meta_data?.ac_bonus ?? 0;
     this.combat.armor.ac +=
       data.content?.armor_item?.item?.meta_data?.runes.potency ?? 0;
+    this.combat.armor.dexCap =
+      data.content?.armor_item?.item?.meta_data?.dex_cap ?? 0;
+
+    // Shield
     this.combat.shield.ac =
       data.content?.shield_item?.item?.meta_data?.ac_bonus ?? 0;
     this.hp = data.content?.max_hp ?? 0;
