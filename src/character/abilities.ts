@@ -55,9 +55,6 @@ export default class Abilities extends Array<Ability> {
     feats_features.baseAbilities.forEach((feature: any) =>
       this.loadFeat(feature, AbilityType.BaseAbility, context),
     );
-    feats_features.otherFeats.forEach((feature: any) =>
-      this.loadFeat(feature, AbilityType.OtherFeat, context),
-    );
     this.sort((a, b) => b.level - a.level);
   }
   loadFeat(feature: any, type: AbilityType, context: CharacterContext) {
