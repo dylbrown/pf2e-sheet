@@ -1,6 +1,8 @@
 import { Reactive } from 'vue';
 import { makeSource, parseDescription } from './util';
 import * as LS from '@/pages/localStorage';
+import { StatModType } from './modifiers';
+import { isArray } from 'mathjs';
 
 export enum AbilityType {
   ClassFeat,
@@ -228,12 +230,50 @@ export type Scores = {
   };
 };
 
+type CustomBonusEntry = {
+  value: number;
+  source: string[];
+};
+
+export class CustomBonuses {
+  private data: {
+    [type: string | StatModType]: CustomBonusEntry;
+  } = {};
+
+  get(k: string | StatModType) {
+    this.data[k] = this.data[k] ?? { value: 0, source: [] };
+    return this.data[k];
+  }
+
+  append(k: string | StatModType, v: number, s: string | string[]) {
+    const e = (this.data[k] = this.data[k] ?? { value: 0, source: [] });
+    e.value += v;
+    e.source.push(...(isArray(s) ? s : [s]));
+  }
+
+  get entries() {
+    return Object.entries(this.data);
+  }
+
+  static combine(c1: CustomBonuses, c2: CustomBonuses): CustomBonuses {
+    const c = new CustomBonuses();
+    for (const [k, v] of [
+      ...Object.entries(c1.data),
+      ...Object.entries(c2.data),
+    ]) {
+      c.append(k, v.value, v.source);
+    }
+    return c;
+  }
+}
+
 export type AttributeEntry = {
   total: number;
   score: Score;
   itemBonus: number;
   level: number;
   proficiency: Proficiency;
+  custom: CustomBonuses;
 };
 
 export type Attributes = {

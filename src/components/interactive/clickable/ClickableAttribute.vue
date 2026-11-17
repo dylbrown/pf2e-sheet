@@ -13,6 +13,13 @@
     }}
     <br />
     {{ Util.signed(attrEntry?.level ?? 0) }} from level
+    <template v-for="[type, entry] of attrEntry.custom.entries" :key="type">
+      <br />
+      <span>{{ Util.signed(entry.value) }} {{ capitalize(type.toLowerCase()) }}
+        {{
+          entry.value > 0 ? 'bonus' : 'penalty'
+        }} ({{ entry.source.join(', ') }})</span>
+    </template>
     <template v-for="[type, bonus] of Object.entries(c.bonuses).filter(
       ([type, bonus]) => bonus > 0 || c.penalties[type as StatModType] < 0,
     )" :key="type">
@@ -36,7 +43,7 @@ import type PCharacter from '@/character/character';
 import { Attribute, Proficiency, Score, Weapon } from '@/character/model';
 import { applyMods, calculateMods, getAttackMods, StatModType } from '@/character/modifiers';
 import * as Util from '@/character/util';
-import { computed } from 'vue';
+import { capitalize, computed } from 'vue';
 import Clickable from './Clickable.vue';
 
 const props = defineProps<{
@@ -90,11 +97,12 @@ const displayedTotal = computed(() => {
   let displayedTotal =
     abilityMod + (attrEntry?.proficiency ?? 0) + (attrEntry?.level ?? 0);
 
-  Object.entries(c.value).forEach(([_s, m]) => {
-    Object.entries(m).forEach(([_ss, n]) => {
+  Object.values(c.value).forEach((m) => {
+    Object.values(m).forEach((n) => {
       displayedTotal += n;
     });
   });
+  attrEntry.custom.entries.forEach(([k, e]) => displayedTotal += e.value);
   return displayedTotal;
 });
 
@@ -106,7 +114,7 @@ const actualTotal = applyMods(
 
 if (actualTotal !== displayedTotal.value) {
   alert(
-    `${isLore ? props.lore : Attribute[props.attribute]} breakdown is incorrect! Your total is ${actualTotal} but they add up to ${displayedTotal}. Let Dylan know!`,
+    `${isLore ? props.lore : Attribute[props.attribute]} breakdown is incorrect! Your total is ${actualTotal} but they add up to ${displayedTotal.value}. Let Dylan know!`,
   );
 }
 

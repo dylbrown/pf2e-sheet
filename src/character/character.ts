@@ -13,6 +13,7 @@ import {
   attacks,
   WeaponSpecialization,
   Companion,
+  CustomBonuses,
 } from './model';
 import {
   Proficiency,
@@ -87,6 +88,7 @@ export class Character {
         itemBonus: 0,
         level: 0,
         proficiency: Proficiency.Untrained,
+        custom: new CustomBonuses(),
       };
     });
     this.conditions = reactive({});
@@ -124,6 +126,12 @@ export class Character {
     this.id = data.id ?? -1;
     this.name = data.character?.name ?? data.name ?? '';
     this.level = data.character?.level ?? 0;
+    const varLevel =
+      data.content?.raw_data_dump?.variables?.LEVEL?.value ?? this.level;
+    if (varLevel > 20 || varLevel < 1) {
+      // Special exception for if people have done weird things with level
+      this.level = varLevel;
+    }
 
     this.context = {
       ceil: Math.ceil,
@@ -208,10 +216,15 @@ export class Character {
     (this.starfinder ? sfSkills : skills).forEach((s) =>
       this.setProficiency(data, s, 'SKILL_'),
     );
-    this.attributes[Attribute.Attacks].itemBonus = parseInt(
-      (data.content?.raw_data_dump?.bonuses?.NON_SPELL_ATTACK_ROLLS_BONUS ??
-        [])[0]?.value ?? '0',
-    );
+    const nonSpellAttackRolls =
+      data.content?.raw_data_dump?.bonuses?.NON_SPELL_ATTACK_ROLLS_BONUS ?? [];
+    for (const entry of nonSpellAttackRolls) {
+      this.attributes[Attribute.Attacks].custom.append(
+        entry.type ?? '',
+        parseInt(entry.value ?? '0'),
+        entry.source ?? '',
+      );
+    }
     Object.entries(weaponsAndArmor).forEach(([k, v]) =>
       this.setProficiency(data, v, k, true),
     );
@@ -261,6 +274,7 @@ export class Character {
               ].value.attribute?.substring('ATTRIBUTE_'.length) ?? '',
             ),
             level: entry.parts.level ?? 0,
+            custom: new CustomBonuses(),
           };
         }
       }
@@ -283,7 +297,11 @@ export class Character {
       const b = new Weapon.WBuilder();
       let attribute = Attribute.UnarmedAttacks;
       for (const [k, v] of Object.entries(weaponsAndArmor)) {
-        if (k.startsWith(entry.item.meta_data.category)) {
+        if (
+          k
+            .toLowerCase()
+            .startsWith(entry.item.meta_data.category.toLowerCase())
+        ) {
           attribute = v;
           break;
         }
@@ -307,6 +325,14 @@ export class Character {
         attribute: attribute,
         group: entry.item.meta_data.group,
       };
+      if (b.partial.striking == 10) {
+        // Weird mythic special case
+        b.partial.potency = 4;
+      }
+      if (b.partial.striking == 10) {
+        // Weird mythic special case
+        b.partial.potency = 4;
+      }
       b.partial.damage = new DamageInstance(
         entry.stats.damage.bonus.total,
         entry.stats.damage.damageType,
@@ -433,6 +459,17 @@ export class Character {
       proficiencies[key].parts?.breakdown?.bonusValue ?? 0;
     this.attributes[attribute].proficiency = (proficiencies[key].parts
       ?.profValue ?? 0) as Proficiency;
+
+    // Track custom operation changes if they're at least the nice kind for now
+    for (const o of data.character?.custom_operations?.filter(
+      (o: any) => o.type == 'addBonusToValue' && o.data?.variable == key,
+    ) ?? []) {
+      this.attributes[attribute].custom.append(
+        o.data.type,
+        parseInt(o.data.value),
+        'Custom',
+      );
+    }
   }
 
   protected loadLegacy(data: any) {
@@ -537,6 +574,7 @@ export default class PCharacter extends Character {
           itemBonus: 0,
           level: 0,
           score: Score.Intelligence,
+          custom: new CustomBonuses(),
         };
       } else {
         this.attributes[
@@ -564,6 +602,7 @@ export default class PCharacter extends Character {
             itemBonus: 0,
             score: Score.Intelligence,
             level: proficiency != Proficiency.Untrained ? this.level : 0,
+            custom: new CustomBonuses(),
           };
         }
         continue;

@@ -6,6 +6,7 @@ import {
   Attribute,
   AttributeEntry,
   attrScore,
+  CustomBonuses,
   DamageInstance,
   MultiDamageInstance,
   notChecksAndDCs,
@@ -433,6 +434,7 @@ export function getAttackMods(
     score = Score.Dexterity;
   }
 
+  const baseAttrEntry = character.attributes[Attribute.Attacks];
   const attrEntry = character.attributes[weapon.attribute];
   const weaponGroup =
     character.combat.weapon_groups[capitalize(weapon.group) + ' Weapons'];
@@ -442,18 +444,14 @@ export function getAttackMods(
     attrEntry.itemBonus,
     weaponGroup?.itemBonus ?? 0,
   );
-  const maxNotMaxItem = Math.max(
-    Math.min(weapon.potency, attrEntry.itemBonus),
-    Math.min(weapon.potency, weaponGroup?.itemBonus ?? 0),
-    Math.min(weaponGroup?.itemBonus ?? 0, attrEntry.itemBonus),
-  );
 
   return {
-    total: weapon.attack - maxNotMaxItem,
+    total: weapon.attack,
     score: score,
     itemBonus: maxItem,
     level: character.level,
     proficiency: Math.max(attrEntry.proficiency, weaponGroup?.proficiency ?? 0),
+    custom: CustomBonuses.combine(baseAttrEntry.custom, attrEntry.custom),
   };
 }
 
@@ -578,24 +576,21 @@ export function applySpellDCMods(
 }
 
 type ModNumberList = { [s in StatModType]: number };
+function makeModNumberList(): ModNumberList {
+  const data: Partial<ModNumberList> = {};
+  for (const s of Object.keys(StatModType)) {
+    data[s as StatModType] = 0;
+  }
+  return data as ModNumberList;
+}
 export function calculateMods(
   character: Character,
   modifiedAttr: Attribute,
   extras: StatMod[] = [],
   score?: Score,
 ): [ModNumberList, ModNumberList] {
-  const bonuses: ModNumberList = {
-    [StatModType.None]: 0,
-    [StatModType.Item]: 0,
-    [StatModType.Status]: 0,
-    [StatModType.Circumstance]: 0,
-  };
-  const penalties: ModNumberList = {
-    [StatModType.None]: 0,
-    [StatModType.Item]: 0,
-    [StatModType.Status]: 0,
-    [StatModType.Circumstance]: 0,
-  };
+  const bonuses: ModNumberList = makeModNumberList();
+  const penalties: ModNumberList = makeModNumberList();
 
   const conditionsList = Object.values(character.conditions);
   const condCount = conditionsList.length;
