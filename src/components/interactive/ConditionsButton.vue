@@ -8,7 +8,8 @@
       </div>
       <q-popup-proxy self="top left" anchor="bottom left" v-model="viewConditions">
         <div class="condition-list">
-          <div class="condition" v-for="[i, effect] of Object.values(conditionEffects).entries()" :key="i">
+          <div class="condition" v-for="[i, effect] of Object.values(conditionEffects).entries().filter(oracleFilter)"
+            :key="i">
             <div class="condition-header">
               <div class="row center-content">
                 <span><q-icon icon :name="effect.icon" /> {{ effect.name }}</span>
@@ -126,4 +127,11 @@ watch(conditions, (val) => {
     conditionEnabled.value[i] = conditions[key as Condition] != null;
   }
 });
+
+const oracleFilter = ([n, c]: [number, ConditionData]): boolean => {
+  if (c.name == 'Cursebound') {
+    return character.abilities.some(a => a.traits.some(t => t.name == 'Cursebound')) || character.abilities.excluded.some(a => a.traits.some(t => t.name == 'Cursebound'));
+  }
+  return true;
+}
 </script>

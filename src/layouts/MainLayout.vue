@@ -58,7 +58,11 @@
     <div id="update-hints">
       <q-card style="overflow-y: auto;" class="bg-info">
         <h6 style="text-align: center; margin: .5em 0 0 0;">Changelog</h6>
-        <q-card-section>
+        <q-card-section style="padding: 8px 16px">
+          <b>18/11/26</b><br />
+          Add Cursebound counter for Oracles
+        </q-card-section>
+        <q-card-section style="padding: 8px 16px">
           <b>16/11/26</b>
           <ul style="margin: .5em 0;">
             <li><b>Dark Mode (WIP)!</b></li>

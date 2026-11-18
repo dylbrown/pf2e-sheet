@@ -293,6 +293,7 @@ export enum Condition {
   Sickened = 'Sickened',
   Stupefied = 'Stupefied',
   Unconscious = 'Unconscious',
+  Cursebound = 'Cursebound',
 }
 
 export const conditionEffects: { [condition in Condition]: ConditionData } = {
@@ -393,6 +394,13 @@ export const conditionEffects: { [condition in Condition]: ConditionData } = {
     ],
     'airline_seat_flat',
     { [Condition.Blinded]: true, [Condition.OffGuard]: true },
+  ),
+  [Condition.Cursebound]: new ConditionData(
+    Condition.Cursebound,
+    [],
+    'ra-bleeding-eye',
+    undefined,
+    true,
   ),
 };
 
